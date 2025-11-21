@@ -21,6 +21,8 @@ lint:
 # Run pre-commit hooks on all files
 [group('qa')]
 check:
+    @echo "Running mypy type checks"
+    @uv run python -m mypy src/
     @echo "Running pre-commit hooks on all files"
     @uv run pre-commit run --all-files
 
@@ -72,10 +74,6 @@ fresh: clean install
     @echo "✅ Fresh setup complete, ready to code 🚀"
 
 # Django specific commands
-# Run Django development server
-[group("django")]
-dj-runserver:
-    uv run python src/manage.py runserver
 
 # Apply database migrations
 [group("django")]
