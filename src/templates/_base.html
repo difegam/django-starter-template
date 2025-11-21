@@ -1,0 +1,78 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <meta name="author" content="difegam" />
+        <title>
+            {% block title %}
+                Django Starter Template
+            {% endblock title %}
+        </title>
+        <!-- Favicon -->
+        <link rel="icon" type="image/png" href="{% static 'images/favicon.png' %}" />
+        <!-- Tailwind CSS and DaisyUI -->
+        <link rel="stylesheet"
+              type="text/css"
+              href="https://cdn.jsdelivr.net/npm/daisyui@5" />
+        <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+        <!-- CSS styles -->
+        <link rel="stylesheet" href="{% static 'css/styles.css' %}" />
+        <!-- HTMX -->
+        <script src="https://cdn.jsdelivr.net/npm/htmx.org@2.0.8/dist/htmx.min.js"></script>
+    </head>
+    <!-- Body -->
+    <body>
+        <!-- Header -->
+        <header role="banner">
+            <nav role="navigation" aria-label="Main navigation">
+                {% block navigation %}
+                    <ul>
+                        <li>
+                            <a href="#">Home</a>
+                        </li>
+                    </ul>
+                {% endblock navigation %}
+            </nav>
+        </header>
+        <!-- Messages -->
+        {% if messages %}
+            <div role="alert" class="messages">
+                {% for message in messages %}
+                    <div class="message {% if message.tags %}{{ message.tags }}{% endif %}">{{ message }}</div>
+                {% endfor %}
+            </div>
+        {% endif %}
+        <!-- Main content -->
+        <main id="main-content" role="main">
+            {% block content %}
+                <!-- Hero section -->
+                <section aria-labelledby="hero-title">
+                    <h1 id="hero-title">Welcome to Your Website</h1>
+                    <p>Your main content goes here.</p>
+                </section>
+                <!-- Article section -->
+                <article>
+                    <h2>Article Title</h2>
+                    <p>Article content goes here.</p>
+                </article>
+                <!-- Aside content -->
+                <aside role="complementary">
+                    <h3>Related Information</h3>
+                    <p>Supplementary content goes here.</p>
+                </aside>
+            {% endblock content %}
+        </main>
+        <!-- Footer -->
+        <footer role="contentinfo">
+            {% block footer %}
+                <p>
+                    © <time datetime="{% now "Y" %}">{% now "Y" %}</time> Your Company. All rights reserved.
+                </p>
+            {% endblock footer %}
+        </footer>
+        <!-- JavaScript -->
+        <script src="{% static 'js/base.js' %}"></script>
+    </body>
+</html>

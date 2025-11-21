@@ -1,0 +1,114 @@
+# Ruff configuration file
+line-length = 120
+indent-width = 4
+target-version = "py313"
+show-fixes = false
+extend-exclude = [
+    ".venv",
+    "logs",
+    "__pycache__",
+    "build",
+    "dist",
+    ".git",
+    ".mypy_cache",
+    ".pytest_cache",
+    ".vscode",
+    "node_modules",
+    "*/migrations/*",
+    "*/templates/*",
+    "*/static/*",
+    "*.html",
+    "*.css",
+    "*.js",
+    "__init__.py",
+    "manage.py",
+]
+force-exclude = true
+
+src = ["unit_bridge", "apps", "tests"]
+
+[format]
+quote-style = "single"
+indent-style = "space"
+docstring-code-format = true
+docstring-code-line-length = "dynamic"
+skip-magic-trailing-comma = false
+line-ending = "auto"
+
+
+[lint]
+preview = true
+pydocstyle.convention = "google"
+
+# Enable rules https://docs.astral.sh/ruff/rules/
+select = [
+    "ANN",  # annotations
+    "ARG",  # Arguments
+    "B",    # bugbear
+    "BLE",  # blind-except
+    "C4",   # comprehensions
+    "DJ",   # Django
+    "DTZ",  # naive datetime
+    "ERA",  # commented-out-code
+    "E",    # style errors
+    "F",    # Pyflakes
+    "G010", # logging-warn
+    "I",    # Isort
+    "INP",  # implicit-namespace-package
+    "ISC",  # string concatenation
+    "LOG",  # logging
+    "N",    # naming
+    "PERF", # performance
+    "PGH",  # pygrep-hooks
+    "PIE",  # miscellaneous
+    "PL",   # pylint
+    "PTH",  # use-pathlib
+    "Q",    # quotes
+    "RET",  # unnecessary-return
+    "RSE",  # raise
+    "RUF",  # Ruff
+    "S",    # security
+    "SIM",  # simplify
+    "T20",  # print statements
+    "TC",   # type-checking
+    "TID",  # tidy imports
+    "UP",   # upgrade
+    "W",    # style warnings
+    "YTT",  # sys.version
+]
+ignore = [
+    "A005",    # allow to shadow stdlib and builtin module names
+    "COM812",  # trailing comma, conflicts with `ruff format`
+    "COM819",  # prohibited trailing comma, conflicts with `ruff format`
+    "ISC001",  # implicit string concat conflicts with `ruff format`
+    "ISC002",  # multi-line implicit string concat, conflicts with `ruff format`
+    "ISC003",  # prefer explicit string concat over implicit concat
+    "Q000",    # bad quotes inline string, conflicts with formatter's quote style
+    "Q001",    # bad quotes multiline string, conflicts with formatter's quote style
+    "Q002",    # bad quotes docstring, conflicts with formatter's quote style
+    "Q003",    # avoidable escaped quote, conflicts with formatter's quote style
+    "W191",    # tab indentation, conflicts with formatter's indent style
+    "E111",    # indentation with invalid multiple, conflicts with formatter
+    "E114",    # indentation with invalid multiple comment, conflicts with formatter
+    "E117",    # over-indented, conflicts with formatter
+    "PLR09",   # we have our own complexity rules
+    "PLR2004", # do not report magic numbers
+    "PLR6301", # do not require classmethod / staticmethod when self not used
+    "ARG001",
+    "ANN002",
+    "ANN003",
+    "DJ001",   # Avoid using `null=True` on string-based fields,
+    "RUF012",  # mutable class attributes (too pedantic for Django models)
+]
+external = ["WPS"]
+fixable = ["ALL"]
+unfixable = ["F401"]
+
+
+[lint.per-file-ignores]
+"__init__.py" = ["D", "E402"]
+"**/{tests,docs,tools}/*" = ["S101", "E402"]
+"src/config/settings/{prod,dev}.py" = ["F405"]
+
+[lint.isort]
+known-third-party = ["django"]

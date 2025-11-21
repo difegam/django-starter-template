@@ -1,0 +1,30 @@
+<div class="navbar bg-base-100 shadow-sm">
+    <div class="flex-1">
+        <a class="btn btn-ghost text-xl">Django Starter Template</a>
+    </div>
+    <div class="flex-none">
+        <ul class="menu menu-horizontal px-5 gap-2">
+            <li>
+                <details>
+                    <summary>allauth</summary>
+                    <ul class="bg-base-100 rounded-t-none px-1 shadow-lg">
+                        <li>
+                            <a href="{% url 'account_login' %}">Sign In</a>
+                        </li>
+                        <li>
+                            <a href="{% url 'account_logout' %}">Sign Out</a>
+                        </li>
+                        <li>
+                            <a href="{% url 'account_signup' %}">Sign Up</a>
+                        </li>
+                        <li>
+                            <a href="https://docs.allauth.org/en/latest/account/views.html"
+                               target="_blank"
+                               rel="noopener noreferrer">allauth Views Docs</a>
+                        </li>
+                    </ul>
+                </details>
+            </li>
+        </ul>
+    </div>
+</div>
