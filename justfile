@@ -1,6 +1,4 @@
 set dotenv-load := true
-alias dj-rs := dj-runserver
-
 # Available recipes
 @_:
     echo "Available recipes:"
