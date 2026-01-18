@@ -237,7 +237,7 @@ def cli() -> argparse.Namespace:
     )
     parser.add_argument(
         '--name',
-        'project_name',
+        dest='project_name',
         nargs='?',
         help='Name of the new project (lowercase, with hyphens or underscores)',
     )
