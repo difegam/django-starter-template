@@ -22,7 +22,33 @@ A modern Django 5.2+ starter template with best practices, using **uv** for depe
 - [uv](https://github.com/astral-sh/uv) - Install with `curl -LsSf https://astral.sh/uv/install.sh | sh`
 - [Just](https://github.com/casey/just) - Install with `brew install just` (macOS)
 
-### Installation
+### Option 1: Initialize a New Project (Recommended)
+
+Use the included initialization script to set up a fresh project:
+
+```bash
+# Interactive mode
+uv run init_project.py
+
+# Non-interactive mode
+uv run init_project.py my-project-name --description "My awesome Django project"
+```
+
+The initialization script will:
+- Remove the existing git repository (unless `--skip-git` is used)
+- Remove the virtual environment and database
+- Create a new README.md with your project name
+- Update pyproject.toml with your project details
+- Prepare the project for a fresh start
+
+After initialization:
+```bash
+rm init_project.py  # Remove the script
+git init            # Initialize new git repo
+just install        # Set up environment
+```
+
+### Option 2: Manual Installation
 
 1. Clone the repository:
 ```bash
@@ -61,7 +87,77 @@ just run
 
 Visit [http://127.0.0.1:8000](http://127.0.0.1:8000) to see your app running!
 
-## 📋 Available Commands
+## � Project Initialization Script
+
+The included `init_project.py` script helps you quickly transform this template into your own project.
+
+### Features
+
+- **Interactive or Non-Interactive**: Run with or without command-line arguments
+- **Clean Slate**: Removes git history, virtual environment, and database
+- **Auto-Configuration**: Updates README.md and pyproject.toml with your project details
+- **Rich UI**: Beautiful terminal interface with progress bars and colored output
+
+### Usage
+
+**Interactive Mode** (recommended for first-time users):
+```bash
+uv run init_project.py
+```
+
+You'll be prompted to enter:
+- Project name (lowercase, with hyphens or underscores)
+- Optional custom description
+
+**Non-Interactive Mode**:
+```bash
+# Basic usage
+uv run init_project.py my-awesome-project
+
+# With description
+uv run init_project.py my-awesome-project --description "A revolutionary Django app"
+
+# Skip git repository removal
+uv run init_project.py my-awesome-project --skip-git
+```
+
+### Command-Line Options
+
+- `project_name` - Name of your new project (positional argument)
+- `--description, -d` - Custom project description
+- `--skip-git` - Skip removing the git repository
+
+### What It Does
+
+1. **Removes existing git repository** - Clean slate for your version control
+2. **Removes virtual environment** - Fresh Python environment
+3. **Removes database file** - No leftover demo data
+4. **Creates new README.md** - Customized with your project name and description
+5. **Updates pyproject.toml** - Sets your project name and metadata
+
+### After Initialization
+
+Once the script completes, follow these steps:
+
+```bash
+# 1. Remove the initialization script (you won't need it anymore)
+rm init_project.py
+
+# 2. Initialize a new git repository
+git init
+
+# 3. Set up the environment
+just install
+
+# 4. Create your .env file (see Configuration section)
+
+# 5. Run migrations
+just dj-migrate
+
+# 6. Start coding! 🎉
+```
+
+## �📋 Available Commands
 
 ### Django Commands
 
