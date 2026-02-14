@@ -1,64 +1,58 @@
 set dotenv-load := true
-# Available recipes
-@_:
-    echo "Available recipes:"
-    just --list
 
-# Run the application locally
+# List available recipes
+[private]
+default:
+    @just --list
+
+[doc("Run the application locally")]
 [group("django")]
-run:
+serve:
     @echo "🚀 Starting the Django development server..."
     uv run python src/manage.py runserver
 
-# Run linter and formatter
+[doc('Run linter and formatter')]
 [group("qa")]
 lint:
     uv run ruff check --fix
     uv run ruff format
 
-# Run pre-commit hooks on all files
+[doc('Run type checks with ty')]
 [group('qa')]
-check:
-    @echo "Running mypy type checks"
-    @uv run python -m mypy src/
-    @echo "Running pre-commit hooks on all files"
+ty:
+    @echo 'Running ty type checks'
+    @uv run ty check
+
+[doc('Run type checks and pre-commit hooks')]
+[group('qa')]
+check: lint ty
+    @echo 'Running pre-commit hooks on all files'
     @uv run pre-commit run --all-files
 
-# Run Tests
+[doc('Run tests with pytest')]
 [group('qa')]
 test:
     echo "🧪 Testing app...! "
     @uv run pytest -vv --tb=short -s tests/
 
-# Create a requirements.txt from pyproject.toml
+[doc('Create a requirements.txt from pyproject.toml')]
 [group('development')]
-export-requirements:
+export-reqs:
     @echo "Exporting requirements"
-    uv pip compile pyproject.toml -o requirements.txt
+    @uv pip compile pyproject.toml -o requirements.txt
 
-# Build docker images
-[group('docker')]
-build *ARGS:
-    @echo "Building docker images"
-
-# 🐳 “Dive” is a tool that helps you explore a Docker image, examine its layers, and find ways to reduce its size.
-[group('docker')]
-dive *ARGS:
-    @echo "Exploring docker image"
-    @docker run -ti --rm  -v /var/run/docker.sock:/var/run/docker.sock wagoodman/dive {{ARGS}}
-
-# Ensure project virtualenv is up to date
-[group("development")]
-install:
-    @echo "📦 Installing the application for development"
-    uv sync --all-groups
-    uv run pre-commit install
-    @echo "\n✅ Setup complete, ready to code 🚀"
+[doc('Install project dependencies and setup pre-commit hooks')]
+[group('development')]
+init:
+    @echo '📦 Installing the application for development'
+    @uv sync --all-groups
+    @uv run pre-commit install
+    @echo '✅ Setup complete, ready to code 🚀'
 
 # Update dependencies
 [group("development")]
 update:
-    uv sync --all-groups
+    @uv sync --all-groups
 
 # Remove temporary files
 [group("development")]
@@ -68,45 +62,46 @@ clean:
 
 # Recreate project virtualenv from nothing
 [group("development")]
-fresh: clean install
+fresh: clean init
     @echo "✅ Fresh setup complete, ready to code 🚀"
 
 # Django specific commands
 
-# Apply database migrations
+[doc("Apply database migrations")]
 [group("django")]
-dj-migrate: _makemigrations
-    uv run python src/manage.py migrate
+migrate: makemigrations
+    @uv run python src/manage.py migrate
 
-# Create database migrations
-_makemigrations:
-    uv run python src/manage.py makemigrations
+[doc("Create new Django migrations based on model changes")]
+[private]
+makemigrations:
+    @uv run python src/manage.py makemigrations
 
+[doc("Create a Django superuser")]
 [group("django")]
-[doc("Run Django migrations")]
-dj-superuser:
-    uv run python src/manage.py createsuperuser
+add-superuser:
+    @uv run python src/manage.py createsuperuser
 
-[group("django")]
 [doc("Start Django shell")]
-dj-shell:
-    uv run python src/manage.py shell
-
 [group("django")]
+shell:
+    @uv run python src/manage.py shell
+
 [doc("Run Django deploy check")]
-dj-check:
-    uv run python src/manage.py check --deploy
-
-# Collect static files
 [group("django")]
-dj-collectstatic:
-    uv run python src/manage.py collectstatic --noinput
+deploy-check:
+    @uv run python src/manage.py check --deploy
 
-# New app creation
+[doc("Collect static files")]
+[group("django")]
+collectstatic:
+    @uv run python src/manage.py collectstatic --noinput
+
+[doc("Create a new Django app with the given NAME")]
 [group("django")]
 [working-directory("src")]
-@new-app NAME:
+new NAME:
     # Use module invocation to avoid missing django-admin script issues
-    uv run python -m django startapp {{NAME}}
-    mkdir -p {{NAME}}/templates/{{NAME}} {{NAME}}/static/{{NAME}}
-    echo "Remember to add {{BLUE}}'{{NAME}}'{{NORMAL}} to CUSTOM_APPS in {{BLUE}}src/config/settings.py{{NORMAL}}"
+    @uv run python -m django startapp {{ NAME }}
+    mkdir -p {{ NAME }}/templates/{{ NAME }} {{ NAME }}/static/{{ NAME }}
+    echo "Remember to add {{ BLUE }}'{{ NAME }}'{{ NORMAL }} to CUSTOM_APPS in {{ BLUE }}src/config/settings.py{{ NORMAL }}"
