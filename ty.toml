@@ -1,0 +1,102 @@
+# ty Configuration (Django)
+# Docs: https://docs.astral.sh/ty/reference/configuration/
+
+[environment]
+# Set this to the Python version you actually run in prod/CI.
+# (ty can also infer it from pyproject.toml / your environment, but being explicit is fine.)
+python-version = "3.12" # e.g. 3.12+ for Django 6.0
+
+# Virtual environment path (relative to repo root)
+python = ".venv"
+
+# Include the repo root for manage.py + add ./src if you use a src layout.
+# If you do NOT use src/, remove "./src".
+root = [".", "./src"]
+
+[rules]
+# Unresolved references and imports
+unresolved-reference = "error"
+unresolved-import = "error"
+unresolved-attribute = "error"
+
+# Type assignment and declarations
+invalid-assignment = "error"
+invalid-declaration = "error"
+invalid-argument-type = "error"
+invalid-return-type = "error"
+
+# Function and parameter type checking
+invalid-parameter-default = "error"
+missing-argument = "error"
+unknown-argument = "error"
+too-many-positional-arguments = "error"
+
+# Warning-level rules for code quality
+unused-ignore-comment = "warn"
+redundant-cast = "warn"
+
+# Ignore rules that may be too strict initially
+possibly-unresolved-reference = "ignore"
+
+# Runtime error detection
+division-by-zero = "error"
+index-out-of-bounds = "error"
+
+[src]
+# What to type-check (Django + tests)
+include = ["manage.py", "src", "tests"]
+
+exclude = [
+    # Tooling / caches (ty already excludes many of these by default, but keeping explicit is fine)
+    "**/.git/",
+    "**/.venv/",
+    "**/__pycache__/",
+    "**/.ruff_cache/",
+    "**/.mypy_cache/",
+    "**/dist/",
+    "**/build/",
+    "**/*.pyc",
+    "**/*.pyo",
+
+    # Django-generated / usually-not-worth-checking
+    "**/migrations/**",
+
+    # Common Django non-Python directories (speed/noise reduction)
+    "**/templates/**",
+    "**/static/**",
+    "**/staticfiles/**",
+    "**/media/**",
+    "**/locale/**",
+]
+
+respect-ignore-files = true
+
+[terminal]
+output-format = "full"
+error-on-warning = false
+
+# --- Overrides ---
+
+# Tests tend to be more dynamic: relax a bit.
+[[overrides]]
+include = ["tests/**", "**/test_*.py", "**/conftest.py"]
+
+[overrides.rules]
+possibly-unresolved-reference = "warn"
+unresolved-attribute = "warn"
+unresolved-import = "warn"
+
+# Settings often contain optional imports depending on environment (S3 storage, sentry, etc.)
+# Keep visibility (warn), but don't fail the whole run.
+[[overrides]]
+include = ["**/settings.py", "**/settings/**/*.py", "**/local_settings.py"]
+
+[overrides.rules]
+unresolved-import = "warn"
+
+# __init__.py files often re-export conditionally
+[[overrides]]
+include = ["**/__init__.py"]
+
+[overrides.rules]
+unresolved-import = "warn"

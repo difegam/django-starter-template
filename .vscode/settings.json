@@ -1,0 +1,20 @@
+{
+  // Disable Python extension's language server - ty provides LSP + diagnostics
+  "python.languageServer": "None",
+
+  // ty diagnostics for the whole workspace (not only open files)
+  "ty.diagnosticMode": "workspace",
+
+  // Use ty from the configured interpreter environment
+  "ty.importStrategy": "fromEnvironment",
+
+  // Point to the project's virtual environment interpreter
+  "ty.interpreter": ["${workspaceFolder}/.venv/bin/python"],
+
+  // Enable auto-import suggestions in completions
+  "ty.completions.autoImport": true,
+
+  // Inlay hints configuration (optional - adjust as preferred)
+  "ty.inlayHints.variableTypes": true,
+  "ty.inlayHints.callArgumentNames": true
+}
