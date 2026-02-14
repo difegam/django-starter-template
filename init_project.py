@@ -15,7 +15,8 @@ This script:
 - Prepares the project for a fresh start
 
 Usage:
-    uv run init_project.py <project-name>
+    uv run init_project.py [project-name]
+    uv run init_project.py --name <project-name>
 """
 
 import argparse
@@ -100,7 +101,7 @@ def create_readme(base_dir: Path, project_name: str, description: str | None = N
 - **django-allauth** - Email-based authentication with social account support
 - **uv** - Fast, modern Python package manager
 - **Just** - Command runner for development tasks
-- **Type Safety** - Full mypy strict mode with django-stubs
+- **Type Safety** - `ty` checks plus strict mypy configuration with django-stubs
 - **Code Quality** - Ruff for linting/formatting, pre-commit hooks
 - **Testing** - pytest with pytest-django and coverage reporting
 - **Environment Configuration** - django-environ for 12-factor app compliance
@@ -117,7 +118,7 @@ def create_readme(base_dir: Path, project_name: str, description: str | None = N
 
 1. Set up the environment:
 ```bash
-just install
+just init
 ```
 
 2. Create a `.env` file in the project root:
@@ -131,30 +132,32 @@ DATABASE_URL=sqlite:///src/db.sqlite3
 
 3. Run migrations:
 ```bash
-just dj-migrate
+just migrate
 ```
 
 4. Create a superuser:
 ```bash
-uv run python src/manage.py createsuperuser
+just add-superuser
 ```
 
 5. Run the development server:
 ```bash
-just run
+just serve
 ```
 
 ## Available Commands
 
 Run `just` to see all available commands:
 
-- `just install` - Set up environment (uv sync + pre-commit install)
-- `just run` - Start Django dev server
+- `just init` - Set up environment (uv sync + pre-commit install)
+- `just serve` - Start Django dev server
 - `just test` - Run pytest suite
 - `just lint` - Run ruff linting and formatting
-- `just check` - Run all pre-commit hooks
-- `just dj-migrate` - Run migrations
-- `just new-app NAME` - Create new Django app
+- `just ty` - Run type checks with ty
+- `just check` - Run lint, type checks, and pre-commit hooks
+- `just migrate` - Run migrations
+- `just add-superuser` - Create a superuser
+- `just new NAME` - Create a new Django app
 
 ## Project Structure
 
@@ -162,6 +165,7 @@ Run `just` to see all available commands:
 src/
 ├── config/          # Django settings and configuration
 ├── users/           # Custom user model
+├── web/             # Main web app
 ├── templates/       # Project-wide templates
 └── static/          # Project-wide static files
 ```
@@ -171,7 +175,7 @@ src/
 This project follows strict code quality standards:
 
 - **Python Style**: Single quotes, 120 char line length (enforced by ruff)
-- **Type Checking**: Strict mypy with django-stubs
+- **Type Checking**: `ty` checks plus strict mypy config with django-stubs
 - **Pre-commit Hooks**: Automatic code quality checks on commit
 
 ## License
@@ -233,7 +237,7 @@ def cli() -> argparse.Namespace:
     """Parse command-line arguments."""
     parser = argparse.ArgumentParser(
         description='Initialize a new Django project from this starter template',
-        epilog='If no project name is provided, the script will run in interactive mode.',
+        epilog='Provide a project name as a positional argument or with --name. If omitted, interactive mode is used.',
     )
     parser.add_argument(
         '--name',
@@ -256,14 +260,16 @@ def main() -> None:
     args = cli()
 
     # Interactive mode if no project name provided
+    provided_name: str = args.project_name
+
     if args.project_name:
         # Validate before lowercasing for better error messages
-        if not validate_project_name(args.project_name.lower()):
+        if not validate_project_name(provided_name.lower()):
             console.print(
                 '[red]✗[/red] Invalid project name. Use only lowercase letters, numbers, hyphens, and underscores.'
             )
             sys.exit(1)
-        project_name = args.project_name.lower()
+        project_name = provided_name.lower()
         description = args.description
     else:
         console.print(
@@ -363,10 +369,10 @@ def main() -> None:
     next_steps.append('\n2. Initialize a new git repository: ', style='bold')
     next_steps.append('git init', style='cyan')
     next_steps.append('\n3. Set up the environment: ', style='bold')
-    next_steps.append('just install', style='cyan')
+    next_steps.append('just init', style='cyan')
     next_steps.append('\n4. Create a .env file with your configuration', style='bold')
     next_steps.append('\n5. Run migrations: ', style='bold')
-    next_steps.append('just dj-migrate', style='cyan')
+    next_steps.append('just migrate', style='cyan')
     next_steps.append('\n6. Start coding! 🎉\n', style='bold green')
 
     console.print(Panel(next_steps, title='[bold]Next Steps', border_style='yellow'))

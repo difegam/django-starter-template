@@ -9,7 +9,7 @@ A modern Django 5.2+ starter template with best practices, using **uv** for depe
 - **django-allauth** - Email-based authentication with social account support
 - **uv** - Fast, modern Python package manager
 - **Just** - Command runner for development tasks
-- **Type Safety** - Full mypy strict mode with django-stubs
+- **Type Safety** - `ty` checks plus strict mypy configuration with django-stubs
 - **Code Quality** - Ruff for linting/formatting, pre-commit hooks
 - **Testing** - pytest with pytest-django and coverage reporting
 - **Environment Configuration** - django-environ for 12-factor app compliance
@@ -45,7 +45,7 @@ After initialization:
 ```bash
 rm init_project.py  # Remove the script
 git init            # Initialize new git repo
-just install        # Set up environment
+just init           # Set up environment
 ```
 
 ### Option 2: Manual Installation
@@ -58,7 +58,7 @@ cd django-starter-template
 
 2. Set up the environment:
 ```bash
-just install
+just init
 ```
 
 3. Create a `.env` file in the project root:
@@ -72,22 +72,22 @@ DATABASE_URL=sqlite:///src/db.sqlite3
 
 4. Run migrations:
 ```bash
-just dj-migrate
+just migrate
 ```
 
 5. Create a superuser:
 ```bash
-just dj-superuser
+just add-superuser
 ```
 
 6. Start the development server:
 ```bash
-just run
+just serve
 ```
 
 Visit [http://127.0.0.1:8000](http://127.0.0.1:8000) to see your app running!
 
-## � Project Initialization Script
+## 🛠️ Project Initialization Script
 
 The included `init_project.py` script helps you quickly transform this template into your own project.
 
@@ -147,46 +147,47 @@ rm init_project.py
 git init
 
 # 3. Set up the environment
-just install
+just init
 
 # 4. Create your .env file (see Configuration section)
 
 # 5. Run migrations
-just dj-migrate
+just migrate
 
 # 6. Start coding! 🎉
 ```
 
-## �📋 Available Commands
+## 📋 Available Commands
 
 ### Django Commands
 
 | Command | Description |
 |---------|-------------|
-| `just run` | Start Django development server |
-| `just dj-migrate` | Run migrations (automatically runs makemigrations first) |
-| `just dj-superuser` | Create a superuser |
-| `just dj-shell` | Start Django shell |
-| `just dj-check` | Run Django deployment checks |
-| `just dj-collectstatic` | Collect static files |
-| `just new-app NAME` | Create a new Django app with proper structure |
+| `just serve` | Start Django development server |
+| `just migrate` | Run migrations (automatically runs makemigrations first) |
+| `just add-superuser` | Create a superuser |
+| `just shell` | Start Django shell |
+| `just deploy-check` | Run Django deployment checks |
+| `just collectstatic` | Collect static files |
+| `just new NAME` | Create a new Django app with proper structure |
 
 ### Development Commands
 
 | Command | Description |
 |---------|-------------|
-| `just install` | Set up environment (uv sync + pre-commit install) |
+| `just init` | Set up environment (uv sync + pre-commit install) |
 | `just update` | Update all dependencies |
 | `just clean` | Remove temporary files and caches |
 | `just fresh` | Clean and reinstall everything |
-| `just export-requirements` | Generate requirements.txt from pyproject.toml |
+| `just export-reqs` | Generate `requirements.txt` from `pyproject.toml` |
 
 ### Quality Assurance Commands
 
 | Command | Description |
 |---------|-------------|
 | `just lint` | Run ruff linting and formatting |
-| `just check` | Run mypy and all pre-commit hooks |
+| `just ty` | Run type checks with `ty` |
+| `just check` | Run lint, type checks, and all pre-commit hooks |
 | `just test` | Run pytest test suite |
 
 
@@ -248,7 +249,7 @@ Uses **Ruff** for fast Python linting and formatting:
 
 ### Type Checking
 
-Uses **mypy** in strict mode with django-stubs:
+Uses **ty** for routine checks (`just ty`) and maintains strict **mypy** configuration with django-stubs:
 
 - All functions require type hints
 - `disallow_untyped_defs=True`
@@ -297,7 +298,7 @@ Tests are located in the top-level `tests/` directory.
 Use the built-in command to create properly structured apps:
 
 ```bash
-just new-app blog
+just new blog
 ```
 
 This creates:
@@ -331,15 +332,6 @@ LOCAL_APPS = [
 - **ruff** - Fast linter and formatter
 - **pre-commit** - Git hook management
 - **django-debug-toolbar** - Debug panel for development
-
-## 🐳 Docker Support
-
-Docker commands are available in the justfile:
-
-```bash
-just build          # Build Docker images
-just dive IMAGE     # Explore Docker image layers
-```
 
 ## 🤝 Contributing
 
