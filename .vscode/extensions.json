@@ -1,0 +1,33 @@
+{
+  "recommendations": [
+    "ms-python.python",
+    "astral-sh.ty",
+    "adrianwilczynski.alpine-js-intellisense",
+    "anteprimorac.html-end-tag-labels",
+    "astral-sh.ty",
+    "batisteo.vscode-django",
+    "bradlc.vscode-tailwindcss",
+    "charliermarsh.ruff",
+    "christian-kohler.path-intellisense",
+    "craigrbroughton.htmx-attributes",
+    "dbaeumer.vscode-eslint",
+    "ecmel.vscode-html-css",
+    "esbenp.prettier-vscode",
+    "formulahendry.auto-rename-tag",
+    "htmlhint.vscode-htmlhint",
+    "mikestead.dotenv",
+    "monosans.djlint",
+    "nefrob.vscode-just-syntax",
+    "njqdev.vscode-python-typehint",
+    "nwgh.bandit",
+    "otovo-oss.htmx-tags",
+    "rohaquinlop.complexipy",
+    "samuelcolvin.jinjahtml",
+    "sidthesloth.html5-boilerplate",
+    "streetsidesoftware.code-spell-checker",
+    "tamasfe.even-better-toml",
+    "tekumara.typos-vscode",
+    "vincaslt.highlight-matching-tag",
+    "yzhang.markdown-all-in-one"
+  ]
+}
