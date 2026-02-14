@@ -310,7 +310,7 @@ This creates:
 ```python
 LOCAL_APPS = [
     'users',
-    'demo',
+    'web',
     'blog',  # Add your new app here
 ]
 ```
