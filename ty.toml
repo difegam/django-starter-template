@@ -72,6 +72,7 @@ exclude = [
 respect-ignore-files = true
 
 [terminal]
+# Output configuration
 output-format = "full"
 error-on-warning = false
 
