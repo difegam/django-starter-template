@@ -3,19 +3,21 @@
 
 A modern Django 5.2+ Vibe Coding Starter starter template with best practices, using **uv** for dependency management and **just** for task automation. Includes a custom user model, django-allauth for authentication, and a rich set of development tools for linting, type checking, testing, and more. Get up and running with a new Django project in seconds!
 
-Frontend assets are managed with Tailwind CSS and DaisyUI, with a simple npm setup for building and watching CSS changes. The project structure is organized for scalability and maintainability, with clear separation of concerns between configuration, apps, components, and utilities.
+Frontend assets are managed with **Tailwind CSS v4** and **daisyUI 5**, with a simple npm setup for building and watching CSS changes. The project structure is organized for scalability and maintainability, with clear separation of concerns between configuration, apps, components, and utilities.
 
-Using Django Templates partials and django-cotton for component-based rendering, you can build dynamic, reusable UI components with ease.
+Using **HTMX** for dynamic partial page updates and **Alpine.js** for lightweight interactivity, combined with Django Templates partials and django-cotton for component-based rendering, you can build dynamic, reusable UI components with ease.
 
 ##  Features
 
 - **Django 5.2+** - Latest Django features and security updates
 - **Custom User Model** - Pre-configured `CustomUser` extending `AbstractUser`
 - **django-allauth** - Email-based authentication with social account support
+- **HTMX + Alpine.js** - Dynamic, hypermedia-driven user interfaces
+- **Tailwind CSS v4 + daisyUI 5** - Modern, utility-first CSS framework with semantic components
 - **uv** - Fast, modern Python package manager
-- **Just** - Command runner for development tasks
-- **Type Safety** - `ty`
-- **Code Quality** - Ruff for linting/formatting, pre-commit hooks
+- **Just** - Command runner for development tasks (Python and frontend)
+- **Type Safety** - `ty` for Python type checking
+- **Code Quality** - Ruff for linting/formatting, pre-commit hooks, ESLint for JavaScript
 - **Testing** - pytest with pytest-django and coverage reporting
 - **Environment Configuration** - django-environ for 12-factor app compliance
 
@@ -24,6 +26,7 @@ Using Django Templates partials and django-cotton for component-based rendering,
 ### Prerequisites
 
 - Python 3.13+
+- Node.js 20+ and npm 10+ (for frontend tooling)
 - [uv](https://github.com/astral-sh/uv) - Install with `curl -LsSf https://astral.sh/uv/install.sh | sh`
 - [Just](https://github.com/casey/just) - Install with `brew install just` (macOS)
 
@@ -180,11 +183,22 @@ just migrate
 
 | Command | Description |
 |---------|-------------|
-| `just init` | Set up environment (uv sync + pre-commit install) |
+| `just init` | Set up environment (uv sync + npm install + pre-commit install) |
 | `just update` | Update all dependencies |
 | `just clean` | Remove temporary files and caches |
 | `just fresh` | Clean and reinstall everything |
 | `just export-reqs` | Generate `requirements.txt` from `pyproject.toml` |
+
+### Frontend CSS Commands
+
+| Command | Description |
+|---------|----------|
+| `npm run css:dev` | Watch and compile Tailwind CSS (includes daisyUI) |
+| `npm run css:build` | Production build of Tailwind CSS (minified) |
+| `npm run lint` | Lint JavaScript files |
+| `npm run lint:fix` | Auto-fix JavaScript linting issues |
+| `npm run format` | Format all code with Prettier |
+| `npm run format:check` | Check code formatting without modifying |
 
 ### Quality Assurance Commands
 
@@ -341,13 +355,15 @@ LOCAL_APPS = [
 
 ## 📦 Dependencies
 
-### Core Dependencies
+### Python - Core Dependencies
 
 - **Django 5.2+** - Web framework
 - **django-allauth** - Authentication with social accounts
 - **django-environ** - Environment variable management
+- **django-cotton** - Component-based template rendering
+- **django-htmx** - HTMX support utilities
 
-### Development Dependencies
+### Python - Development Dependencies
 
 - **pytest** & **pytest-django** - Testing framework
 - **pytest-cov** - Coverage reporting
@@ -355,6 +371,18 @@ LOCAL_APPS = [
 - **ruff** - Fast linter and formatter
 - **pre-commit** - Git hook management
 - **django-debug-toolbar** - Debug panel for development
+
+### Frontend - Runtime Dependencies
+
+- **HTMX** (`htmx.org`) - High power interactions for HTML
+- **Alpine.js** (`alpinejs`) - Lightweight JavaScript framework for interactivity
+
+### Frontend - Development Dependencies
+
+- **Tailwind CSS v4** - Utility-first CSS framework
+- **daisyUI v5** - Pre-built Tailwind CSS component library
+- **ESLint** - JavaScript linting
+- **Prettier** - Code formatter with Tailwind CSS plugin for class sorting
 
 ## 🤝 Contributing
 
