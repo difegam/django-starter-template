@@ -1,4 +1,4 @@
-{% load static %}
+{% load django_htmx static %}
 <!DOCTYPE html>
 <html lang="en">
     <head>
@@ -12,6 +12,8 @@
         </title>
         <!-- Favicon -->
         <link rel="icon" type="image/png" href="{% static 'img/favicon.png' %}" />
+        <!-- HTMX -->
+        {% htmx_script %}
         <!-- Tailwind CSS and DaisyUI -->
         <link rel="stylesheet"
               type="text/css"
@@ -19,11 +21,9 @@
         <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
         <!-- CSS styles -->
         <link rel="stylesheet" href="{% static 'css/styles.css' %}" />
-        <!-- HTMX -->
-        <script src="https://cdn.jsdelivr.net/npm/htmx.org@2.0.8/dist/htmx.min.js"></script>
     </head>
     <!-- Body -->
-    <body>
+    <body hx-headers='{"x-csrftoken": "{{ csrf_token }}"}'>
         <!-- Header -->
         <header role="banner">
             <nav role="navigation" aria-label="Main navigation">

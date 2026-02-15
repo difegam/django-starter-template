@@ -1,6 +1,11 @@
-# Django Starter Template
+# Django Vibe Coding Starter
 
-A modern Django 5.2+ starter template with best practices, using **uv** for dependency management and **just** for task automation.
+
+A modern Django 5.2+ Vibe Coding Starter starter template with best practices, using **uv** for dependency management and **just** for task automation. Includes a custom user model, django-allauth for authentication, and a rich set of development tools for linting, type checking, testing, and more. Get up and running with a new Django project in seconds!
+
+Frontend assets are managed with Tailwind CSS and DaisyUI, with a simple npm setup for building and watching CSS changes. The project structure is organized for scalability and maintainability, with clear separation of concerns between configuration, apps, components, and utilities.
+
+Using Django Templates partials and django-cotton for component-based rendering, you can build dynamic, reusable UI components with ease.
 
 ##  Features
 
