@@ -366,7 +366,7 @@ dev = [
 
 [package.metadata]
 requires-dist = [
-    { name = "django", specifier = ">=5.2.7" },
+    { name = "django", specifier = ">=6.0.0" },
     { name = "django-allauth", extras = ["socialaccount"], specifier = ">=65.13.1" },
     { name = "django-cotton", specifier = ">=2.6.1" },
     { name = "django-environ", specifier = ">=0.12.0" },
