@@ -1,0 +1,22 @@
+@import 'tailwindcss';
+
+/* Tailwind v4 source scanning for Django templates and static JS. */
+@source '../../templates/**/*.html';
+@source '../../**/templates/**/*.html';
+@source '../../static/**/*.js';
+@source '../../**/static/**/*.js';
+
+@plugin 'daisyui' {
+  themes: light --default, dark --prefersdark;
+  logs: false;
+}
+
+@theme {
+  --font-sans: Inter, ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji',
+    'Segoe UI Emoji';
+}
+
+/* Prevent flash of unstyled Alpine.js content */
+[x-cloak] {
+  display: none !important;
+}

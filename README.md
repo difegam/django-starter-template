@@ -14,7 +14,7 @@ Using Django Templates partials and django-cotton for component-based rendering,
 - **django-allauth** - Email-based authentication with social account support
 - **uv** - Fast, modern Python package manager
 - **Just** - Command runner for development tasks
-- **Type Safety** - `ty` checks plus strict mypy configuration with django-stubs
+- **Type Safety** - `ty`
 - **Code Quality** - Ruff for linting/formatting, pre-commit hooks
 - **Testing** - pytest with pytest-django and coverage reporting
 - **Environment Configuration** - django-environ for 12-factor app compliance

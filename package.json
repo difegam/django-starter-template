@@ -8,15 +8,16 @@
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "npx @tailwindcss/cli -i ./static/css/src/input.css -o ./static/css/src/output.css --watch",
-    "build": "npx @tailwindcss/cli -i ./static/css/src/input.css -o ./static/css/src/output.css --minify",
-    "build:dev": "npx @tailwindcss/cli -i ./static/css/src/input.css -o ./static/css/src/output.css",
+    "dev": "tailwindcss -i ./src/static/css/input.css -o ./src/static/css/output.css --watch",
+    "build": "tailwindcss -i ./src/static/css/input.css -o ./src/static/css/output.css --minify",
+    "build:dev": "tailwindcss -i ./src/static/css/input.css -o ./src/static/css/output.css",
     "pretty": "prettier --write ."
   },
   "keywords": [],
   "author": "difegam",
   "license": "ISC",
   "devDependencies": {
+    "@tailwindcss/cli": "^4.0.0",
     "daisyui": "^5.5.14",
     "tailwindcss": "^4.0.0",
     "eslint": "^9.35.0",

@@ -10,7 +10,7 @@ yarn-error.log*
 dist/
 
 # CSS output
-static/css/src/output.css
+src/static/css/output.css
 
 # Python bytecode / extensions
 __pycache__/

@@ -1,18 +1,12 @@
 ---
-name: 'Python Expert Guidelines'
-description: 'Comprehensive guidelines for expert-level Python development, covering modern practices, tools, and patterns for Python 3.12+.'
-applyTo: '**/*.py'
+applyTo: 'src/**/*.py,tests/**/*.py,scripts/**/*.py'
 ---
 
-# Python Expert Guidelines
+# Python Style Rules
 
-## Overview
+Apply these conventions for all Python changes.
 
-This comprehensive guide consolidates expert-level Python development practices, targeting **Python 3.13+** with modern tooling and cutting-edge ecosystem practices from 2024/2025. It combines foundational coding conventions with advanced patterns for building production-ready, high-performance applications.
-
-## Global Development Principles
-
-### Core Directives
+## Core Directives
 
 - Target **Python 3.12+** with compatibility for modern packaging workflows (uv/Poetry)
 - **Standard library first** - only add dependencies when they make code simpler, safer, or faster
@@ -21,13 +15,32 @@ This comprehensive guide consolidates expert-level Python development practices,
 - Use **f-strings**, **`pathlib.Path`**, **`logging`** (never `print`), and **context managers** for resources
 - Prefer **comprehensions** to `map`/`filter`; never use wildcard imports
 
-### Copilot Integration
+## Type safety and signatures
+
+- Add type hints to all new or edited functions.
+- In views, use explicit Django request/response types where practical.
+- Prefer explicit return types for service and utility functions.
+
+## Code style
+
+- Prefer small, focused functions over large multi-purpose blocks.
+- Use guard clauses and early returns for invalid states.
+- Keep error handling explicit and actionable.
+- Do not leave dead code, unused imports, or placeholder branches.
+
+## Comments and documentation
+
+- Avoid comments that restate obvious code.
+- Add short comments only where behavior is non-obvious.
+- Keep function/module docs concise and concrete.
+
+### Agent Integration
 
 **Prompt optimization:** "Write a typed, small function that accepts `Path` inputs, uses only the stdlib (unless clearly justified), raises specific exceptions, and includes a short docstring."
 
 ## Modern Python Features & Language Mastery
 
-### Python 3.13+ Features
+### Python 3.12+ Features
 
 - **Improved error messages** and performance optimizations
 - **Enhanced type system** with better inference and error reporting
@@ -203,14 +216,13 @@ Only add third-party dependencies when they:
 
 - **Package management** with **uv** (fastest Python package manager)
 - **Code formatting and linting** with **ruff** (replacing black, isort, flake8)
-- **Static type checking** with **mypy** and **pyright**
+- **Static type checking** with **ty** and **pyright**
 - **Project configuration** with **pyproject.toml** (modern standard)
 - **Pre-commit hooks** for code quality automation
 
 ### Tool Configuration
 
 - **Ruff** = primary linter & formatter (target Py 3.12, 100-char lines)
-- **Mypy** in **strict mode** with Django plugin support
 - Enable comprehensive rule sets: errors, formatting, imports, modernization, best practices
 - **Virtual environment** management with venv, pipenv, or uv
 - **Dependency management** and lock files

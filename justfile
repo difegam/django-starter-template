@@ -46,6 +46,7 @@ export-reqs:
 init:
     @echo '📦 Installing the application for development'
     @uv sync --all-groups
+    @npm install
     @uv run pre-commit install
     @echo '✅ Setup complete, ready to code 🚀'
 
@@ -105,3 +106,13 @@ new NAME:
     @uv run python -m django startapp {{ NAME }}
     mkdir -p {{ NAME }}/templates/{{ NAME }} {{ NAME }}/static/{{ NAME }}
     echo "Remember to add {{ BLUE }}'{{ NAME }}'{{ NORMAL }} to CUSTOM_APPS in {{ BLUE }}src/config/settings.py{{ NORMAL }}"
+
+[doc("Watch and compile Tailwind CSS for development")]
+[group("frontend")]
+css-dev:
+    npm run dev
+
+[doc("Build and minify Tailwind CSS for production")]
+[group("frontend")]
+css-build:
+    npm run build

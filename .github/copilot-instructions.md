@@ -1,204 +1,70 @@
-# Django Starter Template - AI Coding Agent Guide
+# Copilot Instructions
 
-## Project Architecture
+## Architecture
 
-This is a Django 5.2+ starter template using **uv** for dependency management and **Just** for task automation. The codebase follows a modular structure with the Django project located in `src/`.
+Django 5.2+ project rooted in `src/` with `config/` as the Django settings module (not a typical `project_name/` layout). All Django commands run from `src/` via `uv run python src/manage.py`.
 
-### Key Structure
+- **`src/config/`** — settings, root URLs, ASGI/WSGI. Settings use `django-environ` to read `.env` from project root.
+- **`src/users/`** — custom user model (`CustomUser` extends `AbstractUser`). Always use `get_user_model()` or `settings.AUTH_USER_MODEL`, never `django.contrib.auth.models.User`.
+- **`src/web/`** — example app serving pages. New apps go in `src/` via `just new NAME`.
+- **`src/templates/`** — project-wide templates. Apps own templates at `src/<app>/templates/<app>/`.
+- **`src/templates/cotton/`** — reusable Cotton components used across pages with `<c-*>` syntax.
+- **`src/static/`** — project-wide static files. Apps own static at `src/<app>/static/<app>/`.
+- **`tests/`** — top-level pytest suite with `conftest.py` (`DJANGO_SETTINGS_MODULE = config.settings`).
 
-- `src/config/` - Django settings and URL configuration
-- `src/users/` - Custom user model (extends AbstractUser)
-- `src/web/` - Example app demonstrating the structure
-- `src/templates/` - Project-wide templates with `_base.html` as the base template
-- `src/static/` - Project-wide static files (css/, js/, img/)
-- `tests/` - Top-level test directory (not inside src/)
+## Key Commands
 
-### Custom User Model
-
-This project uses a **custom user model** (`users.CustomUser`) from the start. Always reference `AUTH_USER_MODEL` or import `CustomUser` from `users.models` instead of Django's default User model.
-
-## Critical Workflows
-
-### Project Initialization
-
-If starting a new project from this template, use `uv run init_project.py`:
-
-- Run interactively for prompts, or pass `project_name` as argument
-- Removes git repo, venv, and database for fresh start
-- Creates new README.md and updates pyproject.toml
-- After running, delete the script and run `just init`
-
-### Development Commands (via Just)
-
-**Django Commands:**
-
-- `just serve` - Start Django dev server
-- `just migrate` - Run migrations (auto-runs makemigrations first)
-- `just add-superuser` - Create a superuser
-- `just shell` - Start Django shell
-- `just new NAME` - Create new Django app with proper structure
-- `just deploy-check` - Run Django deployment checks
-- `just collectstatic` - Collect static files
-
-**Quality Assurance:**
-
-- `just lint` - Run ruff linting and formatting
-- `just ty` - Run ty type checker (Astral's mypy alternative)
-- `just check` - Run lint + ty + all pre-commit hooks
-- `just test` - Run pytest suite with verbose output
-
-**Development:**
-
-- `just init` - Set up environment (uv sync + pre-commit install)
-- `just update` - Update all dependencies
-- `just clean` - Remove temp files, caches, venv
-- `just fresh` - Clean + init for fresh setup
-- `just export-reqs` - Generate requirements.txt from pyproject.toml
-
-**Important**: Always use `uv run python src/manage.py <command>` or the `just` recipes. Never run `django-admin` or bare `python` commands.
-
-### Creating New Apps
-
-Use `just new NAME` which:
-
-1. Creates the app in `src/` directory
-2. Sets up `templates/NAME/` and `static/NAME/` directories
-3. Reminds you to add it to `LOCAL_APPS` in `src/config/settings.py`
-
-**Always add new apps to `LOCAL_APPS`** (not `INSTALLED_APPS` directly).
-
-### Environment Configuration
-
-Uses `django-environ` with `.env` file in project root. The `.env` file is read from `BASE_DIR.parent` (one level above `src/`).
-
-Required variables:
-
-- `SECRET_KEY` - Django secret key
-- `DEBUG` - Boolean for debug mode
-- `ALLOWED_HOSTS` - Comma-separated list (defaults to localhost,127.0.0.1)
-- `TIME_ZONE` - Timezone string (defaults to UTC)
-- `DATABASE_URL` - Database connection (defaults to `sqlite:///src/db.sqlite3`)
-
-## Code Quality Standards
-
-### Python Style (Ruff)
-
-- **Single quotes** for strings (enforced by ruff formatter)
-- Line length: 120 characters
-- Target: Python 3.13
-- Migrations, templates, static files, `__init__.py`, and `manage.py` excluded from linting
-- Comprehensive ruleset including Django-specific rules (DJ), security (S), and performance (PERF)
-
-### Type Checking (mypy + ty)
-
-**mypy** (django-stubs integration):
-
-- **Strict mode enabled** with django-stubs plugin
-- All functions require type hints (disallow_untyped_defs=True)
-- mypy_path points to `./src`
-- Migrations and tests excluded from type checking
-
-**ty** (Astral's type checker):
-
-- Python 3.12+ targeted
-- Checks `manage.py`, `src/`, and `tests/`
-- Errors on unresolved imports/references, invalid assignments
-- Warns on unused-ignore-comment and redundant-cast
-- Relaxed rules for tests and settings files
-- Run with `just ty`
-
-### Pre-commit Hooks
-
-Runs automatically on commit (or via `just check`):
-
-- djlint for Django templates (reformatting + linting)
-- ruff for Python linting/formatting
-- pyupgrade (Python 3.13+ syntax)
-- codespell (spelling checker)
-- bandit (security scanning, excludes tests/)
-- detect-secrets (prevents committing secrets)
-- uv-secure (dependency vulnerability scanning)
-- shellcheck (shell script linting)
-- Standard hooks (trailing whitespace, file size, YAML/JSON/TOML validation)
-
-## Project-Specific Conventions
-
-### Authentication
-
-Uses **django-allauth** with email-only authentication:
-
-- `ACCOUNT_LOGIN_METHODS = {'email'}` - No username login
-- `ACCOUNT_UNIQUE_EMAIL = True` - Email must be unique
-- Login redirects to `home` URL name
-- Allauth URLs mounted at `/accounts/`
-- **Password minimum length: 12 characters** (not Django's default 8)
-
-### Type Annotations
-
-All view functions must be annotated:
-
-```python
-from django.http.request import HttpRequest
-from django.http.response import HttpResponse
-
-def my_view(request: HttpRequest) -> HttpResponse:
-    return render(request, 'template.html')
-```
-
-### App Structure Convention
-
-Each Django app follows this structure:
+All dev commands use `just` (task runner) + `uv` (package manager):
 
 ```
-app_name/
-├── templates/app_name/    # App-specific templates
-├── static/app_name/        # App-specific static files
-├── migrations/
-├── models.py
-├── views.py
-├── urls.py
-├── admin.py
-└── tests.py
+just init          # uv sync + npm install + pre-commit install
+just serve         # runserver
+just migrate       # makemigrations + migrate
+just test          # pytest -vv --tb=short -s tests/
+just lint          # ruff check --fix + ruff format
+just ty            # ty type checker
+just check         # lint + ty + pre-commit hooks
+just security      # bandit + detect-secrets + pip-audit
+just css-dev       # Tailwind watch mode
+just css-build     # Tailwind minified production build
+just new NAME      # scaffold new app in src/ with template/static dirs
 ```
 
-### Settings Organization
+## Coding Conventions
 
-Settings are split logically in `src/config/settings.py`:
+- **Python 3.13+**, max line length 120, 4-space indent, single quotes preferred.
+- **Type hints required** on all new functions (params + return types). See `src/web/views.py` for the pattern: `def home(request: HttpRequest) -> HttpResponse`.
+- **URL patterns**: each app defines `app_name` and `urlpatterns`; include in `src/config/urls.py`.
+- **Settings structure**: `INSTALLED_APPS` is split into `DJANGO_APPS`, `THIRD_PARTY_APPS`, `LOCAL_APPS` lists.
+- **Auth**: django-allauth handles authentication (email-based login). Allauth URLs at `/accounts/`. `django.contrib.sites` enabled with `SITE_ID = 1`.
 
-- `DJANGO_APPS` - Django built-in apps
-- `THIRD_PARTY_APPS` - External packages (allauth, etc.)
-- `LOCAL_APPS` - Project apps (config, users, web, etc.)
-- Final `INSTALLED_APPS = [*DJANGO_APPS, *THIRD_PARTY_APPS, *LOCAL_APPS]`
+## Frontend Stack
 
-**Always add new apps to `LOCAL_APPS`**, not directly to `INSTALLED_APPS`.
+Server-rendered Django templates enhanced with HTMX, Alpine.js, Tailwind CSS + daisyUI:
 
-### Environment Variables Pattern
-
-Uses `django-environ` with typed defaults in settings:
-
-```python
-env = environ.Env(
-    DEBUG=(bool, False),
-    TIME_ZONE=(str, 'UTC'),
-)
-env.read_env(BASE_DIR.parent / '.env')
-```
+- Base template: `src/templates/_base.html` — loads HTMX via `{% htmx_script %}`, Alpine.js via CDN, includes daisyUI from CDN, sets CSRF header globally via `hx-headers`.
+- Standard blocks: `title`, `head`, `navigation`, `content`, `footer`, `scripts`.
+- Partials: `src/templates/partials/` (e.g., `navbar.html`). Use `{% include %}` for partials.
+- Cotton components: place in `src/templates/cotton/`, use with `<c-*>` syntax.
+- Use daisyUI component classes (`btn`, `card`, `navbar`, `hero`, etc.) with Tailwind utilities.
+- Alpine.js for local UI state only (dropdowns, modals, toggles). Use `x-cloak` to prevent FOUC.
+- HTMX for partial page updates; return fragment templates for `HX-Request`, full pages otherwise.
 
 ## Testing
 
-Uses pytest with pytest-django:
+- Framework: `pytest` + `pytest-django`. Configuration in `pytest.ini` with `DJANGO_SETTINGS_MODULE = config.settings` and `pythonpath = src`.
+- `conftest.py` at `tests/` root.
+- Test directories: `tests/web/`, `tests/users/`.
+- Test files: `tests/<app>/test_*.py` with `test_` prefixed functions.
+- Run: `just test` or `uv run pytest -vv --tb=short -s tests/`.
 
-- Run via `just test` or `uv run pytest`
-- Tests located in `tests/` directory (top-level, not inside src/)
-- Coverage reporting enabled with pytest-cov
-- Test output: verbose mode with short traceback (`-vv --tb=short -s`)
+## Pre-commit & Quality Gates
 
-## Common Pitfalls
+Pre-commit hooks enforce: Ruff lint/format, `detect-secrets`, `bandit`, `uv-secure`, `codespell`, `shellcheck`. Run `just check` before committing. Run `just security` for dedicated security scans. Ruff config is in `ruff.toml` (excludes migrations, templates, static files).
 
-1. **Don't forget** to add new apps to `LOCAL_APPS` in settings
-2. **Always use** `uv run` prefix for Python commands
-3. **Migrations are auto-generated** by `just migrate` (don't run makemigrations separately)
-4. **Custom user model** is already set - don't import Django's User model
-5. **Single quotes** are enforced - use 'string' not "string"
-6. **Static/template directories** must exist in each app (created by `just new NAME`)
-7. **Environment file location** - `.env` must be in project root, not in `src/`
+## Production Readiness
+
+- WhiteNoise middleware serves static files in production.
+- Gunicorn available as WSGI server (`gunicorn config.wsgi:application --chdir src`).
+- PostgreSQL support via `psycopg` (configure `DATABASE_URL` env var).
+- Run `just css-build` to compile minified CSS before deploy.
