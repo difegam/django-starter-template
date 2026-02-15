@@ -198,6 +198,24 @@ just migrate
 
 ## 🔧 Configuration
 
+### Tailwind Theme Usage
+
+Theme tokens are defined in `src/static/css/input.css` using Tailwind v4 `@theme`. This generates utilities like `bg-primary`, `text-secondary-dark`, and `border-primary-light`.
+
+```html
+<button class="bg-primary text-white hover:bg-primary-dark px-4 py-2 rounded">
+  Primary
+</button>
+
+<div class="bg-primary-lighter text-primary-darker p-4 rounded">
+  Primary tint
+</div>
+
+<a class="text-secondary hover:text-secondary-dark underline">
+  Secondary link
+</a>
+```
+
 ### Environment Variables
 
 The project uses `django-environ` for configuration. Create a `.env` file in the project root:

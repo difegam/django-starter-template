@@ -14,6 +14,18 @@
 @theme {
   --font-sans: Inter, ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji',
     'Segoe UI Emoji';
+
+  --color-primary-lighter: #fde047;
+  --color-primary-light: #facc15;
+  --color-primary: #eab308;
+  --color-primary-dark: #ca8a04;
+  --color-primary-darker: #a16207;
+
+  --color-secondary-lighter: #6ee7b7;
+  --color-secondary-light: #34d399;
+  --color-secondary: #10b981;
+  --color-secondary-dark: #059669;
+  --color-secondary-darker: #047857;
 }
 
 /* Prevent flash of unstyled Alpine.js content */
