@@ -4,7 +4,7 @@
 [environment]
 # Set this to the Python version you actually run in prod/CI.
 # (ty can also infer it from pyproject.toml / your environment, but being explicit is fine.)
-python-version = "3.12" # e.g. 3.12+ for Django 6.0
+python-version = "3.13" # e.g. 3.13+ for Django 6.0
 
 # Virtual environment path (relative to repo root)
 python = ".venv"

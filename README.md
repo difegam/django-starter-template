@@ -1,15 +1,14 @@
 # Django Vibe Coding Starter
 
-
-A modern Django 5.2+ Vibe Coding Starter starter template with best practices, using **uv** for dependency management and **just** for task automation. Includes a custom user model, django-allauth for authentication, and a rich set of development tools for linting, type checking, testing, and more. Get up and running with a new Django project in seconds!
+A modern Django 6.0+ starter template with best practices, using **uv** for dependency management and **just** for task automation. It includes a custom user model, django-allauth for authentication, and a rich set of development tools for linting, type checking, testing, and more. Get up and running with a new Django project in seconds.
 
 Frontend assets are managed with **Tailwind CSS v4** and **daisyUI 5**, with a simple npm setup for building and watching CSS changes. The project structure is organized for scalability and maintainability, with clear separation of concerns between configuration, apps, components, and utilities.
 
 Using **HTMX** for dynamic partial page updates and **Alpine.js** for lightweight interactivity, combined with Django Templates partials and django-cotton for component-based rendering, you can build dynamic, reusable UI components with ease.
 
-##  Features
+## Features
 
-- **Django 5.2+** - Latest Django features and security updates
+- **Django 6.0+** - Latest Django features and security updates
 - **Custom User Model** - Pre-configured `CustomUser` extending `AbstractUser`
 - **django-allauth** - Email-based authentication with social account support
 - **HTMX + Alpine.js** - Dynamic, hypermedia-driven user interfaces
@@ -20,6 +19,14 @@ Using **HTMX** for dynamic partial page updates and **Alpine.js** for lightweigh
 - **Code Quality** - Ruff for linting/formatting, pre-commit hooks, ESLint for JavaScript
 - **Testing** - pytest with pytest-django and coverage reporting
 - **Environment Configuration** - django-environ for 12-factor app compliance
+
+## Project Structure
+
+- `src/config/` - settings, ASGI/WSGI, root URLs
+- `src/users/` - custom user model and auth-related code
+- `src/web/` - example app for site pages
+- `src/templates/` and `src/static/` - shared templates and assets
+- `tests/` - top-level pytest suite (app tests in `tests/web/`, `tests/users/`)
 
 ## 🚀 Quick Start
 
@@ -97,72 +104,30 @@ Visit [http://127.0.0.1:8000](http://127.0.0.1:8000) to see your app running!
 
 ## 🛠️ Project Initialization Script
 
-The included `init_project.py` script helps you quickly transform this template into your own project.
+The included `init_project.py` script transforms this template into your own project.
 
-### Features
-
-- **Interactive or Non-Interactive**: Run with or without command-line arguments
-- **Clean Slate**: Removes git history, virtual environment, and database
-- **Auto-Configuration**: Updates README.md and pyproject.toml with your project details
-- **Rich UI**: Beautiful terminal interface with progress bars and colored output
-
-### Usage
-
-**Interactive Mode** (recommended for first-time users):
+**Usage**
 ```bash
+# Interactive mode
 uv run init_project.py
-```
 
-You'll be prompted to enter:
-- Project name (lowercase, with hyphens or underscores)
-- Optional custom description
-
-**Non-Interactive Mode**:
-```bash
-# Basic usage
-uv run init_project.py my-awesome-project
-
-# With description
-uv run init_project.py my-awesome-project --description "A revolutionary Django app"
+# Non-interactive mode
+uv run init_project.py my-awesome-project --description "A Django app"
 
 # Skip git repository removal
 uv run init_project.py my-awesome-project --skip-git
 ```
 
-### Command-Line Options
+**What it does**
+- Removes git history, virtual environment, and the demo database
+- Updates `README.md` and `pyproject.toml` with your project details
 
-- `project_name` - Name of your new project (positional argument)
-- `--description, -d` - Custom project description
-- `--skip-git` - Skip removing the git repository
-
-### What It Does
-
-1. **Removes existing git repository** - Clean slate for your version control
-2. **Removes virtual environment** - Fresh Python environment
-3. **Removes database file** - No leftover demo data
-4. **Creates new README.md** - Customized with your project name and description
-5. **Updates pyproject.toml** - Sets your project name and metadata
-
-### After Initialization
-
-Once the script completes, follow these steps:
-
+**After initialization**
 ```bash
-# 1. Remove the initialization script (you won't need it anymore)
 rm init_project.py
-
-# 2. Initialize a new git repository
 git init
-
-# 3. Set up the environment
 just init
-
-# 4. Create your .env file (see Configuration section)
-
-# 5. Run migrations
 just migrate
-
-# 6. Start coding! 🎉
 ```
 
 ## 📋 Available Commands
@@ -286,11 +251,7 @@ Uses **Ruff** for fast Python linting and formatting:
 
 ### Type Checking
 
-Uses **ty** for routine checks (`just ty`) and maintains strict **mypy** configuration with django-stubs:
-
-- All functions require type hints
-- `disallow_untyped_defs=True`
-- Django plugin enabled
+Uses **ty** for type checks (`just ty`). Configuration lives in `ty.toml` and includes Django-aware paths and test overrides.
 
 Example:
 ```python
@@ -305,13 +266,15 @@ def my_view(request: HttpRequest) -> HttpResponse:
 
 Automatically run on every commit (or manually with `just check`):
 
-- djlint - Django template linting
+- pre-commit hooks - whitespace, YAML/JSON/TOML checks, and file hygiene
+- djlint - Django template linting + formatting
 - ruff - Python linting/formatting
 - pyupgrade - Python 3.13+ syntax upgrades
 - codespell - Spell checking
 - bandit - Security issue detection
 - detect-secrets - Secret detection
 - uv-secure - Dependency vulnerability scanning
+- shellcheck - Shell script static analysis
 
 ## 🧪 Testing
 
@@ -357,17 +320,20 @@ LOCAL_APPS = [
 
 ### Python - Core Dependencies
 
-- **Django 5.2+** - Web framework
+- **Django 6.0+** - Web framework
 - **django-allauth** - Authentication with social accounts
 - **django-environ** - Environment variable management
 - **django-cotton** - Component-based template rendering
 - **django-htmx** - HTMX support utilities
+- **whitenoise** - Static file serving
+- **gunicorn** - Production WSGI server
 
 ### Python - Development Dependencies
 
 - **pytest** & **pytest-django** - Testing framework
 - **pytest-cov** - Coverage reporting
-- **mypy** & **django-stubs** - Type checking
+- **ty** - Type checking
+- **django-stubs** - Better type hints for Django APIs
 - **ruff** - Fast linter and formatter
 - **pre-commit** - Git hook management
 - **django-debug-toolbar** - Debug panel for development

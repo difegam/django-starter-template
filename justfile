@@ -110,9 +110,9 @@ new NAME:
 [doc("Watch and compile Tailwind CSS for development")]
 [group("frontend")]
 css-dev:
-    npm run dev
+    npm run css:dev
 
 [doc("Build and minify Tailwind CSS for production")]
 [group("frontend")]
 css-build:
-    npm run build
+    npm run css:build
