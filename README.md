@@ -1,10 +1,10 @@
 # Django Vibe Coding Starter
 
-A modern Django 6.0+ starter template with best practices, using **uv** for dependency management and **just** for task automation. It includes a custom user model, django-allauth for authentication, and a rich set of development tools for linting, type checking, testing, and more. Get up and running with a new Django project in seconds.
+A modern Django 6.0+ starter template with best practices, using **uv** for dependency management and **just** for task automation. It includes a custom user model, django-allauth for authentication, and a strong set of development tools for linting, type checking, testing, and more. Get a new Django project running in seconds.
 
-Frontend assets are managed with **Tailwind CSS v4** and **daisyUI 5**, with a simple npm setup for building and watching CSS changes. The project structure is organized for scalability and maintainability, with clear separation of concerns between configuration, apps, components, and utilities.
+Frontend assets use **Tailwind CSS v4** and **daisyUI 5**, with a simple npm setup for building and watching CSS changes. The structure is designed for scalability and maintainability, with clear separation between configuration, apps, components, and utilities.
 
-Using **HTMX** for dynamic partial page updates and **Alpine.js** for lightweight interactivity, combined with Django Templates partials and django-cotton for component-based rendering, you can build dynamic, reusable UI components with ease.
+**HTMX** enables dynamic partial page updates, while **Alpine.js** adds lightweight interactivity. Combined with Django templates, partials, and django-cotton, you can build reusable UI components with ease.
 
 ## Features
 
@@ -22,11 +22,11 @@ Using **HTMX** for dynamic partial page updates and **Alpine.js** for lightweigh
 
 ## Project Structure
 
-- `src/config/` - settings, ASGI/WSGI, root URLs
-- `src/users/` - custom user model and auth-related code
-- `src/web/` - example app for site pages
-- `src/templates/` and `src/static/` - shared templates and assets
-- `tests/` - top-level pytest suite (app tests in `tests/web/`, `tests/users/`)
+- `src/config/` - Settings, ASGI/WSGI, root URLs
+- `src/users/` - Custom user model and auth-related code
+- `src/web/` - Example app for site pages
+- `src/templates/` and `src/static/` - Shared templates and assets
+- `tests/` - Top-level pytest suite (app tests in `tests/web/`, `tests/users/`)
 
 ## 🚀 Quick Start
 
@@ -100,7 +100,7 @@ just add-superuser
 just serve
 ```
 
-Visit [http://127.0.0.1:8000](http://127.0.0.1:8000) to see your app running!
+Visit [http://127.0.0.1:8000](http://127.0.0.1:8000) to see your app running.
 
 ## 🛠️ Project Initialization Script
 
@@ -173,7 +173,6 @@ just migrate
 | `just ty` | Run type checks with `ty` |
 | `just check` | Run lint, type checks, and all pre-commit hooks |
 | `just test` | Run pytest test suite |
-
 
 ## 🔧 Configuration
 
@@ -381,4 +380,4 @@ Built with modern Python tooling:
 
 ---
 
-**Happy coding! 🚀**
+Happy coding!
