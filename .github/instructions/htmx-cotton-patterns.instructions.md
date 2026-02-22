@@ -4,14 +4,18 @@ applyTo: 'src/templates/**/*.html,src/**/templates/**/*.html,src/**/views.py,src
 
 # HTMX + Cotton + Alpine Patterns
 
-Use these rules for server-rendered interactivity with HTMX, django-cotton components, and Alpine.js.
+Use these rules for server-rendered interactivity with HTMX, django-cotton
+components, and Alpine.js.
 
 ## Rendering Strategy
 
 - **Initial loads**: Return full-page templates with complete HTML structure.
-- **HTMX requests**: Return focused partial fragments (use `request.htmx` to detect).
-- **Template organization**: Page shell in `_base.html`, reusable blocks in `partials/`, components in `cotton/`.
-- **Partial definition**: Use Django 6.0 `{% partialdef %}` or `django-template-partials` for fragment rendering.
+- **HTMX requests**: Return focused partial fragments (use `request.htmx` to
+  detect).
+- **Template organization**: Page shell in `_base.html`, reusable blocks in
+  `partials/`, components in `cotton/`.
+- **Partial definition**: Use Django 6.0 `{% partialdef %}` or
+  `django-template-partials` for fragment rendering.
 
 ### View pattern for partial rendering
 
@@ -62,9 +66,11 @@ def item_list(request: HttpRequest) -> HttpResponse:
 ### Core attributes
 
 - **hx-get/hx-post/hx-put/hx-delete**: HTTP method and endpoint
-- **hx-target**: CSS selector for element to update (default: triggering element)
+- **hx-target**: CSS selector for element to update (default: triggering
+  element)
 - **hx-swap**: How to swap content (see swap strategies below)
-- **hx-trigger**: Event that triggers request (default: `click` for buttons, `submit` for forms)
+- **hx-trigger**: Event that triggers request (default: `click` for buttons,
+  `submit` for forms)
 - **hx-indicator**: Element to show during request (gets `htmx-request` class)
 - **hx-vals**: Add JSON data to request
 
@@ -356,7 +362,7 @@ def item_list(request: HttpRequest) -> HttpResponse:
     x-cloak
   >
     <div
-      class="modal-box"
+      class="modal-box animate-modal-enter"
       hx-get="/modal-content"
       hx-trigger="intersect once"
       hx-swap="innerHTML"
@@ -365,6 +371,34 @@ def item_list(request: HttpRequest) -> HttpResponse:
     </div>
   </div>
 </div>
+```
+
+### Native dialog modal with animations
+
+```html
+<!-- Trigger button -->
+<button onclick="example_modal.showModal()" class="btn btn-primary">
+  Open Modal
+</button>
+
+<!-- Modal using native dialog element -->
+<dialog id="example_modal" class="modal">
+  <div class="modal-box animate-modal-enter">
+    <h3 class="text-lg font-bold">Modal Title</h3>
+    <p class="py-4">Modal content loaded via HTMX on open.</p>
+    <div hx-get="/modal-details" hx-trigger="load" hx-swap="innerHTML">
+      <span class="loading loading-spinner"></span>
+    </div>
+    <div class="modal-action">
+      <form method="dialog">
+        <button class="btn">Close</button>
+      </form>
+    </div>
+  </div>
+  <form method="dialog" class="modal-backdrop animate-backdrop-enter">
+    <button>close</button>
+  </form>
+</dialog>
 ```
 
 ## Common Patterns and Anti-Patterns
@@ -413,7 +447,8 @@ def item_list(request: HttpRequest) -> HttpResponse:
 
 - **Keep HTMX endpoints in the owning Django app** (follow URL ownership rules).
 - **Use `request.htmx` in views** to return partials vs full pages.
-- **Leverage django-template-partials** for fragment definitions near full templates.
+- **Leverage django-template-partials** for fragment definitions near full
+  templates.
 - **Apply CSRF globally** via `hx-headers` in base template.
 - **Use explicit swap strategies** (`hx-swap`) for predictable behavior.
 - **Add loading indicators** with `hx-indicator` and CSS transitions.

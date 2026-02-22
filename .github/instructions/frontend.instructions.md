@@ -1,33 +1,50 @@
 ---
-description: 'frontend patterns (Django templates + HTMX + django-cotton + Alpine + Tailwind/daisyUI)'
+description:
+  'frontend patterns (Django templates + HTMX + django-cotton + Alpine +
+  Tailwind/daisyUI)'
 applyTo: 'src/**/templates/**/*.html,src/**/static/**/*,src/templates/**/*.html,src/static/**/*'
 ---
 
 # Frontend Development Guide
 
-Frontend development for this project is **server-rendered first** (Django templates) with **HTMX** for partial updates, **django-cotton** for reusable template components, **Alpine** for lightweight interactivity, and **Tailwind + daisyUI** for a consistent premium UI.
+Frontend development for this project is **server-rendered first** (Django
+templates) with **HTMX** for partial updates, **django-cotton** for reusable
+template components, **Alpine** for lightweight interactivity, and **Tailwind +
+daisyUI** for a consistent premium UI.
 
 ## Technology Stack Overview
 
 - **Django templates**: server-side rendering with `extends` + `{% block %}`
-- **django-cotton**: reusable UI components in `templates/cotton/` with `<c-*>` syntax
-- **HTMX (+ django-htmx)**: progressive enhancement via HTML attributes + HTMX-aware server responses
-- **Alpine.js**: small interactive behaviors (modals, toasts, pickers, micro-interactions)
-- **Tailwind CSS + daisyUI**: utility-first + component classes; use custom themes `project` / `project-dark`
+- **django-cotton**: reusable UI components in `templates/cotton/` with `<c-*>`
+  syntax
+- **HTMX (+ django-htmx)**: progressive enhancement via HTML attributes +
+  HTMX-aware server responses
+- **Alpine.js**: small interactive behaviors (modals, toasts, pickers,
+  micro-interactions)
+- **Tailwind CSS + daisyUI**: utility-first + component classes; use custom
+  themes `project` / `project-dark`
 
 ## General Frontend Principles
 
-- **Progressive enhancement**: pages must work as normal HTML; HTMX/Alpine only enhance.
-- **Mobile-first**: default layouts and touch targets for phones; enhance for desktop/TV.
-- **Consistency**: use the shared component library (Cotton/components/partials) instead of one-off markup.
-- **Accessibility**: minimum WCAG AA contrast, keyboard support, and clear focus states.
+- **Progressive enhancement**: pages must work as normal HTML; HTMX/Alpine only
+  enhance.
+- **Mobile-first**: default layouts and touch targets for phones; enhance for
+  desktop/TV.
+- **Consistency**: use the shared component library (Cotton/components/partials)
+  instead of one-off markup.
+- **Accessibility**: minimum WCAG AA contrast, keyboard support, and clear focus
+  states.
 
 ## Project Structure (Frontend Files)
 
-- Templates live under `src/templates/` (project-wide) and `src/<app>/templates/<app>/` (app-owned, namespaced to avoid collisions).
-- Static assets live under `src/static/` (project-wide) and `src/<app>/static/<app>/` (app-owned, namespaced).
-- Cotton components should live under `src/templates/cotton/` (or app-level `templates/cotton/`) so they can be used everywhere.
-- Base template: `src/templates/_base.html` loads static assets, HTMX, Alpine, and defines standard blocks.
+- Templates live under `src/templates/` (project-wide) and
+  `src/<app>/templates/<app>/` (app-owned, namespaced to avoid collisions).
+- Static assets live under `src/static/` (project-wide) and
+  `src/<app>/static/<app>/` (app-owned, namespaced).
+- Cotton components should live under `src/templates/cotton/` (or app-level
+  `templates/cotton/`) so they can be used everywhere.
+- Base template: `src/templates/_base.html` loads static assets, HTMX, Alpine,
+  and defines standard blocks.
 - Use `{% load static %}` in templates that reference static files.
 
 ### Template loading pattern
@@ -52,22 +69,29 @@ Frontend development for this project is **server-rendered first** (Django templ
 
 ## Theme & UI System (Premium Layout)
 
-- Use daisyUI component classes (`btn`, `card`, `badge`, `navbar`, etc.) with Tailwind utilities for layout.
+- Use daisyUI component classes (`btn`, `card`, `badge`, `navbar`, etc.) with
+  Tailwind utilities for layout.
 - Implement and use a custom daisyUI theme:
   - Light: `<project-name>` (e.g., `app`)
   - Dark: `<project-name>-dark` (e.g., `app-dark`)
-- Prefer setting the theme via `data-theme` (e.g., `<html data-theme="app">`), and keep dark mode as a theme switch (not a separate CSS system).
+- Prefer setting the theme via `data-theme` (e.g., `<html data-theme="app">`),
+  and keep dark mode as a theme switch (not a separate CSS system).
 - Typography: prefer **Inter** (or system fallback).
-- Interaction constraints: animations should be subtle and fast; avoid complex motion.
+- Interaction constraints: animations should be subtle and fast; avoid complex
+  motion.
 
 ## django-cotton Component Guidelines
 
-Prefer Cotton for shared UI building blocks (buttons, inputs, chips, cards, modal shells).
+Prefer Cotton for shared UI building blocks (buttons, inputs, chips, cards,
+modal shells).
 
 - Keep components **purely presentational** (no DB queries; minimal branching).
-- Expose customization via attributes, and allow pass-through HTML attributes via `{{ attrs }}`.
-- Prefer `<c-*>` usage in page templates; avoid copy-pasting daisyUI markup across pages.
-- Document component inputs and slots in HTML comments at the top of each component file.
+- Expose customization via attributes, and allow pass-through HTML attributes
+  via `{{ attrs }}`.
+- Prefer `<c-*>` usage in page templates; avoid copy-pasting daisyUI markup
+  across pages.
+- Document component inputs and slots in HTML comments at the top of each
+  component file.
 - Use semantic HTML elements inside components for better accessibility.
 
 ### Component examples
@@ -96,8 +120,10 @@ Prefer Cotton for shared UI building blocks (buttons, inputs, chips, cards, moda
 
 For HTMX updates, prefer template fragments over separate “partials-only” files:
 
-- **Django 6.0+**: Use built-in template partials (`{% partialdef %}` / `{% partial %}`) to define fragments close to the full-page template.
-- **Django < 6.0**: Use `django-template-partials` package to provide the same syntax.
+- **Django 6.0+**: Use built-in template partials (`{% partialdef %}` /
+  `{% partial %}`) to define fragments close to the full-page template.
+- **Django < 6.0**: Use `django-template-partials` package to provide the same
+  syntax.
 - Use stable element IDs so HTMX swaps are predictable.
 - Keep modal markup in a fragment intended for `#modal-root`.
 - Return fragments for HTMX requests, full pages for normal requests.
@@ -140,13 +166,17 @@ def user_list(request: HttpRequest) -> HttpResponse:
 
 Use HTMX for mutations and fragment updates.
 
-- **CSRF protection**: Set `hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}}'` on `<body>` tag globally, or use `{% csrf_token %}` in individual forms.
-- **Progressive enhancement**: Forms must work without JavaScript; HTMX enhances them.
+- **CSRF protection**: Set `hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}}'`
+  on `<body>` tag globally, or use `{% csrf_token %}` in individual forms.
+- **Progressive enhancement**: Forms must work without JavaScript; HTMX enhances
+  them.
 - **Prefer server-rendered fragments** over client-side rendering.
 - **Loading states**: Use `hx-indicator` to show spinners during requests.
-- **Scoped swaps**: Use `hx-target` to update specific containers, not entire sections.
+- **Scoped swaps**: Use `hx-target` to update specific containers, not entire
+  sections.
 - **Business logic**: Always enforce rules server-side; HTMX is for UX only.
-- **django-htmx middleware**: Add `django_htmx.middleware.HtmxMiddleware` to detect HTMX requests via `request.htmx`.
+- **django-htmx middleware**: Add `django_htmx.middleware.HtmxMiddleware` to
+  detect HTMX requests via `request.htmx`.
 
 ### Base template CSRF setup (django-htmx)
 
@@ -193,8 +223,10 @@ Use HTMX for mutations and fragment updates.
 
 - `hx-get`, `hx-post`, `hx-put`, `hx-delete`: HTTP methods for requests
 - `hx-target`: CSS selector for element to update (default: triggering element)
-- `hx-swap`: How to swap content (`innerHTML`, `outerHTML`, `beforeend`, `afterend`)
-- `hx-trigger`: Event that triggers request (default: `click` for buttons, `submit` for forms)
+- `hx-swap`: How to swap content (`innerHTML`, `outerHTML`, `beforeend`,
+  `afterend`)
+- `hx-trigger`: Event that triggers request (default: `click` for buttons,
+  `submit` for forms)
 - `hx-indicator`: Element to show during request
 - `hx-vals`: Add JSON data to request
 - `hx-boost`: Enable AJAX for all links/forms in container
@@ -204,7 +236,8 @@ Use HTMX for mutations and fragment updates.
 ### Component Architecture
 
 - Keep components **small and focused** (one behavior).
-- Use `x-data` for local state; use `Alpine.store()` for cross-page concerns (toasts, locale UI state).
+- Use `x-data` for local state; use `Alpine.store()` for cross-page concerns
+  (toasts, locale UI state).
 - Avoid “business logic” in Alpine; Alpine is for UI behavior only.
 
 ### Alpine.js Patterns
@@ -219,16 +252,20 @@ Use HTMX for mutations and fragment updates.
 
 ### Alpine.js Best Practices
 
-- Use `x-cloak` to prevent flash of unstyled content: `[x-cloak] { display: none !important; }`
+- Use `x-cloak` to prevent flash of unstyled content:
+  `[x-cloak] { display: none !important; }`
 - Prefer `@click` over `x-on:click` for brevity
 - Use `:class` for conditional styling: `:class="{ 'active': isActive }"`
-- Add `.debounce` for search inputs that trigger HTMX: `x-model.debounce.250ms="q"`
+- Add `.debounce` for search inputs that trigger HTMX:
+  `x-model.debounce.250ms="q"`
 
 ## Localization (i18n) UX
 
-- Language selector should be accessible on key pages (landing, settings, account).
+- Language selector should be accessible on key pages (landing, settings,
+  account).
 - Keep strings short; avoid idioms and cultural references.
-- Use Django i18n tags (`{% trans %}`, `{% blocktrans %}`) for all user-facing text.
+- Use Django i18n tags (`{% trans %}`, `{% blocktrans %}`) for all user-facing
+  text.
 - Mark translatable strings in Python with `gettext()` or `gettext_lazy()`.
 
 ### Django i18n template patterns
@@ -257,15 +294,21 @@ Use HTMX for mutations and fragment updates.
 
 ## Accessibility Baseline
 
-- **Contrast**: Meet WCAG AA minimum (4.5:1 for normal text, 3:1 for large text).
-- **Tap targets**: Minimum 44×44px for all interactive elements (buttons, links, form controls).
+- **Contrast**: Meet WCAG AA minimum (4.5:1 for normal text, 3:1 for large
+  text).
+- **Tap targets**: Minimum 44×44px for all interactive elements (buttons, links,
+  form controls).
 - **Color**: Never rely on color alone; use labels, icons, or text explanations.
-- **Semantic HTML**: Use proper elements (`<button>`, `<nav>`, `<main>`) before adding ARIA.
-- **Keyboard navigation**: All interactive elements must be keyboard accessible (test with Tab key).
+- **Semantic HTML**: Use proper elements (`<button>`, `<nav>`, `<main>`) before
+  adding ARIA.
+- **Keyboard navigation**: All interactive elements must be keyboard accessible
+  (test with Tab key).
 - **Focus states**: Visible focus indicators on all interactive elements.
-- **Alt text**: All images must have descriptive `alt` attributes (empty `alt=""` for decorative images).
+- **Alt text**: All images must have descriptive `alt` attributes (empty
+  `alt=""` for decorative images).
 - **Form labels**: Every input must have an associated `<label>` element.
-- **ARIA attributes**: Use `aria-label`, `aria-expanded`, `aria-controls` when needed for dynamic content.
+- **ARIA attributes**: Use `aria-label`, `aria-expanded`, `aria-controls` when
+  needed for dynamic content.
 
 ### Accessibility patterns
 
@@ -315,6 +358,175 @@ Use HTMX for mutations and fragment updates.
     border-width: 0;
   }
 </style>
+```
+
+## Custom CSS Utilities
+
+The project includes custom animation and styling utilities in
+`src/static/css/input.css`. These are opt-in classes to enhance UI polish
+without requiring additional dependencies.
+
+### Animation Utilities
+
+**Modal and overlay animations:**
+
+```html
+<!-- Modal with enter animation -->
+<dialog id="my_modal" class="modal">
+  <div class="modal-box animate-modal-enter">
+    <h3 class="text-lg font-bold">Modal Title</h3>
+    <p>Modal content here.</p>
+  </div>
+  <form method="dialog" class="modal-backdrop animate-backdrop-enter">
+    <button>close</button>
+  </form>
+</dialog>
+```
+
+**Available animation classes:**
+
+- `animate-modal-enter` - Subtle scale + fade-in for modals and popups (0.2s)
+- `animate-backdrop-enter` - Fade-in for backdrop overlays (0.15s)
+- `animate-slide-down-fade` - Slide down + fade for dropdowns and notices (0.2s)
+- `animate-fade-in-up` - Slide up + fade for list items and cards (0.3s)
+- `animate-spinner` - Continuous rotation for loading indicators
+
+**Usage patterns:**
+
+```html
+<!-- Staggered list animations -->
+<ul>
+  <li class="animate-fade-in-up" style="animation-delay: 0ms">Item 1</li>
+  <li class="animate-fade-in-up" style="animation-delay: 50ms">Item 2</li>
+  <li class="animate-fade-in-up" style="animation-delay: 100ms">Item 3</li>
+</ul>
+
+<!-- Custom loading spinner -->
+<div class="animate-spinner">
+  <svg class="h-5 w-5"><!-- icon --></svg>
+</div>
+
+<!-- Dropdown with slide animation -->
+<div
+  x-show="open"
+  x-transition:enter="animate-slide-down-fade"
+  class="dropdown-content"
+>
+  Dropdown items
+</div>
+```
+
+### Skeleton Shimmer Utility
+
+For loading states that need a shimmer effect:
+
+```html
+<!-- Skeleton loader with shimmer -->
+<div class="skeleton-shimmer h-4 w-32 rounded"></div>
+<div class="skeleton-shimmer mt-2 h-8 w-full rounded"></div>
+
+<!-- Card skeleton -->
+<div class="card bg-base-100">
+  <div class="card-body space-y-3">
+    <div class="skeleton-shimmer h-6 w-3/4 rounded"></div>
+    <div class="skeleton-shimmer h-4 w-full rounded"></div>
+    <div class="skeleton-shimmer h-4 w-5/6 rounded"></div>
+  </div>
+</div>
+```
+
+**Features:**
+
+- Automatically adapts to light/dark themes via `[data-theme='dark']`
+- Uses `theme()` function for consistent colors with daisyUI
+- 1.5s infinite animation loop
+
+### Focus-Visible Ring
+
+Custom focus indicator aligned to theme colors (automatically applied):
+
+```css
+/* Applied globally to all interactive elements */
+button:focus-visible,
+a:focus-visible,
+input:focus-visible,
+textarea:focus-visible,
+select:focus-visible,
+[tabindex]:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 2px
+    color-mix(in oklab, theme(--color-primary) 60%, transparent);
+  border-radius: inherit;
+}
+```
+
+**This replaces the default browser outline with:**
+
+- 2px semi-transparent ring using the primary theme color
+- Consistent with daisyUI aesthetic
+- Inherits border-radius from element
+- Only visible on keyboard focus (`:focus-visible`), not mouse clicks
+
+### Themed Scrollbars
+
+Opt-in custom scrollbars for app regions:
+
+```html
+<!-- Main content area with themed scrollbar -->
+<main class="app-main-scrollbar overflow-y-auto">
+  <!-- Long content -->
+</main>
+
+<!-- Sidebar with accent-colored scrollbar -->
+<aside class="sidebar-scrollbar overflow-y-auto">
+  <!-- Navigation items -->
+</aside>
+```
+
+**Features:**
+
+- `app-main-scrollbar` - Neutral-colored thin scrollbar (light: neutral-400,
+  dark: neutral-600)
+- `sidebar-scrollbar` - Primary-colored thin scrollbar (uses theme primary
+  color)
+- Automatically adapts to light/dark themes
+- Uses CSS `scrollbar-width: thin` for Firefox
+- Uses `::-webkit-scrollbar-*` pseudo-elements for Chromium browsers
+- Transparent track, colored thumb with hover state
+
+**When to use:**
+
+- Long content areas that benefit from visual polish
+- Sidebar navigation where brand color reinforces hierarchy
+- Skip for short content or mobile views (native overlay scrollbars are better)
+
+### Accessibility Considerations
+
+**Reduced motion:** All animations respect `prefers-reduced-motion` preference
+automatically. The project includes a global media query in `input.css` that
+reduces animation durations to near-instant for users who prefer reduced motion.
+
+```css
+@media (prefers-reduced-motion: reduce) {
+  .animate-modal-enter,
+  .animate-backdrop-enter,
+  .animate-slide-down-fade,
+  .animate-fade-in-up {
+    animation-duration: 0.01ms !important;
+  }
+}
+```
+
+**For Alpine.js transitions with custom classes:**
+
+```html
+<div
+  x-show="open"
+  x-transition:enter="animate-modal-enter"
+  x-transition:enter.duration.0ms.if="window.matchMedia('(prefers-reduced-motion: reduce)').matches"
+>
+  Content
+</div>
 ```
 
 ## Common Patterns to Avoid

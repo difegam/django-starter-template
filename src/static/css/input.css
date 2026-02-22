@@ -208,3 +208,17 @@ select:focus-visible,
 .sidebar-scrollbar:hover::-webkit-scrollbar-thumb {
   background-color: color-mix(in oklab, theme(--color-primary) 55%, transparent);
 }
+
+/* Respect user's motion preferences */
+@media (prefers-reduced-motion: reduce) {
+  .animate-modal-enter,
+  .animate-backdrop-enter,
+  .animate-slide-down-fade,
+  .animate-fade-in-up {
+    animation-duration: 0.01ms !important;
+  }
+
+  .skeleton-shimmer {
+    animation: none !important;
+  }
+}
