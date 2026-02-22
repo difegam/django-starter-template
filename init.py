@@ -15,8 +15,8 @@ This script:
 - Prepares the project for a fresh start
 
 Usage:
-    uv run init_project.py [project-name]
-    uv run init_project.py --name <project-name>
+    uv run init.py [project-name]
+    uv run init.py --name <project-name>
 """
 
 import argparse
@@ -365,7 +365,7 @@ def main() -> None:
 
     next_steps = Text()
     next_steps.append('\n1. Remove this script: ', style='bold')
-    next_steps.append('rm init_project.py', style='cyan')
+    next_steps.append('rm init.py', style='cyan')
     next_steps.append('\n2. Initialize a new git repository: ', style='bold')
     next_steps.append('git init', style='cyan')
     next_steps.append('\n3. Set up the environment: ', style='bold')

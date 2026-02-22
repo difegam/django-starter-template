@@ -57,7 +57,7 @@ Essential configuration and automation files at the repository root:
 - `AGENTS.md`: AI agent guidelines for code generation
 - `DJANGO_VIBE_CODING_STARTER.md`: Comprehensive guide for replicating this
   pattern
-- `init_project.py`: Initialization script for setting up new projects from this
+- `init.py`: Initialization script for setting up new projects from this
   template
 - `uv.lock`: Lock file for Python dependencies (managed by uv)
 

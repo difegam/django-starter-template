@@ -43,10 +43,10 @@ Use the included initialization script to set up a fresh project:
 
 ```bash
 # Interactive mode
-uv run init_project.py
+uv run init.py
 
 # Non-interactive mode
-uv run init_project.py my-project-name --description "My awesome Django project"
+uv run init.py my-project-name --description "My awesome Django project"
 ```
 
 The initialization script will:
@@ -58,7 +58,7 @@ The initialization script will:
 
 After initialization:
 ```bash
-rm init_project.py  # Remove the script
+rm init.py          # Remove the script
 git init            # Initialize new git repo
 just init           # Set up environment
 ```
@@ -104,18 +104,18 @@ Visit [http://127.0.0.1:8000](http://127.0.0.1:8000) to see your app running.
 
 ## 🛠️ Project Initialization Script
 
-The included `init_project.py` script transforms this template into your own project.
+The included `init.py` script transforms this template into your own project.
 
 **Usage**
 ```bash
 # Interactive mode
-uv run init_project.py
+uv run init.py
 
 # Non-interactive mode
-uv run init_project.py my-awesome-project --description "A Django app"
+uv run init.py my-awesome-project --description "A Django app"
 
 # Skip git repository removal
-uv run init_project.py my-awesome-project --skip-git
+uv run init.py my-awesome-project --skip-git
 ```
 
 **What it does**
@@ -124,7 +124,7 @@ uv run init_project.py my-awesome-project --skip-git
 
 **After initialization**
 ```bash
-rm init_project.py
+rm init.py
 git init
 just init
 just migrate
