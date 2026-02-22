@@ -7,13 +7,14 @@
 @source '../../**/static/**/*.js';
 
 @plugin 'daisyui' {
-  themes: light --default, dark --prefersdark;
+  themes:
+    light --default,
+    dark --prefersdark;
   logs: false;
 }
 
 @theme {
-  --font-sans: Inter, ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji',
-    'Segoe UI Emoji';
+  --font-sans: Inter, ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji';
 
   --color-primary-lighter: #fde047;
   --color-primary-light: #facc15;
@@ -31,4 +32,179 @@
 /* Prevent flash of unstyled Alpine.js content */
 [x-cloak] {
   display: none !important;
+}
+
+/* Motion utilities (opt-in via class) */
+@keyframes modal-enter {
+  from {
+    opacity: 0;
+    transform: scale(0.97) translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+@keyframes backdrop-enter {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slide-down-fade {
+  from {
+    opacity: 0;
+    transform: translateY(-12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fade-in-up {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes spinner {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+.animate-modal-enter {
+  animation: modal-enter 0.2s ease-out both;
+}
+
+.animate-backdrop-enter {
+  animation: backdrop-enter 0.15s ease-out both;
+}
+
+.animate-slide-down-fade {
+  animation: slide-down-fade 0.2s ease-out both;
+}
+
+.animate-fade-in-up {
+  animation: fade-in-up 0.3s ease-out both;
+}
+
+.animate-spinner {
+  animation: spinner 0.6s linear infinite;
+}
+
+.skeleton-shimmer {
+  background: linear-gradient(
+    90deg,
+    theme(--color-neutral-200) 25%,
+    theme(--color-neutral-100) 50%,
+    theme(--color-neutral-200) 75%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.5s ease-in-out infinite;
+}
+
+[data-theme='dark'] .skeleton-shimmer {
+  background: linear-gradient(
+    90deg,
+    theme(--color-neutral-800) 25%,
+    theme(--color-neutral-700) 50%,
+    theme(--color-neutral-800) 75%
+  );
+  background-size: 200% 100%;
+}
+
+/* Focus-visible ring aligned to theme tokens */
+:focus-visible {
+  outline: none;
+}
+
+button:focus-visible,
+a:focus-visible,
+input:focus-visible,
+textarea:focus-visible,
+select:focus-visible,
+[tabindex]:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 2px color-mix(in oklab, theme(--color-primary) 60%, transparent);
+  border-radius: inherit;
+}
+
+/* Themed scrollbars for app shell regions (opt-in via class) */
+.app-main-scrollbar,
+.sidebar-scrollbar {
+  scrollbar-width: thin;
+}
+
+.app-main-scrollbar {
+  scrollbar-color: theme(--color-neutral-400) transparent;
+}
+
+.app-main-scrollbar::-webkit-scrollbar,
+.sidebar-scrollbar::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+.app-main-scrollbar::-webkit-scrollbar-track,
+.sidebar-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.app-main-scrollbar::-webkit-scrollbar-thumb,
+.sidebar-scrollbar::-webkit-scrollbar-thumb {
+  border: 2px solid transparent;
+  border-radius: 999px;
+  background-clip: padding-box;
+}
+
+.app-main-scrollbar::-webkit-scrollbar-thumb {
+  background-color: theme(--color-neutral-400);
+}
+
+.app-main-scrollbar:hover::-webkit-scrollbar-thumb {
+  background-color: theme(--color-neutral-500);
+}
+
+[data-theme='dark'] .app-main-scrollbar {
+  scrollbar-color: theme(--color-neutral-600) transparent;
+}
+
+[data-theme='dark'] .app-main-scrollbar::-webkit-scrollbar-thumb {
+  background-color: theme(--color-neutral-600);
+}
+
+[data-theme='dark'] .app-main-scrollbar:hover::-webkit-scrollbar-thumb {
+  background-color: theme(--color-neutral-500);
+}
+
+.sidebar-scrollbar {
+  scrollbar-color: color-mix(in oklab, theme(--color-primary) 50%, transparent) transparent;
+}
+
+.sidebar-scrollbar::-webkit-scrollbar-thumb {
+  background-color: color-mix(in oklab, theme(--color-primary) 35%, transparent);
+}
+
+.sidebar-scrollbar:hover::-webkit-scrollbar-thumb {
+  background-color: color-mix(in oklab, theme(--color-primary) 55%, transparent);
 }

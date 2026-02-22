@@ -26,9 +26,27 @@
                     </svg>
                     Download from GitHub
                 </a>
+                <button type="button"
+                        class="btn btn-outline ml-2"
+                        onclick="starter_modal.showModal()">Open modal</button>
             </div>
         </div>
     </div>
+
+    <dialog id="starter_modal" class="modal">
+        <div class="modal-box animate-modal-enter">
+            <h3 class="text-lg font-bold">Welcome</h3>
+            <p class="py-4">This is a minimal daisyUI modal using the native dialog element.</p>
+            <div class="modal-action">
+                <form method="dialog">
+                    <button class="btn">Close</button>
+                </form>
+            </div>
+        </div>
+        <form method="dialog" class="modal-backdrop animate-backdrop-enter">
+            <button>close</button>
+        </form>
+    </dialog>
 {% endblock content %}
 {% block footer %}
     <footer class="footer footer-horizontal footer-center bg-neutral text-neutral-content p-10">
