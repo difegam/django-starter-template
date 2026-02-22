@@ -1,4 +1,9 @@
 ---
+description:
+  This file describes patterns for using HTMX with django-cotton components and
+  Alpine.js in server-rendered templates. It covers when to use Django template
+  partials vs cotton components, HTMX attribute patterns, and best practices for
+  clean integration.
 applyTo: 'src/templates/**/*.html,src/**/templates/**/*.html,src/**/views.py,src/**/urls.py,src/static/js/**/*.js'
 ---
 
@@ -7,6 +12,50 @@ applyTo: 'src/templates/**/*.html,src/**/templates/**/*.html,src/**/views.py,src
 Use these rules for server-rendered interactivity with HTMX, django-cotton
 components, and Alpine.js.
 
+## Mental Model: Partials vs Cotton vs Includes
+
+### Django template partials (Django 6.0+)
+
+Inline, **named** fragments you define with `{% partialdef %}` and render with
+`{% partial %}`. They render with the **current template context** and can be
+addressed externally via `template.html#partial_name` (e.g., in `render()` or
+`{% include %}`).
+
+**Use partials when:**
+
+- The fragment is **only** relevant to one page/template (or one feature
+  template) and splitting into a new file would add friction
+- You want to return only a fragment for **HTMX/AJAX** by rendering
+  `template.html#partial_name`
+- The fragment needs page-specific context and logic
+
+### Django Cotton components
+
+File-based **UI components** (templates under `templates/cotton/`) with
+**props/attributes**, `{{ slot }}`, **named slots**, dynamic attributes
+(`:attr="..."`), attribute forwarding via `{{ attrs }}` / `:attrs`, optional
+**context isolation** via `only`, and local defaults via `<c-vars />`.
+
+**Use Cotton components when:**
+
+- The UI piece is reused across 3+ pages (e.g., buttons, inputs, cards, modals)
+- You want "component ergonomics": explicit inputs, slots, attribute
+  passthrough, default props, and optional context isolation
+- Building your design system's reusable building blocks
+
+### Include partials (`{% include 'partials/navbar.html' %}`)
+
+Static template fragments for page composition.
+
+**Use includes when:**
+
+- Breaking large templates into logical sections
+- Fragment is same across pages but not interactive
+- No HTMX swap targeting needed (e.g., navbar, footer)
+
+**Practical rule:** Partials for local refactors + response fragments, Cotton
+for your reusable design system, includes for static composition.
+
 ## Rendering Strategy
 
 - **Initial loads**: Return full-page templates with complete HTML structure.
@@ -14,8 +63,8 @@ components, and Alpine.js.
   detect).
 - **Template organization**: Page shell in `_base.html`, reusable blocks in
   `partials/`, components in `cotton/`.
-- **Partial definition**: Use Django 6.0 `{% partialdef %}` or
-  `django-template-partials` for fragment rendering.
+- **Partial definition**: Use Django 6.0 built-in `{% partialdef %}` for
+  fragment rendering (no package needed; built into Django 6.0+).
 
 ### View pattern for partial rendering
 
@@ -38,7 +87,6 @@ def item_list(request: HttpRequest) -> HttpResponse:
 
 ```django
 {% extends "_base.html" %}
-{% load partials %}
 
 {% block content %}
 <h1>Items</h1>
@@ -49,7 +97,7 @@ def item_list(request: HttpRequest) -> HttpResponse:
     Refresh List
 </button>
 
-{% partialdef item-table inline %}
+{% partialdef item-table %}
 <div id="item-table">
     <ul>
     {% for item in items %}
@@ -60,6 +108,9 @@ def item_list(request: HttpRequest) -> HttpResponse:
 {% endpartialdef %}
 {% endblock %}
 ```
+
+**Note:** Django 6.0+ built-in partials don't require `{% load partials %}`. The
+`inline` attribute is not part of the standard syntax.
 
 ## HTMX Patterns
 
@@ -443,12 +494,149 @@ def item_list(request: HttpRequest) -> HttpResponse:
 <form hx-post="/delete"><!-- Missing {% csrf_token %} --></form>
 ```
 
+## Best Practices for Django Template Partials
+
+1. **Treat `{% partial %}` as "same-template only"** Define and render within
+   the same template. To reuse across files, reference it as `other.html#name`
+   via `{% include %}` or `render()` rather than expecting `{% partial name %}`
+   to "import" it.
+
+2. **Make dependencies explicit with `{% with %}`** Partials inherit the current
+   context, which is convenient but can create hidden coupling. Wrap calls with
+   `{% with %}` to document required variables:
+
+   ```django
+   {% with user=request.user items=item_list %}
+     {% partial user_info %}
+   {% endwith %}
+   ```
+
+3. **Use `template.html#partial` for HTMX endpoints** Return only the fragment
+   you need from the view (cleaner than duplicating mini-templates):
+
+   ```python
+   # views.py
+   return render(request, "authors.html#user-info", {"user": user})
+   ```
+
+4. **Use stable element IDs** Always include a unique ID on the root element of
+   fragments for predictable HTMX swapping.
+
+## Best Practices for Django Cotton Components
+
+1. **Adopt a predictable component layout + naming**
+   - Put components under `templates/cotton/` (configurable)
+   - Use snake_case filenames by default; call components in templates with
+     kebab-case tag names
+   - Use subfolders with dot notation; use `index.html` as the "default"
+     component for a folder when it has sub-components
+
+2. **Prefer explicit inputs; use `<c-vars />` for defaults**
+   - Declare defaults (and effectively "document props") at the top of a
+     component with `<c-vars />`:
+
+   ```django
+   {# templates/cotton/button.html #}
+   <c-vars variant="primary" size="md" />
+   <button {{ attrs }} class="btn btn-{{ variant }} btn-{{ size }}">
+       {{ slot }}
+   </button>
+   ```
+
+   - Use dynamic attributes (`:attr="..."`) for non-string types and
+     "pass-through objects"
+
+3. **Forward HTML attributes intentionally**
+   - Use `{{ attrs }}` when your component wraps a real HTML element (especially
+     form controls)
+   - Use `:attrs="attrs"` to build wrapper/higher-order components that proxy
+     all attributes to an inner component:
+
+   ```django
+   {# templates/cotton/fancy-button.html #}
+   <c-button :attrs="attrs" class="fancy-style">
+       <span class="icon">✨</span>
+       {{ slot }}
+   </c-button>
+   ```
+
+4. **Use `only` when you want safety/encapsulation**
+   - Add `only` to prevent the component from seeing parent context except for
+     passed attributes—this reduces accidental coupling and name collisions:
+
+   ```django
+   {# Usage #}
+   <c-card :title="post.title" only>{{ post.content }}</c-card>
+   ```
+
+5. **Keep components purely presentational**
+   - No DB queries, no business logic
+   - Accept all data as attributes/slots
+   - Minimal branching logic
+
+## Combining Partials and Cotton Cleanly
+
+### Pattern A: Partials inside a page template; Cotton for shared UI primitives
+
+- Page template defines partials like `results_list`, `results_rows`,
+  `empty_state`
+- Those partials _use_ Cotton components like `<c-table>`, `<c-badge>`,
+  `<c-button>`
+
+Example:
+
+```django
+{# search.html #}
+{% extends "_base.html" %}
+
+{% block content %}
+<div id="search-results">
+    {% partialdef results_list %}
+        <ul>
+        {% for result in results %}
+            <li>
+                <c-badge variant="primary">{{ result.category }}</c-badge>
+                {{ result.title }}
+            </li>
+        {% endfor %}
+        </ul>
+    {% endpartialdef %}
+</div>
+{% endblock %}
+```
+
+### Pattern B: Partials inside a Cotton component to reduce repetition
+
+A Cotton component is still just a Django template file, so you can use
+`{% partialdef %}` inside it to keep internal markup DRY (e.g., a repeated "row"
+structure). Partials will render with that component's context.
+
+### Pattern C: Feature template as a "partial library"
+
+Put multiple `{% partialdef %}` blocks into `features/search.html`, then:
+
+- Full page renders normal template
+- HTMX endpoints return `features/search.html#results_rows`
+
+This keeps feature fragments co-located:
+
+```python
+# views.py
+def search_results(request: HttpRequest) -> HttpResponse:
+    query = request.GET.get('q', '')
+    results = search(query)
+
+    if request.htmx:
+        return render(request, 'features/search.html#results_rows', {'results': results})
+    return render(request, 'features/search.html', {'results': results})
+```
+
 ## Best Practices Summary
 
 - **Keep HTMX endpoints in the owning Django app** (follow URL ownership rules).
 - **Use `request.htmx` in views** to return partials vs full pages.
-- **Leverage django-template-partials** for fragment definitions near full
-  templates.
+- **Use Django 6.0+ built-in `{% partialdef %}`** for fragment definitions near
+  full templates (no package needed).
 - **Apply CSRF globally** via `hx-headers` in base template.
 - **Use explicit swap strategies** (`hx-swap`) for predictable behavior.
 - **Add loading indicators** with `hx-indicator` and CSS transitions.
@@ -456,3 +644,5 @@ def item_list(request: HttpRequest) -> HttpResponse:
 - **Component extraction** when markup repeats across 3+ places.
 - **Alpine for UI, HTMX for data** - clear separation of concerns.
 - **Progressive enhancement** - forms must work without JavaScript.
+- **Decision framework**: Partials for page-local fragments, Cotton for
+  cross-app reusable UI, includes for static composition.

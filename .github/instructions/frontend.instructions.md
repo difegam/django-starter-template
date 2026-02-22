@@ -85,14 +85,90 @@ daisyUI** for a consistent premium UI.
 Prefer Cotton for shared UI building blocks (buttons, inputs, chips, cards,
 modal shells).
 
-- Keep components **purely presentational** (no DB queries; minimal branching).
+**Core principles:**
+
+- Keep components **purely presentational** (no DB queries; minimal branching)
 - Expose customization via attributes, and allow pass-through HTML attributes
-  via `{{ attrs }}`.
+  via `{{ attrs }}`
 - Prefer `<c-*>` usage in page templates; avoid copy-pasting daisyUI markup
-  across pages.
+  across pages
 - Document component inputs and slots in HTML comments at the top of each
-  component file.
-- Use semantic HTML elements inside components for better accessibility.
+  component file
+- Use semantic HTML elements inside components for better accessibility
+
+### Best practices
+
+1. **Use `<c-vars />` for defaults and documentation**
+
+   ```django
+   {# templates/cotton/button.html #}
+   {# Usage: <c-button variant="primary" size="lg">Click me</c-button> #}
+   <c-vars variant="primary" size="md" type="button" />
+   <button {{ attrs }}
+           type="{{ type }}"
+           class="btn btn-{{ variant }} btn-{{ size }} {{ attrs.class }}">
+       {{ slot }}
+   </button>
+   ```
+
+2. **Forward HTML attributes with `{{ attrs }}`** Use `{{ attrs }}` to allow
+   users to add custom attributes, classes, HTMX directives, etc.:
+
+   ```django
+   {# Allows: <c-input name="email" hx-post="/validate" /> #}
+   <input {{ attrs }} class="input {{ attrs.class }}" />
+   ```
+
+3. **Use named slots for flexible composition**
+
+   ```django
+   {# templates/cotton/card.html #}
+   <div class="card bg-base-100 shadow-xl">
+       <div class="card-body">
+           {% if title %}<h2 class="card-title">{{ title }}</h2>{% endif %}
+           <div>{{ slot }}</div>
+           {% if actions %}
+           <div class="card-actions justify-end">{{ actions }}</div>
+           {% endif %}
+       </div>
+   </div>
+   ```
+
+   Usage:
+
+   ```django
+   <c-card title="Product Name">
+       <c-slot name="default">Product description here</c-slot>
+       <c-slot name="actions">
+           <c-button variant="primary">Buy Now</c-button>
+       </c-slot>
+   </c-card>
+   ```
+
+4. **Use `:attrs` for higher-order components** When building a component that
+   wraps another component:
+
+   ```django
+   {# templates/cotton/icon-button.html #}
+   <c-button :attrs="attrs" class="gap-2">
+       <span class="icon">{{ icon }}</span>
+       {{ slot }}
+   </c-button>
+   ```
+
+5. **Use `only` for context isolation** Add `only` to prevent the component from
+   seeing parent context, reducing coupling:
+
+   ```django
+   <c-card :title="post.title" :content="post.body" only />
+   ```
+
+6. **Component file organization**
+   - Use snake_case filenames: `button.html`, `alert_banner.html`
+   - Call with kebab-case tags: `<c-button>`, `<c-alert-banner>`
+   - Use subfolders for namespacing: `forms/text_input.html` →
+     `<c-forms.text-input>`
+   - Use `index.html` for default exports: `modal/index.html` → `<c-modal>`
 
 ### Component examples
 
@@ -121,12 +197,32 @@ modal shells).
 For HTMX updates, prefer template fragments over separate “partials-only” files:
 
 - **Django 6.0+**: Use built-in template partials (`{% partialdef %}` /
-  `{% partial %}`) to define fragments close to the full-page template.
-- **Django < 6.0**: Use `django-template-partials` package to provide the same
-  syntax.
+  `{% partial %}`) to define fragments close to the full-page template. No
+  `{% load %}` tag needed.
 - Use stable element IDs so HTMX swaps are predictable.
 - Keep modal markup in a fragment intended for `#modal-root`.
 - Return fragments for HTMX requests, full pages for normal requests.
+
+### When to use template fragments vs Cotton components vs includes
+
+**Template partials (`{% partialdef %}`)** for:
+
+- HTMX-swappable fragments within a single page
+- Page-specific logic that won't be reused elsewhere
+- Returning fragment-only responses:
+  `render(request, 'page.html#fragment', context)`
+
+**Cotton components (`<c-*>`)** for:
+
+- Reusable UI building blocks used across 3+ different templates
+- Design system components (buttons, cards, inputs, badges)
+- Purely presentational elements with explicit props/slots
+
+**Includes (`{% include 'partials/navbar.html' %}`)** for:
+
+- Static template composition (navbar, footer, sidebar)
+- Large templates broken into logical sections
+- Non-interactive content that's same across pages
 
 ### Template partial pattern (Django 6.0+)
 
@@ -136,16 +232,21 @@ For HTMX updates, prefer template fragments over separate “partials-only” fi
 
 {% block content %}
 <div id="user-list">
-    {% partial user_list_content %}
+    {% partialdef user_list_content %}
         <ul>
         {% for user in users %}
             <li>{{ user.name }}</li>
         {% endfor %}
         </ul>
-    {% endpartial %}
+    {% endpartialdef %}
 </div>
 {% endblock %}
 ```
+
+**Note:** The correct Django 6.0 built-in syntax is
+`{% partialdef name %}...{% endpartialdef %}` for definition and
+`{% partial name %}` for rendering within the same template. No `{% load %}` tag
+is required.
 
 ### View pattern for HTMX requests
 

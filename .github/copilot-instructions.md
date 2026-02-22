@@ -2,18 +2,29 @@
 
 ## Architecture Overview
 
-This is a Django 5.2+ starter template with a **non-standard project layout**: Django lives in `src/`, with `src/config/` as the settings module (not a `projectname/` package). All commands run from the repo root via `just` and `uv`.
+This is a Django 5.2+ starter template with a **non-standard project layout**:
+Django lives in `src/`, with `src/config/` as the settings module (not a
+`projectname/` package). All commands run from the repo root via `just` and
+`uv`.
 
-**Stack**: Django templates (server-rendered) + HTMX + django-cotton components + Alpine.js + Tailwind CSS v4 + daisyUI 5. Authentication via django-allauth. No REST API — this is a hypermedia-driven app.
+**Stack**: Django templates (server-rendered) + HTMX + django-cotton
+components + Alpine.js + Tailwind CSS v4 + daisyUI 5. Authentication via
+django-allauth. No REST API — this is a hypermedia-driven app.
 
 ## Project Layout
 
-- `src/config/` — Django settings, root URLs, WSGI/ASGI (replaces the typical `projectname/` directory)
-- `src/<app>/` — Django apps (`users`, `web`); each app owns its models, views, URLs, and namespaced templates/static
-- `src/templates/` — Shared templates: `_base.html`, `partials/`, `cotton/` components
-- `src/static/` — Shared static: `css/input.css` (Tailwind entry), `css/output.css` (compiled), `js/`, `img/`
-- `tests/` — Top-level pytest suite (cross-app integration tests, not inside apps)
-- `.github/instructions/` — Detailed domain-specific instruction files (architecture, frontend, HTMX patterns, Python style, etc.)
+- `src/config/` — Django settings, root URLs, WSGI/ASGI (replaces the typical
+  `projectname/` directory)
+- `src/<app>/` — Django apps (`users`, `web`); each app owns its models, views,
+  URLs, and namespaced templates/static
+- `src/templates/` — Shared templates: `_base.html`, `partials/`, `cotton/`
+  components
+- `src/static/` — Shared static: `css/input.css` (Tailwind entry),
+  `css/output.css` (compiled), `js/`, `img/`
+- `tests/` — Top-level pytest suite (cross-app integration tests, not inside
+  apps)
+- `.github/instructions/` — Detailed domain-specific instruction files
+  (architecture, frontend, HTMX patterns, Python style, etc.)
 
 ## Essential Commands
 
@@ -32,23 +43,42 @@ just css-build     # Production Tailwind CSS build
 
 ## Critical Conventions
 
-**Custom User Model**: Always use `get_user_model()` or `settings.AUTH_USER_MODEL`, never `from django.contrib.auth.models import User`. The custom model is `users.CustomUser` extending `AbstractUser`.
+**Custom User Model**: Always use `get_user_model()` or
+`settings.AUTH_USER_MODEL`, never `from django.contrib.auth.models import User`.
+The custom model is `users.CustomUser` extending `AbstractUser`.
 
-**Template Namespacing**: App templates must live in `src/<app>/templates/<app>/` to avoid cross-app collisions. Reference as `'<app>/template.html'` in views.
+**Template Namespacing**: App templates must live in
+`src/<app>/templates/<app>/` to avoid cross-app collisions. Reference as
+`'<app>/template.html'` in views.
 
-**Static Namespacing**: App static files in `src/<app>/static/<app>/`. Reference with `{% static '<app>/file.css' %}`.
+**Static Namespacing**: App static files in `src/<app>/static/<app>/`. Reference
+with `{% static '<app>/file.css' %}`.
 
-**Views**: Use function-based views with type hints (`def my_view(request: HttpRequest) -> HttpResponse:`). Check `request.htmx` to return partial fragments vs full pages.
+**Views**: Use function-based views with type hints
+(`def my_view(request: HttpRequest) -> HttpResponse:`). Check `request.htmx` to
+return partial fragments vs full pages.
 
-**HTMX + Partials**: Use `{% partialdef %}` (Django 6.0) or `django-template-partials` for fragment rendering. Return `template.html#fragment_name` for HTMX requests.
+**HTMX + Partials**: Use Django 6.0+ built-in `{% partialdef %}` for fragment
+rendering (no `{% load %}` tag needed). Return `template.html#fragment_name` for
+HTMX requests. Partials are for page-local fragments and HTMX targets.
 
-**Cotton Components**: Reusable UI in `src/templates/cotton/`. Use `<c-component>` syntax. Components are purely presentational — no DB queries.
+**Cotton Components**: Reusable UI in `src/templates/cotton/`. Use
+`<c-component>` syntax. Components are purely presentational — no DB queries.
+Use for design system building blocks reused across 3+ templates.
 
-**CSRF**: Set globally on `<body hx-headers='{"x-csrftoken": "{{ csrf_token }}"}'>` in `_base.html`.
+**Decision rule**: Partials for page-specific HTMX fragments, Cotton for
+cross-app reusable UI, includes for static composition (navbar, footer).
+
+**CSRF**: Set globally on
+`<body hx-headers='{"x-csrftoken": "{{ csrf_token }}"}'>` in `_base.html`.
 
 ## Frontend Pipeline
 
-Tailwind CSS v4 configured CSS-first in `src/static/css/input.css` (uses `@import 'tailwindcss'`, `@plugin 'daisyui'`, `@source` directives for template scanning). The `tailwind.config.js` is minimal — configuration lives in the CSS file. daisyUI component classes (`btn`, `card`, `hero`, etc.) are preferred over raw Tailwind for UI elements.
+Tailwind CSS v4 configured CSS-first in `src/static/css/input.css` (uses
+`@import 'tailwindcss'`, `@plugin 'daisyui'`, `@source` directives for template
+scanning). The `tailwind.config.js` is minimal — configuration lives in the CSS
+file. daisyUI component classes (`btn`, `card`, `hero`, etc.) are preferred over
+raw Tailwind for UI elements.
 
 ## Adding a New App
 

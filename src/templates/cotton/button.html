@@ -1,0 +1,32 @@
+{#
+Button Component
+
+A reusable button component with support for daisyUI variants, sizes, and HTMX attributes.
+
+Usage:
+  <c-button>Click me</c-button>
+  <c-button variant="primary" size="lg">Large Primary</c-button>
+  <c-button variant="secondary" size="sm" disabled>Small Secondary</c-button>
+  <c-button variant="error" hx-post="/delete" hx-confirm="Are you sure?">Delete</c-button>
+  <c-button variant="ghost" class="btn-circle" aria-label="More options">⋮</c-button>
+
+Props:
+  variant: Button style (primary|secondary|accent|neutral|ghost|link|outline) - default: 'primary'
+  size: Button size (xs|sm|md|lg|xl) - default: 'md'
+  type: Button type attribute (button|submit|reset) - default: 'button'
+  disabled: Whether button is disabled - default: false
+  wide: Make button wider with padding - default: false
+  block: Make button full-width - default: false
+  square: Make button square shape - default: false
+  circle: Make button circular shape - default: false
+
+All HTML attributes (class, id, hx-*, data-*, aria-*, etc.) are forwarded via {{ attrs }}.
+Additional CSS classes can be added via the class attribute and will be merged.
+#}
+<c-vars variant="primary" size="md" type="button" disabled:false wide:false block:false square:false circle:false />
+<button {{ attrs }}
+        type="{{ type }}"
+        {% if disabled %}disabled{% endif %}
+        class="btn btn-{{ variant }} btn-{{ size }} {% if wide %}btn-wide{% endif %} {% if block %}btn-block{% endif %} {% if square %}btn-square{% endif %} {% if circle %}btn-circle{% endif %} {{ attrs.class }}">
+    {{ slot }}
+</button>

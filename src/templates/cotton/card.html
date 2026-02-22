@@ -1,0 +1,84 @@
+{#
+Card Component
+
+A reusable card component with support for title, content, image, and actions using named slots.
+
+Usage:
+  Basic card with title and content:
+    <c-card title="Card Title">
+      This is the card content.
+    </c-card>
+
+  Card with image:
+    <c-card title="Product Name" image="https://example.com/image.jpg" image_alt="Product photo">
+      Product description goes here.
+    </c-card>
+
+  Card with actions:
+    <c-card title="Confirmation">
+      <c-slot name="default">Are you sure you want to proceed?</c-slot>
+      <c-slot name="actions">
+        <c-button variant="primary">Confirm</c-button>
+        <c-button variant="ghost">Cancel</c-button>
+      </c-slot>
+    </c-card>
+
+  Card with all slots:
+    <c-card>
+      <c-slot name="image">
+        <figure><img src="photo.jpg" alt="Description" /></figure>
+      </c-slot>
+      <c-slot name="title">
+        <h2 class="card-title">Custom Title Element</h2>
+      </c-slot>
+      <c-slot name="default">Main content here</c-slot>
+      <c-slot name="actions">
+        <c-button>Action</c-button>
+      </c-slot>
+    </c-card>
+
+  Compact card:
+    <c-card title="Compact" compact:true>
+      Smaller padding
+    </c-card>
+
+Props:
+  title: Card title text (optional, can use title slot for custom HTML)
+  image: Image URL for card figure (optional, can use image slot for custom HTML)
+  image_alt: Alt text for image (required if image is set)
+  compact: Use compact padding - default: false
+  bordered: Add border to card - default: false
+  side: Use horizontal card layout (image on side) - default: false
+
+Slots:
+  image: Custom figure/image content (overrides image prop)
+  title: Custom title content (overrides title prop)
+  default: Main card body content (required)
+  actions: Action buttons or links for card footer
+
+All HTML attributes are forwarded via {{ attrs }}.
+#}
+<c-vars title="" image="" image_alt="" compact:false bordered:false side:false />
+<div {{ attrs }}
+     class="card bg-base-100 shadow-xl {% if bordered %}card-bordered{% endif %} {% if side %}card-side{% endif %} {{ attrs.class }}">
+    {# Image slot or prop #}
+    {% if image_slot %}
+        {{ image_slot }}
+    {% elif image %}
+        <figure>
+            <img src="{{ image }}" alt="{{ image_alt }}" />
+        </figure>
+    {% endif %}
+    <div class="card-body {% if compact %}p-4{% endif %}">
+        {# Title slot or prop #}
+        {% if title_slot %}
+            {{ title_slot }}
+        {% elif title %}
+            <h2 class="card-title">{{ title }}</h2>
+        {% endif %}
+        {# Main content (default slot) #}
+        <div>{{ slot }}</div>
+        {# Actions slot #}
+        {% if actions %}<div class="card-actions justify-end">{{ actions }}</div>{% endif %}
+    </div>
+</div>

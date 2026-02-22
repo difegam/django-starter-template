@@ -12,6 +12,16 @@ This project uses a **non-standard Django layout** where all Django code lives u
 
 **Authentication**: django-allauth provides email-based auth at `/accounts/`. The custom user model (`users.CustomUser` extending `AbstractUser`) is set from day one to avoid painful migration issues later.
 
+## Template Patterns Decision Guide
+
+**Django template partials** (Django 6.0+ built-in `{% partialdef %}`): Use for HTMX-swappable fragments within a single page. Partials inherit the current template context and can be rendered via `render(request, 'template.html#partial_name', context)`. Ideal for page-specific fragments that won't be reused elsewhere.
+
+**Cotton components** (`<c-button>`, `<c-card>` in `src/templates/cotton/`): Use for cross-app reusable UI building blocks with explicit props, slots, and attribute forwarding via `{{ attrs }}`. Components are purely presentational—no DB queries or business logic. Ideal for design system primitives used across 3+ templates.
+
+**Include partials** (`{% include 'partials/navbar.html' %}`): Use for static template composition like navbars, footers, and sidebars. Non-interactive content that's same across pages.
+
+**Practical rule**: Partials for page-local fragments + HTMX targets, Cotton for your reusable design system, includes for static composition.
+
 ## Critical File Inventory
 
 | Component | File Path | Description & Purpose | Why It's Critical |
@@ -74,7 +84,7 @@ Coverage: `uv run pytest --cov=src --cov-report=html`
 - **Namespace everything**: app templates in `src/<app>/templates/<app>/`, static in `src/<app>/static/<app>/`
 - Shared templates in `src/templates/`: `_base.html`, `partials/`, `cotton/`
 - Cotton components (`<c-button>`, `<c-card>`) for reusable UI — purely presentational, no DB queries
-- Use `{% partialdef %}` for HTMX-swappable fragments within full-page templates
+- Use Django 6.0+ built-in `{% partialdef %}` for HTMX-swappable fragments within full-page templates (no `{% load %}` tag needed)
 
 ### Frontend
 - daisyUI component classes (`btn`, `card`, `hero`, `navbar`) preferred over raw Tailwind utilities
