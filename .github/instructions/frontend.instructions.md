@@ -1,7 +1,10 @@
 ---
+name: Frontend Development Patterns
 description:
-  'frontend patterns (Django templates + HTMX + django-cotton + Alpine +
-  Tailwind/daisyUI)'
+  Server-rendered frontend architecture using Django templates, HTMX for
+  progressive enhancement, django-cotton for reusable UI components, Alpine.js
+  for interactivity, and Tailwind CSS with daisyUI. Covers template structure,
+  component patterns, responsive design, and accessibility.
 applyTo: 'src/**/templates/**/*.html,src/**/static/**/*,src/templates/**/*.html,src/static/**/*'
 ---
 

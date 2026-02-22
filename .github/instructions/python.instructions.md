@@ -1,4 +1,9 @@
 ---
+name: Python Style & Type Safety Rules
+description:
+  Python coding standards and style rules for the project. Covers Python 3.13+,
+  type hints, modern syntax, code organization, function design, and integration
+  with project's type checker (ty) and linter (Ruff).
 applyTo: 'src/**/*.py,tests/**/*.py,scripts/**/*.py'
 ---
 
@@ -8,11 +13,15 @@ Apply these conventions for all Python changes.
 
 ## Core Directives
 
-- Target **Python 3.12+** with compatibility for modern packaging workflows (uv/Poetry)
-- **Standard library first** - only add dependencies when they make code simpler, safer, or faster
+- Target **Python 3.12+** with compatibility for modern packaging workflows
+  (uv/Poetry)
+- **Standard library first** - only add dependencies when they make code
+  simpler, safer, or faster
 - Generate code that is **typed, documented, and testable** by default
-- Produce **small, single-responsibility** functions; keep classes lean and focused
-- Use **f-strings**, **`pathlib.Path`**, **`logging`** (never `print`), and **context managers** for resources
+- Produce **small, single-responsibility** functions; keep classes lean and
+  focused
+- Use **f-strings**, **`pathlib.Path`**, **`logging`** (never `print`), and
+  **context managers** for resources
 - Prefer **comprehensions** to `map`/`filter`; never use wildcard imports
 
 ## Type safety and signatures
@@ -36,7 +45,9 @@ Apply these conventions for all Python changes.
 
 ### Agent Integration
 
-**Prompt optimization:** "Write a typed, small function that accepts `Path` inputs, uses only the stdlib (unless clearly justified), raises specific exceptions, and includes a short docstring."
+**Prompt optimization:** "Write a typed, small function that accepts `Path`
+inputs, uses only the stdlib (unless clearly justified), raises specific
+exceptions, and includes a short docstring."
 
 ## Modern Python Features & Language Mastery
 
@@ -64,13 +75,16 @@ Apply these conventions for all Python changes.
 - Use **built-in generics** (`list[str]`, `dict[str, int]`, `set[Path]`)
 - Use the **union operator** (`A | B`, `str | None`) instead of `Union`
 - Handle forward references with **`from __future__ import annotations`**
-- Use **`Protocol`** for structural typing; prefer **dependency injection** over concrete coupling
+- Use **`Protocol`** for structural typing; prefer **dependency injection** over
+  concrete coupling
 
 ### Advanced Type Features
 
-- **`TypeVar`/`ParamSpec/Concatenate`** for complex generics and decorator signatures
+- **`TypeVar`/`ParamSpec/Concatenate`** for complex generics and decorator
+  signatures
 - **Avoid `Any`**; if unavoidable, scope narrowly and document rationale
-- **`dataclasses`** for data containers; choose immutability (`frozen=True`) when possible
+- **`dataclasses`** for data containers; choose immutability (`frozen=True`)
+  when possible
 - **Type aliases** with `type ID = int` for clarity
 - **`Annotated`** for metadata and validation constraints
 
@@ -135,14 +149,17 @@ Only add third-party dependencies when they:
 
 - Always use `with` (or async `with`) for files, sockets, locks, and sessions
 - **`contextlib.suppress`** only for specific, explained exceptions
-- Proper cleanup patterns with `try`/`finally` when context managers aren't available
+- Proper cleanup patterns with `try`/`finally` when context managers aren't
+  available
 
 ### Async Programming
 
 - Prefer **`asyncio`** with `async`/`await` for I/O-bound concurrency
 - **Do not** add async if it doesn't simplify or speed up I/O paths
-- For task sets: gather as a group, propagate exceptions, apply explicit timeouts
-- For HTTP client code, prefer **`httpx`** (sync or async) when stdlib insufficient
+- For task sets: gather as a group, propagate exceptions, apply explicit
+  timeouts
+- For HTTP client code, prefer **`httpx`** (sync or async) when stdlib
+  insufficient
 - **Advanced async patterns** with trio for structured concurrency
 
 ## Error Handling & Logging
@@ -223,13 +240,15 @@ Only add third-party dependencies when they:
 ### Tool Configuration
 
 - **Ruff** = primary linter & formatter (target Py 3.12, 100-char lines)
-- Enable comprehensive rule sets: errors, formatting, imports, modernization, best practices
+- Enable comprehensive rule sets: errors, formatting, imports, modernization,
+  best practices
 - **Virtual environment** management with venv, pipenv, or uv
 - **Dependency management** and lock files
 
 ### Development Workflow
 
-- Project uses **`pyproject.toml`** with **uv** (primary) or **Poetry** (alternative)
+- Project uses **`pyproject.toml`** with **uv** (primary) or **Poetry**
+  (alternative)
 - Prefer `uv run`/`poetry run` for tool execution
 - **Modern Python packaging** and distribution practices
 - **CI/CD integration** with quality gates

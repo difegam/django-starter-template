@@ -1,19 +1,29 @@
 ---
-description: 'Guidelines for creating high-quality custom instruction files for GitHub Copilot'
-applyTo: '**/*.instructions.md'
+name: Custom Instructions File Guidelines
+description:
+  Meta-guide for creating effective instruction files (.instructions.md).
+  Defines frontmatter structure (name, description, applyTo, version,
+  downloadedFrom), section organization, code samples, decision tables, and
+  rules for targeting specific agents and scopes.
+applyTo: '.github/instructions/**/*.md'
 ---
 
 # Custom Instructions File Guidelines
 
-Instructions for creating effective and maintainable custom instruction files that guide GitHub Copilot in generating domain-specific code and following project conventions.
+Instructions for creating effective and maintainable custom instruction files
+that guide GitHub Copilot in generating domain-specific code and following
+project conventions.
 
 ## Project Context
 
-- Target audience: Developers and GitHub Copilot working with domain-specific code
+- Target audience: Developers and GitHub Copilot working with domain-specific
+  code
 - File format: Markdown with YAML frontmatter
-- File naming convention: lowercase with hyphens (e.g., `react-best-practices.instructions.md`)
+- File naming convention: lowercase with hyphens (e.g.,
+  `react-best-practices.instructions.md`)
 - Location: `.github/instructions/` directory
-- Purpose: Provide context-aware guidance for code generation, review, and documentation
+- Purpose: Provide context-aware guidance for code generation, review, and
+  documentation
 
 ## Required Frontmatter
 
@@ -28,8 +38,10 @@ applyTo: 'glob pattern for target files (e.g., **/*.ts, **/*.py)'
 
 ### Frontmatter Guidelines
 
-- **description**: Single-quoted string, 1-500 characters, clearly stating the purpose
-- **applyTo**: Glob pattern(s) specifying which files these instructions apply to
+- **description**: Single-quoted string, 1-500 characters, clearly stating the
+  purpose
+- **applyTo**: Glob pattern(s) specifying which files these instructions apply
+  to
   - Single pattern: `'**/*.ts'`
   - Multiple patterns: `'**/*.ts, **/*.tsx, **/*.js'`
   - Specific files: `'src/**/*.py'`
@@ -65,17 +77,11 @@ Provide concrete examples with clear labels:
 ```markdown
 ### Good Example
 
-\`\`\`language
-// Recommended approach
-code example here
-\`\`\`
+\`\`\`language // Recommended approach code example here \`\`\`
 
 ### Bad Example
 
-\`\`\`language
-// Avoid this pattern
-code example here
-\`\`\`
+\`\`\`language // Avoid this pattern code example here \`\`\`
 ```
 
 ### 4. Validation and Verification (Optional but Recommended)
@@ -145,25 +151,13 @@ code example here
 ```markdown
 ### Good Example - Using TypeScript interfaces
 
-\`\`\`typescript
-interface User {
-id: string;
-name: string;
-email: string;
-}
+\`\`\`typescript interface User { id: string; name: string; email: string; }
 
-function getUser(id: string): User {
-// Implementation
-}
-\`\`\`
+function getUser(id: string): User { // Implementation } \`\`\`
 
 ### Bad Example - Using any type
 
-\`\`\`typescript
-function getUser(id: any): any {
-// Loses type safety
-}
-\`\`\`
+\`\`\`typescript function getUser(id: any): any { // Loses type safety } \`\`\`
 ```
 
 ### Conditional Guidance
@@ -172,7 +166,8 @@ function getUser(id: any): any {
 ## Framework Selection
 
 - **For small projects**: Use Minimal API approach
-- **For large projects**: Use controller-based architecture with clear separation
+- **For large projects**: Use controller-based architecture with clear
+  separation
 - **For microservices**: Consider domain-driven design patterns
 ```
 
@@ -235,9 +230,7 @@ Brief introduction and context.
 
 Description and example
 
-\`\`\`language
-code example
-\`\`\`
+\`\`\`language code example \`\`\`
 
 ### Pattern 2
 

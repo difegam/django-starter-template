@@ -1,5 +1,10 @@
 ---
-description: "This file outlines the use of HTMX with django-cotton components and Alpine.js in server-rendered templates. It explains when to opt for Django template partials over cotton components, discusses HTMX attribute patterns, and provides best practices for seamless integration."
+name: HTMX + Cotton + Alpine Integration Patterns
+description:
+  Advanced interactivity patterns for HTMX, django-cotton components, and
+  Alpine.js in server-rendered templates. Clarifies decision trees (partials vs.
+  components vs. includes), HTMX attribute best practices, form handling, and
+  progressive enhancement without JavaScript dependency.
 applyTo: 'src/templates/**/*.html,src/**/templates/**/*.html,src/**/views.py,src/**/urls.py,src/static/js/**/*.js'
 ---
 

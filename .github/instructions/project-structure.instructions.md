@@ -1,11 +1,18 @@
 ---
-description: This file describes the project structure and conventions for the Django starter template.
+name: Project Structure & File Ownership
+description:
+  Complete map of Django project layout (src/ root, src/config/ settings, app
+  structure, template/static namespacing). Defines ownership boundaries, file
+  inventory, when to use app-specific vs. shared resources, and Django best
+  practices for template/static namespacing.
 applyTo: '**'
 ---
 
 # Project Structure Guide
 
-Use this repository map when deciding where Django starter code should live. This guide follows Django best practices for file organization, template/static file namespacing, and clear ownership boundaries.
+Use this repository map when deciding where Django starter code should live.
+This guide follows Django best practices for file organization, template/static
+file namespacing, and clear ownership boundaries.
 
 ## Project Overview
 
@@ -22,7 +29,8 @@ Essential configuration and automation files at the repository root:
 
 ### Python Configuration
 
-- `pyproject.toml`: Python dependencies, project metadata, and tool configuration (uv, pytest, mypy, etc.)
+- `pyproject.toml`: Python dependencies, project metadata, and tool
+  configuration (uv, pytest, mypy, etc.)
 - `ruff.toml`: Ruff linting and formatting rules
 - `mypy.ini`: Mypy type checking configuration
 - `pytest.ini`: pytest-django settings
@@ -38,7 +46,8 @@ Essential configuration and automation files at the repository root:
 
 - `justfile`: Primary task runner entry point for all development commands
 - `.pre-commit-config.yaml`: Git pre-commit hooks configuration
-- `.env.example`: Required environment variables template (copy to `.env` for local development)
+- `.env.example`: Required environment variables template (copy to `.env` for
+  local development)
 - `.gitignore`: Git ignore patterns
 - `.python-version`: Python version specification for version managers
 
@@ -46,8 +55,10 @@ Essential configuration and automation files at the repository root:
 
 - `README.md`: Project overview and setup instructions
 - `AGENTS.md`: AI agent guidelines for code generation
-- `DJANGO_VIBE_CODING_STARTER.md`: Comprehensive guide for replicating this pattern
-- `init_project.py`: Initialization script for setting up new projects from this template
+- `DJANGO_VIBE_CODING_STARTER.md`: Comprehensive guide for replicating this
+  pattern
+- `init_project.py`: Initialization script for setting up new projects from this
+  template
 - `uv.lock`: Lock file for Python dependencies (managed by uv)
 
 ## Root-Level Directories
@@ -57,11 +68,13 @@ Essential configuration and automation files at the repository root:
 GitHub-specific configuration and documentation:
 
 - `.github/copilot-instructions.md`: GitHub Copilot instructions
-- `.github/instructions/`: Detailed instruction files for different aspects of the project
+- `.github/instructions/`: Detailed instruction files for different aspects of
+  the project
   - `django-architecture.instructions.md`: Backend architecture rules
   - `frontend.instructions.md`: Frontend patterns
   - `htmx-cotton-patterns.instructions.md`: HTMX and django-cotton usage
-  - `instructions.instructions.md`: Meta-guidelines for creating instruction files
+  - `instructions.instructions.md`: Meta-guidelines for creating instruction
+    files
   - `project-structure.instructions.md`: This file
   - `python.instructions.md`: Python coding standards
   - `tech-stack-dependencies.instructions.md`: Technology stack rules
@@ -180,7 +193,8 @@ src/users/
     └── js/
 ```
 
-**Critical:** Always use `get_user_model()` or `settings.AUTH_USER_MODEL`, never `django.contrib.auth.models.User`.
+**Critical:** Always use `get_user_model()` or `settings.AUTH_USER_MODEL`, never
+`django.contrib.auth.models.User`.
 
 ### `src/web/`
 
@@ -225,14 +239,16 @@ src/templates/
 
 **Usage patterns:**
 
-- **`_base.html`**: Defines the HTML shell with blocks for title, head, navigation, content, footer, scripts
+- **`_base.html`**: Defines the HTML shell with blocks for title, head,
+  navigation, content, footer, scripts
 - **`partials/`**: Included with `{% include 'partials/navbar.html' %}`
 - **`cotton/`**: Invoked with `<c-button>` or `<c-card>` tags
 
 **When to use shared vs app-specific templates:**
 
 - **Shared** (`src/templates/`): Navigation, layouts, cross-app components
-- **App-specific** (`src/<app>/templates/<app>/`): App domain logic, forms, detail pages
+- **App-specific** (`src/<app>/templates/<app>/`): App domain logic, forms,
+  detail pages
 
 ### `src/static/`
 
@@ -284,8 +300,8 @@ src/<app>/
 
 ### Template Namespacing (Django Best Practice)
 
-**Why namespace?**
-Django searches all `INSTALLED_APPS` for templates. Without namespacing, two apps with `detail.html` would conflict.
+**Why namespace?** Django searches all `INSTALLED_APPS` for templates. Without
+namespacing, two apps with `detail.html` would conflict.
 
 **Correct:**
 
@@ -309,8 +325,8 @@ src/blog/templates/detail.html  # Will conflict with other apps
 
 ### Static File Namespacing (Django Best Practice)
 
-**Why namespace?**
-Django's `AppDirectoriesFinder` collects static files from all apps. Namespacing prevents collisions.
+**Why namespace?** Django's `AppDirectoriesFinder` collects static files from
+all apps. Namespacing prevents collisions.
 
 **Correct:**
 
@@ -341,7 +357,8 @@ src/blog/static/style.css  # Will conflict with other apps
 | **Static Files**   | App-specific styles, scripts, images       | Global CSS framework, shared utilities, favicons |
 | **Business Logic** | Models, views, forms for one app           | Cross-app services, shared utilities             |
 
-**Rule of thumb:** If it's used by more than one app, move it to shared. If it's domain-specific, keep it in the app.
+**Rule of thumb:** If it's used by more than one app, move it to shared. If it's
+domain-specific, keep it in the app.
 
 ## URL Configuration and Ownership
 
@@ -379,7 +396,8 @@ urlpatterns = [
 ]
 ```
 
-**Pattern:** Root URLs only route to apps and third-party packages, never define views directly.
+**Pattern:** Root URLs only route to apps and third-party packages, never define
+views directly.
 
 ## Business Logic and Code Organization
 
@@ -505,17 +523,23 @@ src/blog/static/blog/
 ## Summary of Key Conventions
 
 1. **Django root in `src/`**: All Django code in `src/`, not at repository root
-2. **Namespace templates and static**: Always use `<app>/templates/<app>/` and `<app>/static/<app>/`
+2. **Namespace templates and static**: Always use `<app>/templates/<app>/` and
+   `<app>/static/<app>/`
 3. **App ownership**: Each app owns its models, views, templates, and URLs
 4. **Root URLs compose**: `src/config/urls.py` only includes app routers
-5. **Shared vs specific**: Shared files in `src/templates/` and `src/static/`, app-specific in app directories
+5. **Shared vs specific**: Shared files in `src/templates/` and `src/static/`,
+   app-specific in app directories
 6. **Custom user model**: Always use `get_user_model()`, never `User` directly
-7. **Business logic**: Keep close to domain; extract to services only when reused
+7. **Business logic**: Keep close to domain; extract to services only when
+   reused
 8. **Testing**: Prefer top-level `tests/` for integration tests
 9. **Task automation**: Use `just` for all development commands
 
 ## References
 
-- Django Official Documentation: [Writing your first Django app](https://docs.djangoproject.com/en/6.0/intro/)
-- Django Best Practices: [Static file namespacing](https://docs.djangoproject.com/en/6.0/intro/tutorial06/#static-file-namespacing)
-- Django Best Practices: [Template namespacing](https://docs.djangoproject.com/en/6.0/intro/tutorial03/#namespacing-url-names)
+- Django Official Documentation:
+  [Writing your first Django app](https://docs.djangoproject.com/en/6.0/intro/)
+- Django Best Practices:
+  [Static file namespacing](https://docs.djangoproject.com/en/6.0/intro/tutorial06/#static-file-namespacing)
+- Django Best Practices:
+  [Template namespacing](https://docs.djangoproject.com/en/6.0/intro/tutorial03/#namespacing-url-names)

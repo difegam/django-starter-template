@@ -1,6 +1,10 @@
 ---
+name: Technology Stack & Dependency Rules
 description:
-  This file describes the tech stack and dependency rules for the project.
+  Governance rules for project dependencies, tooling versions, and tech stack
+  decisions. Covers allowlisted libraries, version constraints, dependency
+  categories (runtime vs. dev), and rules for adding new tools to
+  pyproject.toml, package.json, and configuration files.
 applyTo: 'pyproject.toml,package.json,justfile,ruff.toml,pytest.ini,tailwind.config.js,postcss.config.js'
 ---
 
