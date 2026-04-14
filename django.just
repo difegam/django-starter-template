@@ -44,4 +44,4 @@ new NAME:
     # Use module invocation to avoid missing django-admin script issues
     @uv run python -m django startapp {{ NAME }}
     mkdir -p {{ NAME }}/templates/{{ NAME }} {{ NAME }}/static/{{ NAME }}
-    echo "Remember to add {{ BLUE }}'{{ NAME }}'{{ NORMAL }} to LOCAL_APPS in {{ BLUE }}src/config/settings.py{{ NORMAL }}"
+    echo "Remember to add '{{ NAME }}' to LOCAL_APPS in src/config/settings.py"
