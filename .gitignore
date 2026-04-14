@@ -33,9 +33,10 @@ coverage.xml
 cover/
 TEST*.xml
 
-# Tool caches (ruff, mypy, etc.)
+# Tool caches (ruff, mypy, ty, etc.)
 .mypy_cache/
 .ruff_cache/
+.ty_cache/
 
 # Environments (uv / venv)
 .env

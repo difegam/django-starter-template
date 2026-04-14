@@ -1,9 +1,12 @@
+set windows-shell := ["powershell.exe", "-NoLogo", "-Command"]
 set dotenv-load := true
 
 # List available recipes
 [private]
 default:
-    @just --list
+    @just --list --list-submodules
+
+mod docker "Docker/docker.just"
 
 [doc("Run the application locally")]
 [group("django")]
@@ -46,23 +49,25 @@ export-reqs:
 init:
     @echo '📦 Installing the application for development'
     @uv sync --all-groups
-    @uv run pre-commit install
+    @uv run pre-commit install --install-hooks --hook-type pre-commit --hook-type pre-push
     @echo '✅ Setup complete, ready to code 🚀'
 
-# Update dependencies
+[doc('Update project dependencies')]
 [group("development")]
 update:
-    @uv sync --all-groups
+    @uv lock --upgrade && uv sync --all-groups
+    @echo '✅ Dependencies updated successfully 🚀'
 
-# Remove temporary files
+[doc('Remove temporary files')]
 [group("development")]
 clean:
-    rm -rf .venv .pytest_cache .mypy_cache .ruff_cache .coverage htmlcov
+    rm -rf .venv .pytest_cache .mypy_cache .ty_cache .ruff_cache .coverage htmlcov
     find . -type d -name "__pycache__" -exec rm -r {} +
 
-# Recreate project virtualenv from nothing
+[doc('Recreate project virtualenv from scratch')]
 [group("development")]
 fresh: clean init
+    @uv run pre-commit clean
     @echo "✅ Fresh setup complete, ready to code 🚀"
 
 # Django specific commands

@@ -1,0 +1,14 @@
+---
+name: django-app
+
+services:
+  web:
+    container_name: django-app
+    image: django-app
+    build:
+      context: .
+      dockerfile: Docker/Dockerfile
+    ports:
+      - "8000:8000"
+    env_file:
+      - .env

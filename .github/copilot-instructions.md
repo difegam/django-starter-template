@@ -62,8 +62,8 @@ If starting a new project from this template, use `uv run init_project.py`:
 Use `just new NAME` which:
 
 1. Creates the app in `src/` directory
-2. Sets up `templates/NAME/` and `static/NAME/` directories
-3. Reminds you to add it to `LOCAL_APPS` in `src/config/settings.py`
+1. Sets up `templates/NAME/` and `static/NAME/` directories
+1. Reminds you to add it to `LOCAL_APPS` in `src/config/settings.py`
 
 **Always add new apps to `LOCAL_APPS`** (not `INSTALLED_APPS` directly).
 
@@ -196,9 +196,9 @@ Uses pytest with pytest-django:
 ## Common Pitfalls
 
 1. **Don't forget** to add new apps to `LOCAL_APPS` in settings
-2. **Always use** `uv run` prefix for Python commands
-3. **Migrations are auto-generated** by `just migrate` (don't run makemigrations separately)
-4. **Custom user model** is already set - don't import Django's User model
-5. **Single quotes** are enforced - use 'string' not "string"
-6. **Static/template directories** must exist in each app (created by `just new NAME`)
-7. **Environment file location** - `.env` must be in project root, not in `src/`
+1. **Always use** `uv run` prefix for Python commands
+1. **Migrations are auto-generated** by `just migrate` (don't run makemigrations separately)
+1. **Custom user model** is already set - don't import Django's User model
+1. **Single quotes** are enforced - use 'string' not "string"
+1. **Static/template directories** must exist in each app (created by `just new NAME`)
+1. **Environment file location** - `.env` must be in project root, not in `src/`

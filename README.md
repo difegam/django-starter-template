@@ -2,7 +2,7 @@
 
 A modern Django 5.2+ starter template with best practices, using **uv** for dependency management and **just** for task automation.
 
-##  Features
+## Features
 
 - **Django 5.2+** - Latest Django features and security updates
 - **Custom User Model** - Pre-configured `CustomUser` extending `AbstractUser`
@@ -35,6 +35,7 @@ uv run init_project.py my-project-name --description "My awesome Django project"
 ```
 
 The initialization script will:
+
 - Remove the existing git repository (unless `--skip-git` is used)
 - Remove the virtual environment and database
 - Create a new README.md with your project name
@@ -42,6 +43,7 @@ The initialization script will:
 - Prepare the project for a fresh start
 
 After initialization:
+
 ```bash
 rm init_project.py  # Remove the script
 git init            # Initialize new git repo
@@ -51,17 +53,20 @@ just init           # Set up environment
 ### Option 2: Manual Installation
 
 1. Clone the repository:
+
 ```bash
 git clone <your-repo-url>
 cd django-starter-template
 ```
 
 2. Set up the environment:
+
 ```bash
 just init
 ```
 
 3. Create a `.env` file in the project root:
+
 ```bash
 SECRET_KEY=your-secret-key-here
 DEBUG=True
@@ -71,16 +76,19 @@ DATABASE_URL=sqlite:///src/db.sqlite3
 ```
 
 4. Run migrations:
+
 ```bash
 just migrate
 ```
 
 5. Create a superuser:
+
 ```bash
 just add-superuser
 ```
 
 6. Start the development server:
+
 ```bash
 just serve
 ```
@@ -101,15 +109,18 @@ The included `init_project.py` script helps you quickly transform this template 
 ### Usage
 
 **Interactive Mode** (recommended for first-time users):
+
 ```bash
 uv run init_project.py
 ```
 
 You'll be prompted to enter:
+
 - Project name (lowercase, with hyphens or underscores)
 - Optional custom description
 
 **Non-Interactive Mode**:
+
 ```bash
 # Basic usage
 uv run init_project.py my-awesome-project
@@ -130,10 +141,10 @@ uv run init_project.py my-awesome-project --skip-git
 ### What It Does
 
 1. **Removes existing git repository** - Clean slate for your version control
-2. **Removes virtual environment** - Fresh Python environment
-3. **Removes database file** - No leftover demo data
-4. **Creates new README.md** - Customized with your project name and description
-5. **Updates pyproject.toml** - Sets your project name and metadata
+1. **Removes virtual environment** - Fresh Python environment
+1. **Removes database file** - No leftover demo data
+1. **Creates new README.md** - Customized with your project name and description
+1. **Updates pyproject.toml** - Sets your project name and metadata
 
 ### After Initialization
 
@@ -161,35 +172,34 @@ just migrate
 
 ### Django Commands
 
-| Command | Description |
-|---------|-------------|
-| `just serve` | Start Django development server |
-| `just migrate` | Run migrations (automatically runs makemigrations first) |
-| `just add-superuser` | Create a superuser |
-| `just shell` | Start Django shell |
-| `just deploy-check` | Run Django deployment checks |
-| `just collectstatic` | Collect static files |
-| `just new NAME` | Create a new Django app with proper structure |
+| Command              | Description                                              |
+| -------------------- | -------------------------------------------------------- |
+| `just serve`         | Start Django development server                          |
+| `just migrate`       | Run migrations (automatically runs makemigrations first) |
+| `just add-superuser` | Create a superuser                                       |
+| `just shell`         | Start Django shell                                       |
+| `just deploy-check`  | Run Django deployment checks                             |
+| `just collectstatic` | Collect static files                                     |
+| `just new NAME`      | Create a new Django app with proper structure            |
 
 ### Development Commands
 
-| Command | Description |
-|---------|-------------|
-| `just init` | Set up environment (uv sync + pre-commit install) |
-| `just update` | Update all dependencies |
-| `just clean` | Remove temporary files and caches |
-| `just fresh` | Clean and reinstall everything |
+| Command            | Description                                       |
+| ------------------ | ------------------------------------------------- |
+| `just init`        | Set up environment (uv sync + pre-commit install) |
+| `just update`      | Update all dependencies                           |
+| `just clean`       | Remove temporary files and caches                 |
+| `just fresh`       | Clean and reinstall everything                    |
 | `just export-reqs` | Generate `requirements.txt` from `pyproject.toml` |
 
 ### Quality Assurance Commands
 
-| Command | Description |
-|---------|-------------|
-| `just lint` | Run ruff linting and formatting |
-| `just ty` | Run type checks with `ty` |
+| Command      | Description                                     |
+| ------------ | ----------------------------------------------- |
+| `just lint`  | Run ruff linting and formatting                 |
+| `just ty`    | Run type checks with `ty`                       |
 | `just check` | Run lint, type checks, and all pre-commit hooks |
-| `just test` | Run pytest test suite |
-
+| `just test`  | Run pytest test suite                           |
 
 ## 🔧 Configuration
 
@@ -256,6 +266,7 @@ Uses **ty** for routine checks (`just ty`) and maintains strict **mypy** configu
 - Django plugin enabled
 
 Example:
+
 ```python
 from django.http.request import HttpRequest
 from django.http.response import HttpResponse
@@ -302,6 +313,7 @@ just new blog
 ```
 
 This creates:
+
 - `src/blog/` directory with standard Django app files
 - `src/blog/templates/blog/` for app-specific templates
 - `src/blog/static/blog/` for app-specific static files
@@ -336,12 +348,12 @@ LOCAL_APPS = [
 ## 🤝 Contributing
 
 1. Fork the repository
-2. Create a feature branch: `git checkout -b feature/amazing-feature`
-3. Run quality checks: `just check`
-4. Run tests: `just test`
-5. Commit your changes: `git commit -m 'Add amazing feature'`
-6. Push to the branch: `git push origin feature/amazing-feature`
-7. Open a Pull Request
+1. Create a feature branch: `git checkout -b feature/amazing-feature`
+1. Run quality checks: `just check`
+1. Run tests: `just test`
+1. Commit your changes: `git commit -m 'Add amazing feature'`
+1. Push to the branch: `git push origin feature/amazing-feature`
+1. Open a Pull Request
 
 ## 📝 License
 
@@ -350,6 +362,7 @@ This project is open source and available under the [MIT License](LICENSE).
 ## 🙏 Acknowledgments
 
 Built with modern Python tooling:
+
 - [uv](https://github.com/astral-sh/uv) - Fast Python package manager
 - [Just](https://github.com/casey/just) - Command runner
 - [Ruff](https://github.com/astral-sh/ruff) - Fast Python linter
@@ -362,6 +375,6 @@ Built with modern Python tooling:
 - [uv Documentation](https://docs.astral.sh/uv/)
 - [Just Manual](https://just.systems/)
 
----
+______________________________________________________________________
 
 **Happy coding! 🚀**

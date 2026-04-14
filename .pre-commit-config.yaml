@@ -1,5 +1,10 @@
+minimum_pre_commit_version: "3.2.0"
+
 default_language_version:
   python: python3.13
+
+default_install_hook_types: [pre-commit, pre-push]
+
 exclude: ^(docs|\.venv|\.vscode)/
 
 repos:
@@ -7,86 +12,181 @@ repos:
     rev: "v6.0.0"
     hooks:
       - id: trailing-whitespace
-      - id: mixed-line-ending
-      - id: check-added-large-files
-        args: ["--maxkb=1000"]
+        name: trim trailing whitespace
+        args: [--markdown-linebreak-ext=md]
       - id: end-of-file-fixer
+        name: ensure files end with a single newline
+      - id: mixed-line-ending
+        name: normalize line endings
+      - id: check-added-large-files
+        name: block oversized added files
+        args: ["--maxkb=1000"]
+        exclude: ^uv\.lock$
       - id: check-yaml
+        name: validate YAML syntax
       - id: check-json
+        name: validate JSON syntax
       - id: check-toml
+        name: validate TOML syntax
       - id: check-merge-conflict
+        name: check for merge conflicts
       - id: check-case-conflict
+        name: detect case-insensitive path conflicts
       - id: check-docstring-first
+        name: ensure docstrings are first
       - id: check-executables-have-shebangs
+        name: ensure executables have shebangs
       - id: check-shebang-scripts-are-executable
+        name: ensure shebang scripts are executable
+      - id: check-ast
+        name: check Python syntax and parseability
 
   - repo: https://github.com/djlint/djLint
     rev: v1.36.4
     hooks:
       - id: djlint-reformat-django
-
+        name: reformat Django templates
       - id: djlint-django
+        name: lint Django templates
 
   # Upgrade syntax to newer versions of Python
   - repo: https://github.com/asottile/pyupgrade
     rev: v3.21.2
     hooks:
       - id: pyupgrade
+        name: modernize Python syntax
         description: "Upgrade syntax to newer versions"
         args: [--py313-plus, --keep-runtime-typing]
+        types_or: [python, pyi]
 
   # Ruff Python linter and formatter
   - repo: https://github.com/charliermarsh/ruff-pre-commit
-    rev: "v0.14.6"
+    rev: "v0.15.10"
     hooks:
-      - id: ruff
+      - id: ruff-check
+        name: lint Python and apply safe fixes
         description: "Ruff Python linter"
-        args: ["--fix", "--config=./ruff.toml"]
+        args: [--fix, --config=./ruff.toml]
         types_or: [python, pyi, jupyter]
       - id: ruff-format
+        name: format Python
         description: "Ruff Python formatter"
+        args: [--config=./ruff.toml]
         types_or: [python, pyi, jupyter]
+
+  # Format Markdown files
+  - repo: https://github.com/hukkin/mdformat
+    rev: 1.0.0
+    hooks:
+      - id: mdformat
+        name: format Markdown
+        types: [markdown]
+        additional_dependencies:
+          - mdformat-gfm
 
   # Spelling checker
   - repo: https://github.com/codespell-project/codespell
-    rev: v2.4.1
+    rev: v2.4.2
     hooks:
       - id: codespell
+        name: detect common misspellings
         description: "Check for common misspellings"
-        files: ^.*\.(py|c|h|md|rst|ya?ml)$
+        files: ^.*\.(py|c|h|md|rst|ya?ml|toml)$
         additional_dependencies:
           - tomli
-
-  # Scan your uv.lock file for dependencies with known vulnerabilities.
-  - repo: https://github.com/owenlamont/uv-secure
-    rev: 0.15.0
-    hooks:
-      - id: uv-secure
-        description: "Scan uv.lock for dependencies with known vulnerabilities"
-
-  # Detect secrets in your codebase
-  - repo: https://github.com/Yelp/detect-secrets
-    rev: v1.5.0
-    hooks:
-      - id: detect-secrets
-        description: "Prevent secrets from being committed"
-        args: ["--exclude-lines", "(.*)# scan:ignore"]
-
-  # Detect common security issues in Python code.
-  - repo: https://github.com/pycqa/bandit
-    rev: 1.9.1
-    hooks:
-      - id: bandit
-        description: "Detect common security issues"
-        exclude: ^tests/
-        args: [-r, src]
 
   # Static analysis tool for shell scripts.
   - repo: https://github.com/koalaman/shellcheck-precommit
     rev: v0.11.0
     hooks:
       - id: shellcheck
-        name: Check Shell Scripts
+        name: check shell scripts
         description: "Shell script linter"
         args: ["--severity=warning"]
         types_or: [shell, sh]
+
+  # Python static type checker (mypy)
+  - repo: local
+    hooks:
+      - id: mypy
+        name: type-check Python (mypy)
+        entry: uv run mypy
+        language: system
+        pass_filenames: false
+        stages: [pre-push, manual]
+        types: [python]
+        args:
+          - --config-file=./mypy.ini
+          - --install-types
+          - --non-interactive
+          - src/
+
+  # Find unused code in Python projects.
+  - repo: https://github.com/jendrikseipp/vulture
+    rev: v2.16
+    hooks:
+      - id: vulture
+        name: detect unused Python code
+        pass_filenames: false
+        stages: [pre-push, manual]
+        args: [--min-confidence=80, --ignore-names=cls, "src/"]
+
+  # Detect common security issues in Python code.
+  - repo: https://github.com/pycqa/bandit
+    rev: 1.9.4
+    hooks:
+      - id: bandit
+        name: scan Python for common security issues
+        description: "Detect common security issues"
+        pass_filenames: false
+        stages: [pre-push, manual]
+        args: [-c, pyproject.toml, -r, src]
+
+  # Scan your uv.lock file for dependencies with known vulnerabilities.
+  - repo: https://github.com/owenlamont/uv-secure
+    rev: 0.17.1
+    hooks:
+      - id: uv-secure
+        name: scan locked dependencies for known vulnerabilities
+        description: "Scan uv.lock for dependencies with known vulnerabilities"
+        pass_filenames: false
+        stages: [pre-push, manual]
+
+  # Detect secrets in your codebase
+  - repo: https://github.com/Yelp/detect-secrets
+    rev: v1.5.0
+    hooks:
+      - id: detect-secrets
+        name: prevent committing secrets
+        description: "Prevent secrets from being committed"
+        args:
+          - --baseline
+          - .secrets.baseline
+          - --exclude-lines
+          - (.*)# scan:ignore
+        exclude: package.lock.json
+
+  # Semgrep - Security scanning
+  - repo: https://github.com/semgrep/pre-commit
+    rev: v1.153.0
+    hooks:
+      - id: semgrep
+        name: run Semgrep rules
+        pass_filenames: false
+        stages: [pre-push, manual]
+        args:
+          - --config
+          - auto
+          - --error
+          - --skip-unknown-extensions
+
+  # Run your test suite before pushing code.
+  - repo: local
+    hooks:
+      - id: pytest
+        name: run test suite
+        entry: uv run pytest
+        language: system
+        pass_filenames: false
+        stages: [pre-push, manual]
+        args: [tests]
