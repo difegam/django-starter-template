@@ -22,6 +22,14 @@ A modern Django 5.2+ starter template with best practices, using **uv** for depe
 - [uv](https://github.com/astral-sh/uv) - Install with `curl -LsSf https://astral.sh/uv/install.sh | sh`
 - [Just](https://github.com/casey/just) - Install with `brew install just` (macOS)
 
+### Command Invocation
+
+This project organizes commands in Just modules.
+
+- Use `just django <command>` for Django app operations
+- Use `just <command>` for root development/QA commands
+- Use `just docker <command>` for container workflows
+
 ### Option 1: Initialize a New Project (Recommended)
 
 Use the included initialization script to set up a fresh project:
@@ -31,7 +39,7 @@ Use the included initialization script to set up a fresh project:
 uv run init_project.py
 
 # Non-interactive mode
-uv run init_project.py my-project-name --description "My awesome Django project"
+uv run init_project.py --name my-project-name --description "My awesome Django project"
 ```
 
 The initialization script will:
@@ -78,19 +86,19 @@ DATABASE_URL=sqlite:///src/db.sqlite3
 4. Run migrations:
 
 ```bash
-just migrate
+just django migrate
 ```
 
 5. Create a superuser:
 
 ```bash
-just add-superuser
+just django add-superuser
 ```
 
 6. Start the development server:
 
 ```bash
-just serve
+just django serve
 ```
 
 Visit [http://127.0.0.1:8000](http://127.0.0.1:8000) to see your app running!
@@ -123,18 +131,19 @@ You'll be prompted to enter:
 
 ```bash
 # Basic usage
-uv run init_project.py my-awesome-project
+uv run init_project.py --name my-awesome-project
 
 # With description
-uv run init_project.py my-awesome-project --description "A revolutionary Django app"
+uv run init_project.py --name my-awesome-project --description "A revolutionary Django app"
 
 # Skip git repository removal
-uv run init_project.py my-awesome-project --skip-git
+uv run init_project.py --name my-awesome-project --skip-git
 ```
 
 ### Command-Line Options
 
-- `project_name` - Name of your new project (positional argument)
+- `project_name` - Name of your new project (positional argument, optional)
+- `--name` - Name of your new project (optional flag alternative)
 - `--description, -d` - Custom project description
 - `--skip-git` - Skip removing the git repository
 
@@ -163,7 +172,7 @@ just init
 # 4. Create your .env file (see Configuration section)
 
 # 5. Run migrations
-just migrate
+just django migrate
 
 # 6. Start coding! 🎉
 ```
@@ -172,15 +181,15 @@ just migrate
 
 ### Django Commands
 
-| Command              | Description                                              |
-| -------------------- | -------------------------------------------------------- |
-| `just serve`         | Start Django development server                          |
-| `just migrate`       | Run migrations (automatically runs makemigrations first) |
-| `just add-superuser` | Create a superuser                                       |
-| `just shell`         | Start Django shell                                       |
-| `just deploy-check`  | Run Django deployment checks                             |
-| `just collectstatic` | Collect static files                                     |
-| `just new NAME`      | Create a new Django app with proper structure            |
+| Command                     | Description                                              |
+| --------------------------- | -------------------------------------------------------- |
+| `just django serve`         | Start Django development server                          |
+| `just django migrate`       | Run migrations (automatically runs makemigrations first) |
+| `just django add-superuser` | Create a superuser                                       |
+| `just django shell`         | Start Django shell                                       |
+| `just django deploy-check`  | Run Django deployment checks                             |
+| `just django collectstatic` | Collect static files                                     |
+| `just django new NAME`      | Create a new Django app with proper structure            |
 
 ### Development Commands
 
@@ -194,12 +203,12 @@ just migrate
 
 ### Quality Assurance Commands
 
-| Command      | Description                                     |
-| ------------ | ----------------------------------------------- |
-| `just lint`  | Run ruff linting and formatting                 |
-| `just ty`    | Run type checks with `ty`                       |
-| `just check` | Run lint, type checks, and all pre-commit hooks |
-| `just test`  | Run pytest test suite                           |
+| Command      | Description                                       |
+| ------------ | ------------------------------------------------- |
+| `just lint`  | Run ruff linting and formatting                   |
+| `just ty`    | Run type checks with `ty`                         |
+| `just check` | Run lint, type checks, and pre-commit-stage hooks |
+| `just test`  | Run pytest test suite                             |
 
 ## 🔧 Configuration
 
@@ -277,15 +286,24 @@ def my_view(request: HttpRequest) -> HttpResponse:
 
 ### Pre-commit Hooks
 
-Automatically run on every commit (or manually with `just check`):
+By default, `just check` runs pre-commit-stage hooks on all files.
+
+Pre-commit stage hooks:
 
 - djlint - Django template linting
 - ruff - Python linting/formatting
 - pyupgrade - Python 3.13+ syntax upgrades
 - codespell - Spell checking
-- bandit - Security issue detection
 - detect-secrets - Secret detection
+
+Pre-push/manual stage hooks:
+
+- mypy - Type checking with django-stubs
+- vulture - Unused code detection
+- bandit - Security issue detection
 - uv-secure - Dependency vulnerability scanning
+- semgrep - Security rules scanning
+- pytest - Test suite execution
 
 ## 🧪 Testing
 
@@ -304,12 +322,27 @@ uv run pytest tests/test_specific.py -vv
 
 Tests are located in the top-level `tests/` directory.
 
+## 🐳 Docker
+
+Container commands are available via the Docker Just module:
+
+```bash
+# Build image
+just docker build
+
+# Run container locally
+just docker run
+
+# Build and run with Compose
+docker compose up --build
+```
+
 ## 🆕 Creating New Apps
 
 Use the built-in command to create properly structured apps:
 
 ```bash
-just new blog
+just django new blog
 ```
 
 This creates:

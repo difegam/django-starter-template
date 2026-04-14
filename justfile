@@ -21,7 +21,7 @@ ty:
     @echo 'Running ty type checks'
     @uv run ty check
 
-[doc('Run type checks and pre-commit hooks')]
+[doc('Run type checks and pre-commit-stage hooks')]
 [group('qa')]
 check: lint ty
     @echo 'Running pre-commit hooks on all files'

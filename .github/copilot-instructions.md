@@ -30,21 +30,23 @@ If starting a new project from this template, use `uv run init_project.py`:
 
 ### Development Commands (via Just)
 
+This project uses Just modules. Use `just django <command>` for Django app operations.
+
 **Django Commands:**
 
-- `just serve` - Start Django dev server
-- `just migrate` - Run migrations (auto-runs makemigrations first)
-- `just add-superuser` - Create a superuser
-- `just shell` - Start Django shell
-- `just new NAME` - Create new Django app with proper structure
-- `just deploy-check` - Run Django deployment checks
-- `just collectstatic` - Collect static files
+- `just django serve` - Start Django dev server
+- `just django migrate` - Run migrations (auto-runs makemigrations first)
+- `just django add-superuser` - Create a superuser
+- `just django shell` - Start Django shell
+- `just django new NAME` - Create new Django app with proper structure
+- `just django deploy-check` - Run Django deployment checks
+- `just django collectstatic` - Collect static files
 
 **Quality Assurance:**
 
 - `just lint` - Run ruff linting and formatting
 - `just ty` - Run ty type checker (Astral's mypy alternative)
-- `just check` - Run lint + ty + all pre-commit hooks
+- `just check` - Run lint + ty + pre-commit-stage hooks
 - `just test` - Run pytest suite with verbose output
 
 **Development:**
@@ -59,7 +61,7 @@ If starting a new project from this template, use `uv run init_project.py`:
 
 ### Creating New Apps
 
-Use `just new NAME` which:
+Use `just django new NAME` which:
 
 1. Creates the app in `src/` directory
 1. Sets up `templates/NAME/` and `static/NAME/` directories
@@ -100,7 +102,7 @@ Required variables:
 
 **ty** (Astral's type checker):
 
-- Python 3.12+ targeted
+- Python 3.13+ targeted
 - Checks `manage.py`, `src/`, and `tests/`
 - Errors on unresolved imports/references, invalid assignments
 - Warns on unused-ignore-comment and redundant-cast
@@ -109,17 +111,25 @@ Required variables:
 
 ### Pre-commit Hooks
 
-Runs automatically on commit (or via `just check`):
+Commit-stage hooks run automatically on commit and via `just check`.
+Pre-push/manual hooks run on `pre-push` or `manual` stages.
 
 - djlint for Django templates (reformatting + linting)
 - ruff for Python linting/formatting
 - pyupgrade (Python 3.13+ syntax)
 - codespell (spelling checker)
-- bandit (security scanning, excludes tests/)
 - detect-secrets (prevents committing secrets)
-- uv-secure (dependency vulnerability scanning)
 - shellcheck (shell script linting)
 - Standard hooks (trailing whitespace, file size, YAML/JSON/TOML validation)
+
+Pre-push/manual hooks include:
+
+- mypy (type checking)
+- vulture (unused code detection)
+- bandit (security scanning)
+- uv-secure (dependency vulnerability scanning)
+- semgrep (security scanning)
+- pytest (test suite)
 
 ## Project-Specific Conventions
 
@@ -197,8 +207,8 @@ Uses pytest with pytest-django:
 
 1. **Don't forget** to add new apps to `LOCAL_APPS` in settings
 1. **Always use** `uv run` prefix for Python commands
-1. **Migrations are auto-generated** by `just migrate` (don't run makemigrations separately)
+1. **Migrations are auto-generated** by `just django migrate` (don't run makemigrations separately)
 1. **Custom user model** is already set - don't import Django's User model
 1. **Single quotes** are enforced - use 'string' not "string"
-1. **Static/template directories** must exist in each app (created by `just new NAME`)
+1. **Static/template directories** must exist in each app (created by `just django new NAME`)
 1. **Environment file location** - `.env` must be in project root, not in `src/`
