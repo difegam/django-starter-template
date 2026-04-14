@@ -12,7 +12,7 @@ mod django "django.just"
 [doc('Run linter and formatter')]
 [group("qa")]
 lint:
-    uv run ruff check --fix
+    uv run ruff check src --fix --show-fixes
     uv run ruff format
 
 [doc('Run type checks with ty')]
