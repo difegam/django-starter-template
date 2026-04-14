@@ -10,7 +10,7 @@ A modern Django 5.2+ starter template with best practices, using **uv** for depe
 - **uv** - Fast, modern Python package manager
 - **Just** - Command runner for development tasks
 - **Type Safety** - `ty` checks plus strict mypy configuration with django-stubs
-- **Code Quality** - Ruff for linting/formatting, pre-commit hooks
+- **Code Quality** - Ruff for linting/formatting, prek-managed Git hooks
 - **Testing** - pytest with pytest-django and coverage reporting
 - **Environment Configuration** - django-environ for 12-factor app compliance
 
@@ -197,22 +197,23 @@ just django migrate
 
 ### Development Commands
 
-| Command            | Description                                       |
-| ------------------ | ------------------------------------------------- |
-| `just init`        | Set up environment (uv sync + pre-commit install) |
-| `just update`      | Update all dependencies                           |
-| `just clean`       | Remove temporary files and caches                 |
-| `just fresh`       | Clean and reinstall everything                    |
-| `just export-reqs` | Generate `requirements.txt` from `pyproject.toml` |
+| Command             | Description                                       |
+| ------------------- | ------------------------------------------------- |
+| `just init`         | Set up environment (uv sync + prek install)       |
+| `just update`       | Update all dependencies                           |
+| `just clean`        | Remove temporary files and caches                 |
+| `just fresh`        | Clean and reinstall everything                    |
+| `just hooks-update` | Update prek hook revisions                        |
+| `just export-reqs`  | Generate `requirements.txt` from `pyproject.toml` |
 
 ### Quality Assurance Commands
 
-| Command      | Description                                       |
-| ------------ | ------------------------------------------------- |
-| `just lint`  | Run ruff linting and formatting                   |
-| `just ty`    | Run type checks with `ty`                         |
-| `just check` | Run lint, type checks, and pre-commit-stage hooks |
-| `just test`  | Run pytest test suite                             |
+| Command      | Description                                                |
+| ------------ | ---------------------------------------------------------- |
+| `just lint`  | Run ruff linting and formatting                            |
+| `just ty`    | Run type checks with `ty`                                  |
+| `just check` | Run lint, type checks, and prek-managed commit-stage hooks |
+| `just test`  | Run pytest test suite                                      |
 
 ## 🔧 Configuration
 
@@ -289,11 +290,11 @@ def my_view(request: HttpRequest) -> HttpResponse:
     return render(request, 'template.html')
 ```
 
-### Pre-commit Hooks
+### Prek Hooks
 
-By default, `just check` runs pre-commit-stage hooks on all files.
+By default, `just check` runs prek-managed commit-stage hooks on all files.
 
-Pre-commit stage hooks:
+Commit-stage hooks:
 
 - djlint - Django template linting
 - ruff - Python linting/formatting
@@ -380,7 +381,7 @@ LOCAL_APPS = [
 - **pytest-cov** - Coverage reporting
 - **mypy** & **django-stubs** - Type checking
 - **ruff** - Fast linter and formatter
-- **pre-commit** - Git hook management
+- **prek** - Git hook management
 - **django-debug-toolbar** - Debug panel for development
 
 ## 🤝 Contributing

@@ -106,7 +106,7 @@ def create_readme(base_dir: Path, project_name: str, description: str | None = N
 - **uv** - Fast, modern Python package manager
 - **Just** - Command runner for development tasks
 - **Type Safety** - `ty` checks plus strict mypy configuration with django-stubs
-- **Code Quality** - Ruff for linting/formatting, pre-commit hooks
+- **Code Quality** - Ruff for linting/formatting, prek-managed Git hooks
 - **Testing** - pytest with pytest-django and coverage reporting
 - **Environment Configuration** - django-environ for 12-factor app compliance
 
@@ -153,12 +153,12 @@ just django serve
 
 Run `just` to see all available commands:
 
-- `just init` - Set up environment (uv sync + pre-commit install)
+- `just init` - Set up environment (uv sync + prek install)
 - `just django serve` - Start Django dev server
 - `just test` - Run pytest suite
 - `just lint` - Run ruff linting and formatting
 - `just ty` - Run type checks with ty
-- `just check` - Run lint, type checks, and pre-commit-stage hooks
+- `just check` - Run lint, type checks, and prek-managed commit-stage hooks
 - `just django migrate` - Run migrations
 - `just django add-superuser` - Create a superuser
 - `just django new NAME` - Create a new Django app
@@ -180,7 +180,7 @@ This project follows strict code quality standards:
 
 - **Python Style**: Single quotes, 120 char line length (enforced by ruff)
 - **Type Checking**: `ty` checks plus strict mypy config with django-stubs
-- **Pre-commit Hooks**: Automatic code quality checks on commit
+- **Prek Hooks**: Automatic code quality checks on commit and push
 
 ## License
 

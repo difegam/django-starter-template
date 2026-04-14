@@ -46,15 +46,16 @@ This project uses Just modules. Use `just django <command>` for Django app opera
 
 - `just lint` - Run ruff linting and formatting
 - `just ty` - Run ty type checker (Astral's mypy alternative)
-- `just check` - Run lint + ty + pre-commit-stage hooks
+- `just check` - Run lint + ty + prek-managed commit-stage hooks
 - `just test` - Run pytest suite with verbose output
 
 **Development:**
 
-- `just init` - Set up environment (uv sync + pre-commit install)
+- `just init` - Set up environment (uv sync + prek install)
 - `just update` - Update all dependencies
 - `just clean` - Remove temp files, caches, venv
 - `just fresh` - Clean + init for fresh setup
+- `just hooks-update` - Update prek hook revisions
 - `just export-reqs` - Generate requirements.txt from pyproject.toml
 
 **Important**: Always use `uv run python src/manage.py <command>` or the `just` recipes. Never run `django-admin` or bare `python` commands.
@@ -109,7 +110,7 @@ Required variables:
 - Relaxed rules for tests and settings files
 - Run with `just ty`
 
-### Pre-commit Hooks
+### Prek Hooks
 
 Commit-stage hooks run automatically on commit and via `just check`.
 Pre-push/manual hooks run on `pre-push` or `manual` stages.

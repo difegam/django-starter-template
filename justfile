@@ -21,11 +21,11 @@ ty:
     @echo 'Running ty type checks'
     @uv run ty check
 
-[doc('Run type checks and pre-commit-stage hooks')]
+[doc('Run type checks and prek-managed commit-stage hooks')]
 [group('qa')]
 check: lint ty
-    @echo 'Running pre-commit hooks on all files'
-    @uv run pre-commit run --all-files
+    @echo 'Running prek hooks on all files'
+    @uv run prek run --all-files
 
 [doc('Run tests with pytest')]
 [group('qa')]
@@ -39,13 +39,18 @@ export-reqs:
     @echo "Exporting requirements"
     @uv pip compile pyproject.toml -o requirements.txt
 
-[doc('Install project dependencies and setup pre-commit hooks')]
+[doc('Install project dependencies and setup prek hooks')]
 [group('development')]
 init:
     @echo '📦 Installing the application for development'
     @uv sync --all-groups
-    @uv run pre-commit install --install-hooks --hook-type pre-commit --hook-type pre-push
+    @uv run prek install --prepare-hooks --hook-type pre-commit --hook-type pre-push
     @echo '✅ Setup complete, ready to code 🚀'
+
+[doc('Update prek hook revisions')]
+[group('development')]
+hooks-update:
+    @uv run prek auto-update --cooldown-days 7
 
 [doc('Update project dependencies')]
 [group("development")]
@@ -62,5 +67,5 @@ clean:
 [doc('Recreate project virtualenv from scratch')]
 [group("development")]
 fresh: clean init
-    @uv run pre-commit clean
+    @uv run prek cache clean
     @echo "✅ Fresh setup complete, ready to code 🚀"
