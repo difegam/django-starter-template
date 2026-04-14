@@ -7,12 +7,7 @@ default:
     @just --list --list-submodules
 
 mod docker "Docker/docker.just"
-
-[doc("Run the application locally")]
-[group("django")]
-serve:
-    @echo "🚀 Starting the Django development server..."
-    uv run python src/manage.py runserver
+mod django "django.just"
 
 [doc('Run linter and formatter')]
 [group("qa")]
@@ -69,44 +64,3 @@ clean:
 fresh: clean init
     @uv run pre-commit clean
     @echo "✅ Fresh setup complete, ready to code 🚀"
-
-# Django specific commands
-
-[doc("Apply database migrations")]
-[group("django")]
-migrate: makemigrations
-    @uv run python src/manage.py migrate
-
-[doc("Create new Django migrations based on model changes")]
-[private]
-makemigrations:
-    @uv run python src/manage.py makemigrations
-
-[doc("Create a Django superuser")]
-[group("django")]
-add-superuser:
-    @uv run python src/manage.py createsuperuser
-
-[doc("Start Django shell")]
-[group("django")]
-shell:
-    @uv run python src/manage.py shell
-
-[doc("Run Django deploy check")]
-[group("django")]
-deploy-check:
-    @uv run python src/manage.py check --deploy
-
-[doc("Collect static files")]
-[group("django")]
-collectstatic:
-    @uv run python src/manage.py collectstatic --noinput
-
-[doc("Create a new Django app with the given NAME")]
-[group("django")]
-[working-directory("src")]
-new NAME:
-    # Use module invocation to avoid missing django-admin script issues
-    @uv run python -m django startapp {{ NAME }}
-    mkdir -p {{ NAME }}/templates/{{ NAME }} {{ NAME }}/static/{{ NAME }}
-    echo "Remember to add {{ BLUE }}'{{ NAME }}'{{ NORMAL }} to CUSTOM_APPS in {{ BLUE }}src/config/settings.py{{ NORMAL }}"
