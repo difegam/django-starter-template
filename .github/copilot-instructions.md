@@ -21,7 +21,7 @@ This project uses a **custom user model** (`users.CustomUser`) from the start. A
 
 ### Project Initialization
 
-If starting a new project from this template, use `uv run init_project.py`:
+If starting a new project from this template, run `./init.py` (or `uv run init.py`):
 
 - Run interactively for prompts, or pass `project_name` as argument
 - Removes git repo, venv, and database for fresh start

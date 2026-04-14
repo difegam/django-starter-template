@@ -15,6 +15,10 @@ This script:
 - Prepares the project for a fresh start
 
 Usage:
+    ./init.py [project-name]
+    ./init.py --name <project-name>
+
+    # Alternatively, invoke via uv run:
     uv run init.py [project-name]
     uv run init.py --name <project-name>
 """

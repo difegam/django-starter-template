@@ -36,11 +36,13 @@ Use the included initialization script to set up a fresh project:
 
 ```bash
 # Interactive mode
-uv run init.py
+./init.py
 
 # Non-interactive mode
-uv run init.py --name my-project-name --description "My awesome Django project" --force
+./init.py --name my-project-name --description "My awesome Django project" --force
 ```
+
+> `uv run init.py` also works if you prefer not to invoke the script directly.
 
 The initialization script will:
 
@@ -120,7 +122,7 @@ The included `init.py` script helps you quickly transform this template into you
 **Interactive Mode** (recommended for first-time users):
 
 ```bash
-uv run init.py
+./init.py
 ```
 
 You'll be prompted to enter:
@@ -132,13 +134,13 @@ You'll be prompted to enter:
 
 ```bash
 # Basic usage
-uv run init.py --name my-awesome-project --force
+./init.py --name my-awesome-project --force
 
 # With description
-uv run init.py --name my-awesome-project --description "A revolutionary Django app" --force
+./init.py --name my-awesome-project --description "A revolutionary Django app" --force
 
 # Skip git repository removal
-uv run init.py --name my-awesome-project --skip-git --force
+./init.py --name my-awesome-project --skip-git --force
 ```
 
 ### Command-Line Options
