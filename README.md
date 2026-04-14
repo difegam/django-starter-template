@@ -230,8 +230,9 @@ DATABASE_URL=sqlite:///src/db.sqlite3
 
 # Localization
 TIME_ZONE=UTC
-LANGUAGE_CODE=en-us
 ```
+
+Note: `LANGUAGE_CODE` is currently defined in `src/config/settings.py`.
 
 ### Custom User Model
 
