@@ -1,4 +1,4 @@
-#!/usr/bin/env -S uv run
+#!/usr/bin/env -S uv --quiet run --script
 # /// script
 # requires-python = ">=3.13"
 # dependencies = [
@@ -15,8 +15,8 @@ This script:
 - Prepares the project for a fresh start
 
 Usage:
-    uv run init_project.py [project-name]
-    uv run init_project.py --name <project-name>
+    uv run init.py [project-name]
+    uv run init.py --name <project-name>
 """
 
 import argparse
@@ -47,7 +47,7 @@ def remove_git_repo(base_dir: Path) -> None:
             console.print(f'[red]✗[/red] Failed to remove git repository: {e}')
             sys.exit(1)
     else:
-        console.print('[blue]ℹ[/blue] No git repository found')
+        console.print('[blue]i[/blue] No git repository found')
 
 
 def remove_venv(base_dir: Path) -> None:
@@ -62,7 +62,7 @@ def remove_venv(base_dir: Path) -> None:
             console.print(f'[red]✗[/red] Failed to remove virtual environment: {e}')
             sys.exit(1)
     else:
-        console.print('[blue]ℹ[/blue] No virtual environment found')
+        console.print('[blue]i[/blue] No virtual environment found')
 
 
 def remove_database(base_dir: Path) -> None:
@@ -77,7 +77,7 @@ def remove_database(base_dir: Path) -> None:
             console.print(f'[red]✗[/red] Failed to remove database: {e}')
             sys.exit(1)
     else:
-        console.print('[blue]ℹ[/blue] No database file found')
+        console.print('[blue]i[/blue] No database file found')
 
 
 def create_readme(base_dir: Path, project_name: str, description: str | None = None) -> None:
@@ -132,17 +132,17 @@ DATABASE_URL=sqlite:///src/db.sqlite3
 
 3. Run migrations:
 ```bash
-just migrate
+just django migrate
 ```
 
 4. Create a superuser:
 ```bash
-just add-superuser
+just django add-superuser
 ```
 
 5. Run the development server:
 ```bash
-just serve
+just django serve
 ```
 
 ## Available Commands
@@ -150,14 +150,14 @@ just serve
 Run `just` to see all available commands:
 
 - `just init` - Set up environment (uv sync + pre-commit install)
-- `just serve` - Start Django dev server
+- `just django serve` - Start Django dev server
 - `just test` - Run pytest suite
 - `just lint` - Run ruff linting and formatting
 - `just ty` - Run type checks with ty
-- `just check` - Run lint, type checks, and pre-commit hooks
-- `just migrate` - Run migrations
-- `just add-superuser` - Create a superuser
-- `just new NAME` - Create a new Django app
+- `just check` - Run lint, type checks, and pre-commit-stage hooks
+- `just django migrate` - Run migrations
+- `just django add-superuser` - Create a superuser
+- `just django new NAME` - Create a new Django app
 
 ## Project Structure
 
@@ -180,7 +180,7 @@ This project follows strict code quality standards:
 
 ## License
 
-[Add your license here]
+This project is open source and available under the [MIT License](LICENSE).
 """
 
     console.print(f'Creating new README.md for [cyan]{project_name}[/cyan]')
@@ -208,15 +208,9 @@ def update_pyproject_toml(base_dir: Path, project_name: str, description: str | 
         console.print(f'[red]✗[/red] Failed to read pyproject.toml: {e}')
         sys.exit(1)
 
-    # Replace the name field
-    updated_content = content.replace('name = "django-starter-template"', f'name = "{project_name}"')
-
-    # Update description
     new_description = description if description else f'{project_name} - A Django project'
-    updated_content = updated_content.replace(
-        'description = "A simple way to start your Django project with a solid foundation."',
-        f'description = "{new_description}"',
-    )
+    updated_content = replace_project_field(content, 'name', project_name)
+    updated_content = replace_project_field(updated_content, 'description', new_description)
 
     try:
         pyproject_path.write_text(updated_content, encoding='utf-8')
@@ -233,6 +227,30 @@ def validate_project_name(name: str | None) -> bool:
     return bool(re.match(r'^[a-z0-9_-]+$', name))
 
 
+def replace_project_field(content: str, field_name: str, value: str) -> str:
+    """Replace a field inside the [project] table while preserving surrounding formatting."""
+    project_section_pattern = re.compile(r'(^\[project\]\n)(.*?)(?=^\[|\Z)', re.MULTILINE | re.DOTALL)
+    project_match = project_section_pattern.search(content)
+
+    if not project_match:
+        console.print('[red]✗[/red] [project] section not found in pyproject.toml')
+        sys.exit(1)
+
+    project_section = project_match.group(2)
+    field_pattern = re.compile(rf'^(?P<indent>\s*){re.escape(field_name)}\s*=\s*"[^"]*"\s*$', re.MULTILINE)
+    updated_section, replacements = field_pattern.subn(
+        rf'\g<indent>{field_name} = "{value}"',
+        project_section,
+        count=1,
+    )
+
+    if replacements != 1:
+        console.print(f'[red]✗[/red] Could not update [project].{field_name} in pyproject.toml')
+        sys.exit(1)
+
+    return f'{content[: project_match.start(2)]}{updated_section}{content[project_match.end(2) :]}'
+
+
 def cli() -> argparse.Namespace:
     """Parse command-line arguments."""
     parser = argparse.ArgumentParser(
@@ -241,7 +259,12 @@ def cli() -> argparse.Namespace:
     )
     parser.add_argument(
         '--name',
-        dest='project_name',
+        dest='project_name_flag',
+        nargs='?',
+        help='Name of the new project (lowercase, with hyphens or underscores)',
+    )
+    parser.add_argument(
+        'project_name',
         nargs='?',
         help='Name of the new project (lowercase, with hyphens or underscores)',
     )
@@ -251,7 +274,53 @@ def cli() -> argparse.Namespace:
         action='store_true',
         help='Skip removing the git repository',
     )
+    parser.add_argument(
+        '--force',
+        action='store_true',
+        help='Required for non-interactive runs that delete existing project state',
+    )
     return parser.parse_args()
+
+
+def get_destructive_targets(base_dir: Path, skip_git: bool) -> list[Path]:
+    """Return existing paths that would be deleted by initialization."""
+    targets = [
+        base_dir / '.venv',
+        base_dir / 'src' / 'db.sqlite3',
+    ]
+    if not skip_git:
+        targets.insert(0, base_dir / '.git')
+    return [path for path in targets if path.exists()]
+
+
+def confirm_destructive_actions(base_dir: Path, args: argparse.Namespace, interactive: bool) -> None:
+    """Require explicit confirmation before deleting existing project state."""
+    destructive_targets = get_destructive_targets(base_dir, args.skip_git)
+    if not destructive_targets:
+        return
+
+    target_list = '\n'.join(f' - {path.relative_to(base_dir)}' for path in destructive_targets)
+    message = (
+        'Initialization will permanently delete:\n'
+        f'{target_list}\n'
+        'Make sure you are running this from a fresh template checkout.'
+    )
+
+    if interactive:
+        console.print(Panel.fit(message, title='⚠ Confirm Destructive Changes', border_style='yellow'))
+        if not Confirm.ask('[bold yellow]Continue with deletion?[/bold yellow]', default=False):
+            console.print('[red]✗[/red] Initialization cancelled before making changes.')
+            sys.exit(1)
+        return
+
+    if args.force:
+        return
+
+    console.print(
+        '[red]✗[/red] Non-interactive initialization requires --force when existing project state will be deleted.'
+    )
+    console.print(Panel.fit(message, title='Force Required', border_style='red'))
+    sys.exit(1)
 
 
 def main() -> None:
@@ -260,16 +329,21 @@ def main() -> None:
     args = cli()
 
     # Interactive mode if no project name provided
-    provided_name: str = args.project_name
+    provided_name = args.project_name_flag or args.project_name
 
-    if args.project_name:
-        # Validate before lowercasing for better error messages
-        if not validate_project_name(provided_name.lower()):
+    if args.project_name_flag and args.project_name and args.project_name_flag != args.project_name:
+        console.print('[red]✗[/red] Provide project name using either positional argument or --name, not both.')
+        sys.exit(1)
+
+    interactive = not bool(provided_name)
+
+    if provided_name:
+        if not validate_project_name(provided_name):
             console.print(
                 '[red]✗[/red] Invalid project name. Use only lowercase letters, numbers, hyphens, and underscores.'
             )
             sys.exit(1)
-        project_name = provided_name.lower()
+        project_name = provided_name
         description = args.description
     else:
         console.print(
@@ -285,7 +359,7 @@ def main() -> None:
         while True:
             project_name = Prompt.ask(
                 '[bold cyan]Project name[/bold cyan] [dim](lowercase, with hyphens or underscores)[/dim]'
-            ).lower()
+            )
 
             if validate_project_name(project_name):
                 break
@@ -303,6 +377,7 @@ def main() -> None:
 
     # Get the base directory (where this script is located)
     base_dir = Path(__file__).parent
+    confirm_destructive_actions(base_dir, args, interactive)
 
     console.print()
     console.print(
@@ -365,14 +440,14 @@ def main() -> None:
 
     next_steps = Text()
     next_steps.append('\n1. Remove this script: ', style='bold')
-    next_steps.append('rm init_project.py', style='cyan')
+    next_steps.append('rm init.py', style='cyan')
     next_steps.append('\n2. Initialize a new git repository: ', style='bold')
     next_steps.append('git init', style='cyan')
     next_steps.append('\n3. Set up the environment: ', style='bold')
     next_steps.append('just init', style='cyan')
     next_steps.append('\n4. Create a .env file with your configuration', style='bold')
     next_steps.append('\n5. Run migrations: ', style='bold')
-    next_steps.append('just migrate', style='cyan')
+    next_steps.append('just django migrate', style='cyan')
     next_steps.append('\n6. Start coding! 🎉\n', style='bold green')
 
     console.print(Panel(next_steps, title='[bold]Next Steps', border_style='yellow'))

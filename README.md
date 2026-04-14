@@ -36,10 +36,10 @@ Use the included initialization script to set up a fresh project:
 
 ```bash
 # Interactive mode
-uv run init_project.py
+uv run init.py
 
 # Non-interactive mode
-uv run init_project.py --name my-project-name --description "My awesome Django project"
+uv run init.py --name my-project-name --description "My awesome Django project" --force
 ```
 
 The initialization script will:
@@ -53,7 +53,7 @@ The initialization script will:
 After initialization:
 
 ```bash
-rm init_project.py  # Remove the script
+rm init.py          # Remove the script
 git init            # Initialize new git repo
 just init           # Set up environment
 ```
@@ -105,12 +105,13 @@ Visit [http://127.0.0.1:8000](http://127.0.0.1:8000) to see your app running!
 
 ## 🛠️ Project Initialization Script
 
-The included `init_project.py` script helps you quickly transform this template into your own project.
+The included `init.py` script helps you quickly transform this template into your own project.
 
 ### Features
 
 - **Interactive or Non-Interactive**: Run with or without command-line arguments
 - **Clean Slate**: Removes git history, virtual environment, and database
+- **Safety Gate**: Requires confirmation in interactive mode or `--force` in non-interactive mode before deleting existing state
 - **Auto-Configuration**: Updates README.md and pyproject.toml with your project details
 - **Rich UI**: Beautiful terminal interface with progress bars and colored output
 
@@ -119,7 +120,7 @@ The included `init_project.py` script helps you quickly transform this template 
 **Interactive Mode** (recommended for first-time users):
 
 ```bash
-uv run init_project.py
+uv run init.py
 ```
 
 You'll be prompted to enter:
@@ -131,13 +132,13 @@ You'll be prompted to enter:
 
 ```bash
 # Basic usage
-uv run init_project.py --name my-awesome-project
+uv run init.py --name my-awesome-project --force
 
 # With description
-uv run init_project.py --name my-awesome-project --description "A revolutionary Django app"
+uv run init.py --name my-awesome-project --description "A revolutionary Django app" --force
 
 # Skip git repository removal
-uv run init_project.py --name my-awesome-project --skip-git
+uv run init.py --name my-awesome-project --skip-git --force
 ```
 
 ### Command-Line Options
@@ -146,6 +147,7 @@ uv run init_project.py --name my-awesome-project --skip-git
 - `--name` - Name of your new project (optional flag alternative)
 - `--description, -d` - Custom project description
 - `--skip-git` - Skip removing the git repository
+- `--force` - Required for non-interactive runs that delete existing project state
 
 ### What It Does
 
@@ -161,7 +163,7 @@ Once the script completes, follow these steps:
 
 ```bash
 # 1. Remove the initialization script (you won't need it anymore)
-rm init_project.py
+rm init.py
 
 # 2. Initialize a new git repository
 git init
