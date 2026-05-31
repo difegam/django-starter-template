@@ -29,6 +29,6 @@ def test_custom_user_creation(user: CustomUser) -> None:
 def test_custom_user_password_is_hashed(user: CustomUser) -> None:
     """Passwords must never be stored in plain text."""
     # Django's check_password() verifies against the stored hash.
-    assert user.check_password('supersecretpassword123') is True
+    assert user.check_password('ThisIsATestPassword123') is True
     # The raw password must not appear in the stored hash string.
-    assert 'supersecretpassword123' not in user.password
+    assert 'ThisIsATestPassword123' not in user.password

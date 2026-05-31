@@ -22,8 +22,8 @@ def user(db: None) -> CustomUser:
         def test_something(user: CustomUser) -> None:
             assert user.email == 'user@example.com'
     """
-    return CustomUser.objects.create_user(  # type: ignore[return-value]
+    return CustomUser.objects.create_user(
         username='testuser',
         email='user@example.com',
-        password='supersecretpassword123',
+        password='ThisIsATestPassword123',  # noqa: S106
     )
