@@ -31,6 +31,10 @@ dev = [
 default-groups = ["dev"]
 exclude-newer = "P7D"
 
+[tool.pytest.ini_options]
+DJANGO_SETTINGS_MODULE = 'config.settings'
+pythonpath = ['src']
+
 [tool.djlint]
 profile = "django"
 
