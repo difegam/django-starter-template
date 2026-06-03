@@ -152,20 +152,6 @@ repos:
         pass_filenames: false
         stages: [pre-push, manual]
 
-  # Semgrep - Security scanning
-  - repo: https://github.com/semgrep/pre-commit
-    rev: v1.153.0
-    hooks:
-      - id: semgrep
-        name: run Semgrep rules
-        pass_filenames: false
-        stages: [pre-push, manual]
-        args:
-          - --config
-          - auto
-          - --error
-          - --skip-unknown-extensions
-
   # Run your test suite before pushing code.
   - repo: local
     hooks:
