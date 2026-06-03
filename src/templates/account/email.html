@@ -1,0 +1,63 @@
+{% extends "_base.html" %}
+{% block title %}
+    Email Addresses | Django Starter Template
+{% endblock title %}
+{% block content %}
+    <section class="mx-auto my-10 w-full max-w-md space-y-6"
+             aria-label="Email address management">
+        {% if emailaddresses %}
+            <div class="rounded-lg border border-base-300 bg-base-100 p-6 shadow-md">
+                <h1 class="text-2xl font-semibold">Email addresses</h1>
+                <p class="mt-2 text-sm text-base-content/70">Manage the email addresses associated with your account.</p>
+                <form method="post"
+                      action="{% url "account_email" %}"
+                      class="mt-6 space-y-4">
+                    {% csrf_token %}
+                    <fieldset class="space-y-3">
+                        <legend class="sr-only">Select your primary email address</legend>
+                        {% for radio in emailaddress_radios %}
+                            <div class="flex items-center gap-3 rounded-md border border-base-300 px-4 py-3">
+                                <input type="radio"
+                                       name="email"
+                                       value="{{ radio.emailaddress.email }}"
+                                       id="{{ radio.id }}"
+                                       {% if radio.checked %}checked{% endif %}
+                                       class="radio radio-primary" />
+                                <label for="{{ radio.id }}"
+                                       class="flex flex-1 flex-wrap items-center gap-2 text-sm">
+                                    {{ radio.emailaddress.email }}
+                                    {% if radio.emailaddress.primary %}<span class="badge badge-neutral">Primary</span>{% endif %}
+                                    {% if radio.emailaddress.verified %}
+                                        <span class="badge badge-success">Verified</span>
+                                    {% else %}
+                                        <span class="badge badge-warning">Unverified</span>
+                                    {% endif %}
+                                </label>
+                            </div>
+                        {% endfor %}
+                    </fieldset>
+                    <div class="flex flex-wrap gap-2 pt-2">
+                        <button type="submit" name="action_primary" class="btn btn-sm btn-outline">Make primary</button>
+                        <button type="submit" name="action_send" class="btn btn-sm btn-outline">Re-send verification</button>
+                        <button type="submit"
+                                name="action_remove"
+                                class="btn btn-sm btn-outline btn-error">Remove</button>
+                    </div>
+                </form>
+            </div>
+        {% endif %}
+        {% if can_add_email %}
+            <div class="rounded-lg border border-base-300 bg-base-100 p-6 shadow-md">
+                <h2 class="text-xl font-semibold">Add email address</h2>
+                <p class="mt-2 text-sm text-base-content/70">Add another email address to your account.</p>
+                <form method="post"
+                      action="{% url "account_email" %}"
+                      class="mt-6 space-y-4">
+                    {% csrf_token %}
+                    {{ add_email_form.as_p }}
+                    <button type="submit" name="action_add" class="btn btn-primary w-full">Add email</button>
+                </form>
+            </div>
+        {% endif %}
+    </section>
+{% endblock content %}

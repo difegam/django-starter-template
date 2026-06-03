@@ -1,0 +1,36 @@
+{% extends "_base.html" %}
+{% block title %}
+    Confirm Email Address | Django Starter Template
+{% endblock title %}
+{% block content %}
+    <section class="mx-auto my-10 w-full max-w-md rounded-lg border border-base-300 bg-base-100 p-6 shadow-md"
+             aria-labelledby="confirm-email-title">
+        {% if confirmation %}
+            {% if can_confirm %}
+                <h1 id="confirm-email-title" class="text-2xl font-semibold">Confirm email address</h1>
+                <p class="mt-2 text-sm text-base-content/70">
+                    Please confirm that <strong>{{ confirmation.email_address.email }}</strong> is your email address.
+                </p>
+                <form method="post"
+                      action="{% url "account_confirm_email" confirmation.key %}"
+                      class="mt-6 space-y-4">
+                    {% csrf_token %}
+                    {{ redirect_field }}
+                    <button type="submit" class="btn btn-primary w-full">Confirm email address</button>
+                </form>
+            {% else %}
+                <h1 id="confirm-email-title" class="text-2xl font-semibold">Unable to confirm</h1>
+                <p class="mt-2 text-sm text-base-content/70">
+                    <strong>{{ confirmation.email_address.email }}</strong> could not be confirmed — it has already
+                    been confirmed by a different account.
+                </p>
+            {% endif %}
+        {% else %}
+            <h1 id="confirm-email-title" class="text-2xl font-semibold">Link expired</h1>
+            <p class="mt-2 text-sm text-base-content/70">This confirmation link has expired or is invalid.</p>
+            <p class="mt-6 text-sm text-base-content/70">
+                <a href="{% url "account_email" %}" class="link link-primary">Request a new confirmation email</a>
+            </p>
+        {% endif %}
+    </section>
+{% endblock content %}

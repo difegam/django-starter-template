@@ -1,0 +1,16 @@
+{% extends "_base.html" %}
+{% block title %}
+    Verify Your Email | Django Starter Template
+{% endblock title %}
+{% block content %}
+    <section class="mx-auto my-10 w-full max-w-md rounded-lg border border-base-300 bg-base-100 p-6 shadow-md"
+             aria-labelledby="verification-sent-title">
+        <h1 id="verification-sent-title" class="text-2xl font-semibold">Check your inbox</h1>
+        <p class="mt-2 text-sm text-base-content/70">
+            A verification email has been sent. Follow the link in the email to verify your account.
+        </p>
+        <p class="mt-6 text-sm text-base-content/70">
+            <a href="{% url "account_login" %}" class="link link-primary">Back to sign in</a>
+        </p>
+    </section>
+{% endblock content %}
