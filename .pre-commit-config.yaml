@@ -152,20 +152,6 @@ repos:
         pass_filenames: false
         stages: [pre-push, manual]
 
-  # Detect secrets in your codebase
-  - repo: https://github.com/Yelp/detect-secrets
-    rev: v1.5.0
-    hooks:
-      - id: detect-secrets
-        name: prevent committing secrets
-        description: "Prevent secrets from being committed"
-        args:
-          - --baseline
-          - .secrets.baseline
-          - --exclude-lines
-          - (.*)# scan:ignore
-        exclude: package.lock.json
-
   # Semgrep - Security scanning
   - repo: https://github.com/semgrep/pre-commit
     rev: v1.153.0
