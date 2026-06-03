@@ -78,8 +78,10 @@ just init
 3. Create a `.env` file in the project root:
 
 ```bash
-SECRET_KEY=your-secret-key-here
-DEBUG=True
+# Generate with: openssl rand -base64 48
+SECRET_KEY=replace-with-a-securely-generated-secret-key
+# Keep False for production; use True only in local development
+DEBUG=False
 ALLOWED_HOSTS=localhost,127.0.0.1
 TIME_ZONE=UTC
 DATABASE_URL=sqlite:///src/db.sqlite3
@@ -223,8 +225,10 @@ The project uses `django-environ` for configuration. Create a `.env` file in the
 
 ```bash
 # Django Settings
-SECRET_KEY=your-secret-key-here
-DEBUG=True
+# Generate with: openssl rand -base64 48
+SECRET_KEY=replace-with-a-securely-generated-secret-key
+# Keep False for production; use True only in local development
+DEBUG=False
 ALLOWED_HOSTS=localhost,127.0.0.1
 
 # Database
