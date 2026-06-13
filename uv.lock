@@ -355,18 +355,20 @@ dependencies = [
 
 [package.dev-dependencies]
 dev = [
-    { name = "cyclopts" },
     { name = "django-debug-toolbar" },
     { name = "django-stubs" },
     { name = "django-stubs-ext" },
-    { name = "inquirerpy" },
     { name = "prek" },
     { name = "pytest" },
     { name = "pytest-cov" },
     { name = "pytest-django" },
     { name = "rich" },
-    { name = "ruff" },
     { name = "ty" },
+]
+init-tool = [
+    { name = "cyclopts" },
+    { name = "inquirerpy" },
+    { name = "ruff" },
 ]
 
 [package.metadata]
@@ -380,18 +382,20 @@ requires-dist = [
 
 [package.metadata.requires-dev]
 dev = [
-    { name = "cyclopts", specifier = ">=4,<5" },
     { name = "django-debug-toolbar", specifier = ">=6.3.0" },
     { name = "django-stubs", specifier = ">=6.0.5" },
     { name = "django-stubs-ext", specifier = ">=6.0.5" },
-    { name = "inquirerpy", specifier = ">=0.3.4" },
     { name = "prek", specifier = ">=0.4.3" },
     { name = "pytest", specifier = ">=9.0.3" },
     { name = "pytest-cov", specifier = ">=7.0.0" },
     { name = "pytest-django", specifier = ">=4.12.0" },
     { name = "rich", specifier = ">=13.0.0" },
-    { name = "ruff", specifier = ">=0.15.0" },
     { name = "ty", specifier = ">=0.0.40" },
+]
+init-tool = [
+    { name = "cyclopts", specifier = ">=4.16.1" },
+    { name = "inquirerpy", specifier = ">=0.3.4" },
+    { name = "ruff", specifier = ">=0.15.0" },
 ]
 
 [[package]]
