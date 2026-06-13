@@ -24,8 +24,7 @@ COPY --from=ghcr.io/astral-sh/uv:latest /uv /usr/local/bin/uv
 ENV UV_LINK_MODE=copy \
     UV_COMPILE_BYTECODE=1 \
     UV_PYTHON_DOWNLOADS=never \
-    UV_PYTHON=${PYTHON_VERSION} \
-    UV_PROJECT_ENVIRONMENT=/app
+    UV_PYTHON=${PYTHON_VERSION}
 
 # Copy dependency files first for layer caching
 COPY pyproject.toml uv.lock ./
@@ -34,6 +33,7 @@ COPY pyproject.toml uv.lock ./
 RUN --mount=type=cache,target=/root/.cache \
     uv sync \
     --locked \
+    --system \
     --no-install-project
 
 # Copy the full source code
@@ -45,6 +45,7 @@ RUN --mount=type=cache,target=/root/.cache \
     uv sync \
     --locked \
     --no-dev \
+    --system \
     --no-editable
 
 # Collect static files during build
@@ -59,7 +60,7 @@ RUN SECRET_KEY=build-placeholder \
 # =============================================================================
 FROM build AS development
 RUN --mount=type=cache,target=/root/.cache \
-    uv sync --locked --no-editable
+    uv sync --locked --no-editable --system
 
 # =============================================================================
 # Stage 2: Runtime
@@ -75,8 +76,7 @@ RUN apt-get update -qy && apt-get upgrade -y && \
     && apt-get clean && rm -rf /var/lib/apt/lists/*
 
 # Set environment variables
-ENV PATH="/app/bin:$PATH" \
-    PYTHONPATH="/app/src" \
+ENV PYTHONPATH="/app/src" \
     DJANGO_SETTINGS_MODULE=config.settings \
     APP_USER=appuser \
     APP_GROUP=appuser \
@@ -87,6 +87,10 @@ RUN groupadd -g ${APP_ID} ${APP_GROUP} && \
     useradd -u ${APP_ID} -g ${APP_GROUP} \
     -m -d /home/${APP_USER} \
     -s /bin/bash ${APP_USER}
+
+# Copy installed packages and CLI tools from the build stage
+COPY --from=build /usr/local/lib/python3.13/site-packages/ /usr/local/lib/python3.13/site-packages/
+COPY --from=build /usr/local/bin/ /usr/local/bin/
 
 # Copy the application from the build stage
 COPY --from=build --chown=${APP_USER}:${APP_GROUP} /app /app
