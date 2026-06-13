@@ -1,0 +1,27 @@
+{
+    local_certs
+}
+
+:80, :443 {
+    encode gzip zstd
+
+    handle_path /static/* {
+        root * /var/www/static
+        file_server
+    }
+
+    handle_path /media/* {
+        root * /var/www/media
+        file_server
+    }
+
+    handle {
+        reverse_proxy django:8000
+    }
+
+    header {
+        X-Content-Type-Options "nosniff"
+        X-Frame-Options "DENY"
+        Referrer-Policy "strict-origin-when-cross-origin"
+    }
+}

@@ -88,7 +88,8 @@ ______________________________________________________________________
 │   └── entrypoint.sh           # Container entrypoint
 ├── docker-compose.yml          # Local development stack
 ├── docker-compose.production.yml  # Production stack
-├── Caddyfile                   # Caddy reverse proxy config
+├── Caddyfile.prod               # Production Caddy reverse proxy config
+├── Caddyfile.local              # Local dev Caddy config (self-signed certs)
 ├── justfile                    # Task runner (Just)
 ├── pyproject.toml              # Project metadata & dependencies
 ├── .env.example                # Environment variable reference
