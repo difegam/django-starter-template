@@ -55,6 +55,13 @@ RUN SECRET_KEY=build-placeholder \
     python src/manage.py collectstatic --noinput 2>/dev/null || true
 
 # =============================================================================
+# Stage 1b: Development (extends build, installs dev deps)
+# =============================================================================
+FROM build AS development
+RUN --mount=type=cache,target=/root/.cache \
+    uv sync --locked --no-editable
+
+# =============================================================================
 # Stage 2: Runtime
 # =============================================================================
 FROM python:3.13-slim AS runtime
@@ -84,6 +91,10 @@ RUN groupadd -g ${APP_ID} ${APP_GROUP} && \
 # Copy the application from the build stage
 COPY --from=build --chown=${APP_USER}:${APP_GROUP} /app /app
 
+# Copy and set up the entrypoint
+COPY --from=build --chown=${APP_USER}:${APP_GROUP} /app/Docker/entrypoint.sh /entrypoint.sh
+RUN chmod +x /entrypoint.sh
+
 # Set the working directory
 WORKDIR /app
 
@@ -93,6 +104,5 @@ USER ${APP_USER}
 # Expose Django default port
 EXPOSE 8000
 
-# Run the application with gunicorn
-ENTRYPOINT ["python", "-m", "gunicorn", "config.wsgi:application"]
-CMD ["--bind", "0.0.0.0:8000", "--workers", "3", "--chdir", "src"]
+ENTRYPOINT ["/entrypoint.sh"]
+CMD ["python", "-m", "gunicorn", "config.wsgi:application", "--bind", "0.0.0.0:8000", "--workers", "3", "--chdir", "src"]

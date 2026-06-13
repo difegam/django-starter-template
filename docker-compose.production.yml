@@ -1,0 +1,72 @@
+---
+name: django-production
+
+services:
+  web:
+    build:
+      context: .
+      dockerfile: Docker/Dockerfile
+    restart: unless-stopped
+    env_file: .env
+    depends_on:
+      db:
+        condition: service_healthy
+    volumes:
+      - static_data:/app/src/staticfiles
+      - media_data:/app/src/media
+    secrets:
+      - su_password
+    expose:
+      - "8000"
+
+  db:
+    image: postgres:17-alpine
+    restart: unless-stopped
+    env_file: .env
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-django_db}
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-postgres} -d ${POSTGRES_DB:-django_db}"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  caddy:
+    build: ./Docker/caddy
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    env_file: .env
+    environment:
+      CLOUDFLARE_API_TOKEN: ${CLOUDFLARE_API_TOKEN}
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+      - caddy_config:/config
+      - static_data:/staticfiles
+      - media_data:/media
+    depends_on:
+      - web
+
+  # redis:
+  #   image: redis:7-alpine
+  #   restart: unless-stopped
+  #   volumes:
+  #     - redis_data:/data
+
+volumes:
+  postgres_data:
+  static_data:
+  media_data:
+  caddy_data:
+  caddy_config:
+  # redis_data:
+
+secrets:
+  su_password:
+    file: ./secrets/su_password.txt

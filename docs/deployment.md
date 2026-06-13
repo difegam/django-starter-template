@@ -35,17 +35,25 @@ ______________________________________________________________________
 
 ### Environment Variables
 
-| Variable                 | Description                     | Required          | Default                    |
-| ------------------------ | ------------------------------- | ----------------- | -------------------------- |
-| `SECRET_KEY`             | Django secret key               | Yes               | —                          |
-| `DEBUG`                  | Debug mode                      | No                | `False`                    |
-| `ALLOWED_HOSTS`          | Comma-separated hostnames       | No                | `localhost,127.0.0.1`      |
-| `DATABASE_URL`           | Database connection string      | No                | `sqlite:///src/db.sqlite3` |
-| `CSRF_TRUSTED_ORIGINS`   | Comma-separated trusted origins | For POST requests | —                          |
-| `DJANGO_SETTINGS_MODULE` | Django settings module          | No                | `config.settings`          |
-| `PORT`                   | Web server port                 | No                | `8000`                     |
-| `TIME_ZONE`              | IANA timezone                   | No                | `UTC`                      |
-| `EMAIL_BACKEND`          | Email backend                   | No                | `smtp.EmailBackend`        |
+| Variable                         | Description                                  | Required | Default                    |
+| -------------------------------- | -------------------------------------------- | -------- | -------------------------- |
+| `SECRET_KEY`                     | Django secret key                            | Yes      | —                          |
+| `DEBUG`                          | Debug mode                                   | No       | `False`                    |
+| `ALLOWED_HOSTS`                  | Comma-separated hostnames                    | No       | `localhost,127.0.0.1`      |
+| `CSRF_TRUSTED_ORIGINS`           | Comma-separated trusted origins              | No       | `http://localhost:8000`    |
+| `DATABASE_URL`                   | Database connection string                   | No       | `sqlite:///src/db.sqlite3` |
+| `DJANGO_SETTINGS_MODULE`         | Django settings module                       | No       | `config.settings`          |
+| `EMAIL_URL`                      | Full email URL (`smtp+tls://user:pass@host`) | No       | `console://`               |
+| `TIME_ZONE`                      | IANA timezone                                | No       | `UTC`                      |
+| `LANGUAGE_CODE`                  | Django language code                         | No       | `en-us`                    |
+| `LOGIN_URL`                      | Path to the login view                       | No       | `/accounts/login/`         |
+| `LOGIN_REDIRECT_URL`             | Redirect target after login                  | No       | `home`                     |
+| `PORT`                           | Web server port                              | No       | `8000`                     |
+| `SECURE_SSL_REDIRECT`            | Force HTTPS redirects                        | No       | `False`                    |
+| `DJANGO_SUPERUSER_USERNAME`      | Auto-create superuser (optional)             | No       | —                          |
+| `DJANGO_SUPERUSER_EMAIL`         | Auto-create superuser (optional)             | No       | —                          |
+| `DJANGO_SUPERUSER_PASSWORD`      | Superuser password (dev only)                | No       | —                          |
+| `DJANGO_SUPERUSER_PASSWORD_FILE` | Read password from file (production)         | No       | —                          |
 
 ### Procfile
 
@@ -58,6 +66,8 @@ release: python src/manage.py migrate --noinput
 
 - `web` — starts Gunicorn on the port provided by the platform.
 - `release` — runs database migrations once before each deploy.
+
+The Docker entrypoint (`Docker/entrypoint.sh`) handles migrations, static collection, and optional superuser creation automatically when using Docker-based deployments (Dokploy, Fly.io, VPS).
 
 ### Static Files with WhiteNoise
 
@@ -89,7 +99,95 @@ Ensure these are set in your environment:
 DEBUG=False
 SECRET_KEY=<long-random-string>
 ALLOWED_HOSTS=yourdomain.com,www.yourdomain.com
-CSRF_TRUSTED_ORIGINS=https://yourdomain.com,https://www.yourdomain.com
+CSRF_TRUSTED_ORIGINS=https://yourdomain.com,https://www.example.com
+SECURE_SSL_REDIRECT=True
+```
+
+### Superuser Creation (Optional)
+
+The Docker entrypoint can automatically create a superuser on first boot. Set these in your environment:
+
+```env
+DJANGO_SUPERUSER_USERNAME=admin
+DJANGO_SUPERUSER_EMAIL=admin@example.com
+```
+
+For **production**, read the password from a Docker secret file:
+
+```env
+DJANGO_SUPERUSER_PASSWORD_FILE=/run/secrets/su_password
+```
+
+In your `docker-compose.yml`:
+
+```yaml
+services:
+  web:
+    secrets:
+      - su_password
+    # ...
+
+secrets:
+  su_password:
+    file: ./secrets/su_password.txt
+```
+
+For **development only**, you may set the password inline (never commit real secrets):
+
+```env
+DJANGO_SUPERUSER_PASSWORD=changeme
+```
+
+______________________________________________________________________
+
+## Local Development with Docker
+
+The `docker-compose.yml` at the project root is configured for local development with live code reload and a PostgreSQL database.
+
+### Quick Start
+
+```bash
+# Copy environment variables
+cp .env.example .env
+
+# Start the development stack
+docker compose up --build
+```
+
+This builds the `development` target of `Docker/Dockerfile` (includes dev dependencies), mounts your project directory into the container for live reload, and starts a PostgreSQL database.
+
+### How It Works
+
+| Setting          | Value                                             |
+| ---------------- | ------------------------------------------------- |
+| **Build target** | `development` (includes dev dependencies)         |
+| **Command**      | `python src/manage.py runserver 0.0.0.0:8000`     |
+| **Volume mount** | `.:/app` — code changes are reflected immediately |
+| **Port**         | `8000` (Django) + `5432` (PostgreSQL)             |
+| **Database**     | PostgreSQL 17 via `db` service                    |
+
+### Connecting to PostgreSQL
+
+In your `.env`:
+
+```env
+DATABASE_URL=postgres://postgres:postgres@db:5432/django_db
+POSTGRES_DB=django_db
+POSTGRES_USER=postgres
+POSTGRES_PASSWORD=postgres
+```
+
+### Creating a Superuser
+
+```bash
+docker compose exec web python src/manage.py createsuperuser
+```
+
+### Stopping the Stack
+
+```bash
+docker compose down          # keep volumes
+docker compose down -v       # remove volumes (fresh start)
 ```
 
 ______________________________________________________________________
@@ -497,6 +595,89 @@ For a fully managed experience:
 
 ______________________________________________________________________
 
+## Production Docker Compose
+
+The `docker-compose.production.yml` file provides a production-ready stack with Caddy as the reverse proxy, PostgreSQL, and optional Redis.
+
+### Prerequisites
+
+- Cloudflare API token for DNS-01 wildcard certificates
+- Domain name with DNS pointing to your server
+
+### Environment Variables
+
+Create a `.env` file with these additional variables:
+
+```env
+# Cloudflare DNS for automatic wildcard certificates
+CLOUDFLARE_API_TOKEN=your_cloudflare_api_token_here
+
+# PostgreSQL
+POSTGRES_DB=django_db
+POSTGRES_USER=postgres
+POSTGRES_PASSWORD=<strong-db-password>
+
+# Django
+SECRET_KEY=<your-secret-key>
+DEBUG=False
+ALLOWED_HOSTS=yourdomain.com,www.yourdomain.com
+CSRF_TRUSTED_ORIGINS=https://yourdomain.com,https://www.yourdomain.com
+```
+
+### Cloudflare API Token
+
+Create a Cloudflare API token with these permissions:
+
+- **Zone → Zone → Read**
+- **Zone → DNS → Edit**
+
+These permissions allow Caddy to create and clean up `_acme-challenge` TXT records for DNS-01 validation, enabling wildcard certificates.
+
+### Secrets
+
+Create the superuser password file:
+
+```bash
+mkdir -p secrets
+echo "your-superuser-password" > secrets/su_password.txt
+chmod 600 secrets/su_password.txt
+```
+
+Set these in your `.env`:
+
+```env
+DJANGO_SUPERUSER_USERNAME=admin
+DJANGO_SUPERUSER_EMAIL=admin@example.com
+DJANGO_SUPERUSER_PASSWORD_FILE=/run/secrets/su_password
+```
+
+### Deploy
+
+```bash
+# Build and start
+just deploy-production
+
+# Or manually
+docker compose -f docker-compose.production.yml up -d --build
+
+# View logs
+just logs-production
+
+# Stop
+just stop-production
+```
+
+### Services
+
+| Service   | Image                                | Purpose                              |
+| --------- | ------------------------------------ | ------------------------------------ |
+| `web`     | Built from `Docker/Dockerfile`       | Django + Gunicorn                    |
+| `db`      | `postgres:17-alpine`                 | PostgreSQL database                  |
+| `caddy`   | Built from `Docker/caddy/Dockerfile` | Reverse proxy with Cloudflare DNS-01 |
+| `# redis` | Commented out                        | Optional Celery broker               |
+
+______________________________________________________________________
+
 ## Caddy Configuration Reference
 
 Caddy is used for VPS deployments (Hetzner, DigitalOcean) as a reverse proxy with automatic HTTPS.
@@ -522,6 +703,147 @@ That is all you need for HTTPS + reverse proxy. Caddy automatically redirects HT
 ### Full Production Caddyfile
 
 See the [Hetzner VPS](#hetzner-vps-docker-compose--caddy) section for a complete annotated example with static/media file serving and security headers.
+
+______________________________________________________________________
+
+## Cloudflare DNS for HTTPS
+
+### Why DNS-01
+
+DNS-01 is required for **wildcard certificates** and is the only challenge type that works when your domain is behind Cloudflare's proxy (orange cloud).
+
+### Cloudflare API Token
+
+1. Go to [Cloudflare Dashboard → API Tokens](https://dash.cloudflare.com/profile/api-tokens)
+1. Create a token with permissions:
+   - **Zone → Zone → Read**
+   - **Zone → DNS → Edit**
+1. Restrict the token to the specific zone(s) you need
+
+### Caddy with Cloudflare
+
+The `Docker/caddy/Dockerfile` builds a custom Caddy image with the Cloudflare DNS module:
+
+```dockerfile
+FROM caddy:2-builder AS builder
+RUN xcaddy build --with github.com/caddy-dns/cloudflare
+
+FROM caddy:2-alpine
+COPY --from=builder /usr/bin/caddy /usr/bin/caddy
+```
+
+The `Caddyfile` at the project root configures DNS-01:
+
+```caddy
+{
+    acme_dns cloudflare {env.CLOUDFLARE_API_TOKEN}
+}
+
+yourdomain.com, *.yourdomain.com {
+    reverse_proxy web:8000
+    # ... static/media, headers, etc.
+}
+```
+
+Set `CLOUDFLARE_API_TOKEN` in your environment (`.env` or Docker Compose environment).
+
+### Traefik with Cloudflare
+
+See the [Traefik Alternative](#traefik-alternative) section below for Cloudflare DNS-01 configuration with Traefik.
+
+______________________________________________________________________
+
+## Traefik Alternative
+
+Traefik is an alternative to Caddy for users who need **dynamic routing** or are running **microservices**. It uses Docker labels or file-based configuration for automatic service discovery.
+
+### When to Use Traefik
+
+| Feature              | Caddy                 | Traefik                   |
+| -------------------- | --------------------- | ------------------------- |
+| **Setup complexity** | Simple                | Moderate                  |
+| **Dynamic routing**  | File-based            | Docker labels + file      |
+| **Wildcard certs**   | Cloudflare DNS module | Cloudflare DNS provider   |
+| **Dashboard**        | No built-in           | Yes, with API             |
+| **Middleware**       | Built-in              | Extensive plugin system   |
+| **Best for**         | Simple stacks         | Microservices, Kubernetes |
+
+### Static Configuration (`Docker/traefik.yml`)
+
+```yaml
+entryPoints:
+  web:
+    address: ":80"
+    http:
+      redirections:
+        entryPoint:
+          to: websecure
+          scheme: https
+  websecure:
+    address: ":443"
+
+providers:
+  file:
+    filename: /etc/traefik/dynamic.yml
+
+certificatesResolvers:
+  cloudflare:
+    acme:
+      email: admin@example.com
+      storage: /letsencrypt/acme.json
+      dnsChallenge:
+        provider: cloudflare
+        resolvers:
+          - "1.1.1.1:53"
+          - "8.8.8.8:53"
+```
+
+### Dynamic Configuration (`Docker/traefik-dynamic.yml`)
+
+```yaml
+http:
+  routers:
+    app:
+      rule: "Host(`example.com`) || Host(`*.example.com`)"
+      entryPoints:
+        - websecure
+      service: app
+      tls:
+        certResolver: cloudflare
+        domains:
+          - main: example.com
+            sans:
+              - "*.example.com"
+
+  services:
+    app:
+      loadBalancer:
+        servers:
+          - url: "http://web:8000"
+```
+
+### Docker Compose Setup
+
+```yaml
+services:
+  traefik:
+    image: traefik:v3.0
+    command: --configFile=/etc/traefik/traefik.yml
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./Docker/traefik.yml:/etc/traefik/traefik.yml:ro
+      - ./Docker/traefik-dynamic.yml:/etc/traefik/dynamic.yml:ro
+      - traefik_acme:/letsencrypt
+    environment:
+      CF_DNS_API_TOKEN: ${CF_DNS_API_TOKEN}
+
+volumes:
+  traefik_acme:
+```
+
+Update `example.com` in the dynamic config and your `DJANGO_SETTINGS_MODULE` as needed.
 
 ______________________________________________________________________
 

@@ -69,3 +69,18 @@ clean:
 fresh: clean init
     @uv run prek cache clean
     @echo "✅ Fresh setup complete, ready to code 🚀"
+
+[doc('Build and deploy production Docker Compose stack')]
+[group("deploy")]
+deploy-production:
+    @just docker deploy-production
+
+[doc('Stop production Docker Compose stack')]
+[group("deploy")]
+stop-production:
+    @just docker stop-production
+
+[doc('View production logs')]
+[group("deploy")]
+logs-production:
+    @just docker logs-production

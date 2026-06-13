@@ -22,3 +22,18 @@ run *ARGS:
 dive *ARGS:
     @echo "Exploring docker image"
     @docker run -ti --rm -v /var/run/docker.sock:/var/run/docker.sock wagoodman/dive {{ ARGS }}
+
+[doc("Deploy production Docker Compose stack")]
+[group("deploy")]
+deploy-production:
+    docker compose -f docker-compose.production.yml up -d --build
+
+[doc("Stop production Docker Compose stack")]
+[group("deploy")]
+stop-production:
+    docker compose -f docker-compose.production.yml down
+
+[doc("View production logs")]
+[group("deploy")]
+logs-production:
+    docker compose -f docker-compose.production.yml logs -f

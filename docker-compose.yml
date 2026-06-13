@@ -3,12 +3,39 @@ name: django-app
 
 services:
   web:
-    container_name: django-app
-    image: django-app
     build:
       context: .
       dockerfile: Docker/Dockerfile
+      target: development
+    command: python src/manage.py runserver 0.0.0.0:8000
     ports:
       - "8000:8000"
     env_file:
       - .env
+    volumes:
+      - .:/app
+    depends_on:
+      db:
+        condition: service_healthy
+
+  db:
+    image: postgres:17-alpine
+    restart: unless-stopped
+    env_file:
+      - .env
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-django_db}
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-postgres} -d ${POSTGRES_DB:-django_db}"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  postgres_data:

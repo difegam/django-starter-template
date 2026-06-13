@@ -1,0 +1,19 @@
+http:
+  routers:
+    app:
+      rule: "Host(`example.com`) || Host(`*.example.com`)"
+      entryPoints:
+        - websecure
+      service: app
+      tls:
+        certResolver: cloudflare
+        domains:
+          - main: example.com
+            sans:
+              - "*.example.com"
+
+  services:
+    app:
+      loadBalancer:
+        servers:
+          - url: "http://web:8000"

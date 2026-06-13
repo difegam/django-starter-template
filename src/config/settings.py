@@ -29,11 +29,16 @@ ALLOWED_HOSTS = env.list(
     default=['localhost', '127.0.0.1'],
 )
 
-# https://docs.djangoproject.com/en/dev/ref/settings/#csrf-trusted-origins
-CSRF_TRUSTED_ORIGINS = [
-    'http://localhost:8000',  # Default Django dev server
-    'http://127.0.0.1:8000',  # Alternative local address
-]
+CSRF_TRUSTED_ORIGINS = env.list(
+    'CSRF_TRUSTED_ORIGINS',
+    default=[
+        'http://localhost:8000',
+        'http://127.0.0.1:8000',
+    ],
+)
+
+# https://docs.djangoproject.com/en/5.2/ref/settings/#secure-ssl-redirect
+SECURE_SSL_REDIRECT = env.bool('SECURE_SSL_REDIRECT', default=False)
 
 AUTHENTICATION_BACKENDS = [
     'django.contrib.auth.backends.ModelBackend',
@@ -129,7 +134,7 @@ AUTH_PASSWORD_VALIDATORS = [
 # Internationalization
 # https://docs.djangoproject.com/en/5.2/topics/i18n/
 
-LANGUAGE_CODE = 'en-us'
+LANGUAGE_CODE = env('LANGUAGE_CODE', default='en-us')
 
 TIME_ZONE = env('TIME_ZONE')
 
@@ -165,11 +170,18 @@ MEDIA_ROOT = BASE_DIR / 'media'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-# https://docs.djangoproject.com/en/dev/ref/settings/#email-backend
-EMAIL_BACKEND = env('EMAIL_BACKEND', default='django.core.mail.backends.smtp.EmailBackend')
+EMAIL_URL = env('EMAIL_URL', default=None)
+if EMAIL_URL:
+    EMAIL_CONFIG = env.email_url('EMAIL_URL')
+    vars().update(EMAIL_CONFIG)
+else:
+    EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+
+# https://docs.djangoproject.com/en/dev/ref/settings/#login-url
+LOGIN_URL = env('LOGIN_URL', default='/accounts/login/')
 
 # https://docs.djangoproject.com/en/dev/ref/settings/#login-redirect-url
-LOGIN_REDIRECT_URL = 'home'
+LOGIN_REDIRECT_URL = env('LOGIN_REDIRECT_URL', default='home')
 
 # https://django-allauth.readthedocs.io/en/latest/views.html#logout-account-logout
 ACCOUNT_LOGOUT_REDIRECT_URL = 'home'

@@ -1,0 +1,30 @@
+{
+    acme_dns cloudflare {env.CLOUDFLARE_API_TOKEN}
+}
+
+yourdomain.com, *.yourdomain.com {
+    encode gzip zstd
+
+    handle_path /static/* {
+        root * /staticfiles
+        file_server
+    }
+
+    handle_path /media/* {
+        root * /media
+        file_server
+    }
+
+    reverse_proxy web:8000 {
+        header_up X-Forwarded-Proto {scheme}
+        header_up X-Forwarded-For {remote_host}
+        header_up Host {host}
+    }
+
+    header {
+        Strict-Transport-Security "max-age=63072000; includeSubDomains; preload"
+        X-Content-Type-Options "nosniff"
+        X-Frame-Options "DENY"
+        Referrer-Policy "strict-origin-when-cross-origin"
+    }
+}
