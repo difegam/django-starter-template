@@ -16,7 +16,7 @@ AUTH_USER_MODEL = 'users.CustomUser'
 
 All Django internals and third-party packages (including django-allauth) respect this setting automatically.
 
----
+______________________________________________________________________
 
 ## Current implementation
 
@@ -34,7 +34,7 @@ class CustomUser(AbstractUser):
 
 `AbstractUser` preserves every field and method from Django's built-in `User` (username, email, first_name, last_name, password, is_active, is_staff, is_superuser, last_login, date_joined, groups, user_permissions). The only customisation so far is that `__str__` returns the email address, which matches the email-only login configured via django-allauth.
 
----
+______________________________________________________________________
 
 ## Always reference the user model indirectly
 
@@ -58,6 +58,7 @@ For model `ForeignKey` / `OneToOneField` / `ManyToManyField` relations, always u
 ```python
 from django.conf import settings
 
+
 class Profile(models.Model):
     user = models.OneToOneField(
         settings.AUTH_USER_MODEL,
@@ -65,7 +66,7 @@ class Profile(models.Model):
     )
 ```
 
----
+______________________________________________________________________
 
 ## Adding custom fields
 
@@ -121,9 +122,7 @@ class CustomUserAdmin(UserAdmin):
     list_display = ('username', 'email', 'first_name', 'last_name', 'is_staff')
 
     # Append a new section to the existing fieldsets
-    fieldsets = UserAdmin.fieldsets + (
-        ('Profile', {'fields': ('bio', 'timezone')}),
-    )
+    fieldsets = UserAdmin.fieldsets + (('Profile', {'fields': ('bio', 'timezone')}),)
 ```
 
 ### 4. Update the admin forms if needed
@@ -173,7 +172,7 @@ def test_custom_user_has_default_timezone(user: CustomUser) -> None:
     assert user.timezone == 'UTC'
 ```
 
----
+______________________________________________________________________
 
 ## Adding a custom manager
 
@@ -206,38 +205,42 @@ active = CustomUser.objects.active()
 
 > **Note:** Always subclass `UserManager` (not the plain `Manager`) when replacing the default manager on a user model. `UserManager` provides `create_user()` and `create_superuser()` which are required by Django's auth infrastructure.
 
----
+______________________________________________________________________
 
 ## Authentication context
 
 This project uses django-allauth configured for **email-only login**:
 
-| Setting | Value |
-|---|---|
-| `ACCOUNT_LOGIN_METHODS` | `{'email'}` |
-| `ACCOUNT_UNIQUE_EMAIL` | `True` |
+| Setting                 | Value                                    |
+| ----------------------- | ---------------------------------------- |
+| `ACCOUNT_LOGIN_METHODS` | `{'email'}`                              |
+| `ACCOUNT_UNIQUE_EMAIL`  | `True`                                   |
 | `ACCOUNT_SIGNUP_FIELDS` | `['email*', 'password1*', 'password2*']` |
-| Minimum password length | 12 characters |
-| Login redirect | `home` URL name |
+| Minimum password length | 12 characters                            |
+| Login redirect          | `home` URL name                          |
 
 Because username-based login is disabled, `__str__` returning `self.email` (rather than `self.username`) makes log messages, admin displays, and shell output immediately readable.
 
----
+> **Note:** The default allauth configuration uses `ACCOUNT_EMAIL_VERIFICATION = 'optional'`, meaning users can log in without verifying their email. For production, consider tightening this to `'mandatory'`. See [Authentication](authentication.md) for details.
+
+______________________________________________________________________
 
 ## Common pitfalls
 
-| Pitfall | Consequence | Fix |
-|---|---|---|
-| Importing `from django.contrib.auth.models import User` | Breaks if `AUTH_USER_MODEL` differs from the default | Use `get_user_model()` or `from users.models import CustomUser` |
-| Adding a non-nullable field without a default | Migration fails or prompts Django to ask for a one-off default | Always provide `default=` or `blank=True` for new fields |
-| Forgetting `just django migrate` after editing the model | `OperationalError: no such column` at runtime | Run `just django migrate` after every model change |
-| Replacing the manager without subclassing `UserManager` | `create_superuser` / `create_user` missing or broken | Subclass `UserManager`, not `Manager` |
-| Skipping fixture updates for required fields | Test suite fails with `IntegrityError` | Update `tests/conftest.py` whenever a required field is added |
+| Pitfall                                                  | Consequence                                                    | Fix                                                             |
+| -------------------------------------------------------- | -------------------------------------------------------------- | --------------------------------------------------------------- |
+| Importing `from django.contrib.auth.models import User`  | Breaks if `AUTH_USER_MODEL` differs from the default           | Use `get_user_model()` or `from users.models import CustomUser` |
+| Adding a non-nullable field without a default            | Migration fails or prompts Django to ask for a one-off default | Always provide `default=` or `blank=True` for new fields        |
+| Forgetting `just django migrate` after editing the model | `OperationalError: no such column` at runtime                  | Run `just django migrate` after every model change              |
+| Replacing the manager without subclassing `UserManager`  | `create_superuser` / `create_user` missing or broken           | Subclass `UserManager`, not `Manager`                           |
+| Skipping fixture updates for required fields             | Test suite fails with `IntegrityError`                         | Update `tests/conftest.py` whenever a required field is added   |
 
----
+______________________________________________________________________
 
 ## Further reading
 
+- [Authentication](authentication.md) — allauth config, social login, email verification
+- [Settings & Environment](settings.md) — environment variables and configuration
 - [Django docs — Customizing authentication: substituting a custom user model](https://docs.djangoproject.com/en/5.2/topics/auth/customizing/#substituting-a-custom-user-model)
 - [Django docs — Using a custom user model when starting a project](https://docs.djangoproject.com/en/5.2/topics/auth/customizing/#using-a-custom-user-model-when-starting-a-project)
 - [django-allauth configuration reference](https://docs.allauth.org/en/latest/account/configuration.html)

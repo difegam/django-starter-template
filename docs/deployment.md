@@ -863,6 +863,139 @@ ______________________________________________________________________
 
 ______________________________________________________________________
 
+## Just deploy-production
+
+The `just deploy-production` command builds and starts the production Docker Compose stack:
+
+```bash
+just deploy-production
+# Or: docker compose -f docker-compose.production.yml up -d --build
+```
+
+This command:
+
+1. Builds the Docker image (runtime target, no dev dependencies)
+1. Starts PostgreSQL, Gunicorn (via web service), and Caddy
+1. Runs migrations and collectstatic via the entrypoint
+1. Optionally creates a superuser from environment variables
+
+### What happens on first deploy
+
+The `Docker/entrypoint.sh` script runs automatically:
+
+1. `python src/manage.py migrate --noinput` — apply all migrations
+1. `python src/manage.py collectstatic --noinput` — gather static files
+1. If `DJANGO_SUPERUSER_USERNAME` and `DJANGO_SUPERUSER_EMAIL` are set, create the superuser
+
+### Managing the production stack
+
+```bash
+# View logs
+just logs-production
+# Or: docker compose -f docker-compose.production.yml logs -f
+
+# Stop all services
+just stop-production
+# Or: docker compose -f docker-compose.production.yml down
+
+# Restart after code changes
+docker compose -f docker-compose.production.yml up -d --build
+```
+
+______________________________________________________________________
+
+## Running check --deploy
+
+Before deploying to production, run Django's deployment checklist:
+
+```bash
+just django deploy-check
+# Or: uv run python src/manage.py check --deploy
+```
+
+This checks for common production misconfigurations:
+
+| Check                            | What it verifies                      |
+| -------------------------------- | ------------------------------------- |
+| `SECRET_KEY`                     | Not set to the default insecure value |
+| `DEBUG`                          | Is `False`                            |
+| `SECURE_SSL_REDIRECT`            | Is `True` (HTTPS enforced)            |
+| `SECURE_HSTS_SECONDS`            | Set to a reasonable value             |
+| `SECURE_HSTS_INCLUDE_SUBDOMAINS` | Is `True`                             |
+| `SECURE_HSTS_PRELOAD`            | Is `True`                             |
+| `SESSION_COOKIE_SECURE`          | Is `True`                             |
+| `CSRF_COOKIE_SECURE`             | Is `True`                             |
+| `SECURE_CONTENT_TYPE_NOSNIFF`    | Is `True`                             |
+
+Fix any warnings before going live. Some checks (like HSTS) should only be enabled once you're confident HTTPS works end-to-end.
+
+______________________________________________________________________
+
+## Cloudflare DNS setup
+
+The production Docker Compose stack uses a custom Caddy build with the Cloudflare DNS module for automatic wildcard certificates via DNS-01 challenge.
+
+### Request flow
+
+```
+User → Cloudflare (proxy/DNS) → Caddy (TLS + reverse proxy) → Gunicorn → Django
+```
+
+### Step-by-step setup
+
+1. **Create a Cloudflare API token**
+
+   - Go to [Cloudflare Dashboard → API Tokens](https://dash.cloudflare.com/profile/api-tokens)
+   - Create a token with permissions:
+     - **Zone → Zone → Read**
+     - **Zone → DNS → Edit**
+   - Restrict the token to your specific zone(s)
+
+1. **Set the token in your environment**
+
+   ```env
+   # In your .env or docker-compose.production.yml environment
+   CLOUDFLARE_API_TOKEN=your_token_here
+   ```
+
+1. **Configure DNS records**
+
+   - Create an **A** record pointing your domain to your server's IP
+   - Enable the **proxy** (orange cloud) for DDoS protection and caching
+   - For wildcard subdomains, create a wildcard **A** record (`*` → server IP)
+
+1. **Verify Caddy is using DNS-01**
+
+   The `Caddyfile` should contain:
+
+   ```caddy
+   {
+       acme_dns cloudflare {env.CLOUDFLARE_API_TOKEN}
+   }
+
+   yourdomain.com, *.yourdomain.com {
+       reverse_proxy web:8000
+   }
+   ```
+
+1. **Check certificate issuance**
+
+   ```bash
+   docker compose -f docker-compose.production.yml logs caddy | grep certificate
+   ```
+
+   You should see Caddy obtaining and renewing certificates automatically.
+
+### Cloudflare SSL mode
+
+Set SSL mode to **Full (Strict)** in Cloudflare's dashboard:
+
+- **SSL/TLS → Overview → Full (Strict)**
+- This ensures end-to-end encryption between Cloudflare and your server
+- Caddy handles TLS termination with valid certificates
+
+______________________________________________________________________
+
 ## Troubleshooting
 
 | Problem                     | Likely Cause                        | Fix                                             |

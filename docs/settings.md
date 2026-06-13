@@ -1,0 +1,163 @@
+# Settings & Environment
+
+This project uses **django-environ** to load all configuration from environment variables, following the [Twelve-Factor App](https://12factor.net/) methodology. No secrets should ever appear in version control.
+
+______________________________________________________________________
+
+## How configuration works
+
+1. Django loads `config.settings` (set via `DJANGO_SETTINGS_MODULE` in `pyproject.toml`)
+1. `django-environ` reads your `.env` file (local development) or real environment variables (production)
+1. Settings use `env('VARIABLE_NAME')` to read values with type casting and defaults
+
+______________________________________________________________________
+
+## Settings file
+
+All settings live in a single file: `src/config/settings.py`. The key sections are:
+
+| Section            | What it configures                                                                      |
+| ------------------ | --------------------------------------------------------------------------------------- |
+| **Core**           | `SECRET_KEY`, `DEBUG`, `ALLOWED_HOSTS`, `CSRF_TRUSTED_ORIGINS`, `SECURE_SSL_REDIRECT`   |
+| **Auth backends**  | `ModelBackend` + `allauth.account.auth_backends.AuthenticationBackend`                  |
+| **Installed apps** | Django core + allauth + local apps (`config`, `users`, `web`)                           |
+| **Middleware**     | SecurityMiddleware → WhiteNoiseMiddleware → SessionMiddleware → ... → AccountMiddleware |
+| **Database**       | `DATABASE_URL` parsed into Django's `DATABASES` dict                                    |
+| **Static files**   | WhiteNoise `CompressedManifestStaticFilesStorage`, `STATIC_ROOT`                        |
+| **Email**          | `EMAIL_URL` parsed into Django's email settings                                         |
+| **Auth**           | `AUTH_USER_MODEL = 'users.CustomUser'`, login/redirect URLs                             |
+| **allauth**        | Email-only login, session remember, unique email                                        |
+
+______________________________________________________________________
+
+## Environment variables
+
+### Core
+
+| Variable                 | Required | Default               | Description                                                |
+| ------------------------ | -------- | --------------------- | ---------------------------------------------------------- |
+| `SECRET_KEY`             | **Yes**  | —                     | Django secret key. Generate with `openssl rand -base64 48` |
+| `DEBUG`                  | No       | `False`               | Enable debug mode. Set `True` for local development only   |
+| `ALLOWED_HOSTS`          | No       | `localhost,127.0.0.1` | Comma-separated list of allowed hostnames                  |
+| `DJANGO_SETTINGS_MODULE` | No       | `config.settings`     | Python path to settings module                             |
+
+### Security
+
+| Variable               | Required | Default                                       | Description                                           |
+| ---------------------- | -------- | --------------------------------------------- | ----------------------------------------------------- |
+| `CSRF_TRUSTED_ORIGINS` | No       | `http://localhost:8000,http://127.0.0.1:8000` | Comma-separated trusted origins for POST/PUT/DELETE   |
+| `SECURE_SSL_REDIRECT`  | No       | `False`                                       | Redirect all HTTP to HTTPS. Enable behind a TLS proxy |
+
+### Database
+
+| Variable            | Required | Default                    | Description                                                                  |
+| ------------------- | -------- | -------------------------- | ---------------------------------------------------------------------------- |
+| `DATABASE_URL`      | No       | `sqlite:///src/db.sqlite3` | Database connection URL. PostgreSQL: `postgres://user:pass@host:5432/dbname` |
+| `POSTGRES_DB`       | No       | —                          | PostgreSQL database name (alternative to `DATABASE_URL`)                     |
+| `POSTGRES_USER`     | No       | —                          | PostgreSQL username                                                          |
+| `POSTGRES_PASSWORD` | No       | —                          | PostgreSQL password                                                          |
+| `POSTGRES_HOST`     | No       | `db`                       | PostgreSQL host (use `db` in Docker Compose)                                 |
+| `POSTGRES_PORT`     | No       | `5432`                     | PostgreSQL port                                                              |
+
+### Email
+
+| Variable    | Required | Default                         | Description                                                       |
+| ----------- | -------- | ------------------------------- | ----------------------------------------------------------------- |
+| `EMAIL_URL` | No       | `console://` (prints to stdout) | Email connection URL. Production: `smtp+tls://user:pass@host:587` |
+
+### Internationalization
+
+| Variable        | Required | Default | Description                                                                                         |
+| --------------- | -------- | ------- | --------------------------------------------------------------------------------------------------- |
+| `TIME_ZONE`     | No       | `UTC`   | Default timezone ([IANA identifiers](https://en.wikipedia.org/wiki/List_of_tz_database_time_zones)) |
+| `LANGUAGE_CODE` | No       | `en-us` | Default language (ISO 639-1)                                                                        |
+
+### Auth URLs
+
+| Variable             | Required | Default            | Description                                 |
+| -------------------- | -------- | ------------------ | ------------------------------------------- |
+| `LOGIN_URL`          | No       | `/accounts/login/` | Login page path (used by `@login_required`) |
+| `LOGIN_REDIRECT_URL` | No       | `home`             | Redirect target after login (URL name)      |
+
+### Superuser (optional)
+
+| Variable                         | Required | Default | Description                                                           |
+| -------------------------------- | -------- | ------- | --------------------------------------------------------------------- |
+| `DJANGO_SUPERUSER_USERNAME`      | No       | —       | Auto-create superuser on Docker entrypoint                            |
+| `DJANGO_SUPERUSER_EMAIL`         | No       | —       | Superuser email                                                       |
+| `DJANGO_SUPERUSER_PASSWORD`      | No       | —       | Superuser password (**dev only** — never commit)                      |
+| `DJANGO_SUPERUSER_PASSWORD_FILE` | No       | —       | Read password from file (production, e.g. `/run/secrets/su_password`) |
+
+### Platform
+
+| Variable | Required | Default | Description                                                       |
+| -------- | -------- | ------- | ----------------------------------------------------------------- |
+| `PORT`   | No       | `8000`  | Gunicorn bind port. Most PaaS platforms inject this automatically |
+
+______________________________________________________________________
+
+## Using django-environ
+
+All environment variables are read through `django-environ`'s typed accessors:
+
+```python
+import environ
+
+env = environ.Env(
+    DEBUG=(bool, False),
+    TIME_ZONE=(str, 'UTC'),
+)
+
+# Reading .env file (local development only)
+environ.Env.read_env(BASE_DIR.parent / '.env')
+
+# Usage examples
+SECRET_KEY = env('SECRET_KEY')  # string, required
+DEBUG = env('DEBUG')  # bool, default False
+ALLOWED_HOSTS = env.list('ALLOWED_HOSTS', default=[...])  # comma-separated → list
+DATABASES = {'default': env.db_url('DATABASE_URL', default=...)}  # URL → Django DB dict
+EMAIL_URL = env.email_url('EMAIL_URL')  # URL → email settings dict
+```
+
+______________________________________________________________________
+
+## Setting DJANGO_SETTINGS_MODULE
+
+By default, `DJANGO_SETTINGS_MODULE` is set in `pyproject.toml`:
+
+```toml
+[tool.pytest.ini_options]
+DJANGO_SETTINGS_MODULE = 'config.settings'
+```
+
+And in `src/config/wsgi.py` / `src/config/asgi.py`:
+
+```python
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'config.settings')
+```
+
+If you create separate settings files (e.g. `config/settings/production.py`), update the appropriate locations:
+
+- **Local dev**: keep `config.settings` in `pyproject.toml`
+- **Docker/production**: set `DJANGO_SETTINGS_MODULE=config.settings.production` in your environment
+
+______________________________________________________________________
+
+## Security checklist for production
+
+- [ ] `SECRET_KEY` is a long, random string (never reuse across environments)
+- [ ] `DEBUG=False`
+- [ ] `ALLOWED_HOSTS` includes your production domain(s)
+- [ ] `CSRF_TRUSTED_ORIGINS` includes `https://yourdomain.com`
+- [ ] `SECURE_SSL_REDIRECT=True` (behind a TLS proxy)
+- [ ] `.env` file is never committed to version control
+- [ ] Database credentials use a strong, unique password
+- [ ] `EMAIL_URL` points to a real SMTP server
+
+______________________________________________________________________
+
+## Reference
+
+- Full `.env.example` with all variables and explanations: [`.env.example`](../.env.example)
+- django-environ documentation: https://django-environ.readthedocs.io/
+- Django settings reference: https://docs.djangoproject.com/en/6.0/ref/settings/

@@ -1,10 +1,10 @@
 # Django Starter Template
 
-A modern Django 5.2+ starter template with best practices, using **uv** for dependency management and **just** for task automation.
+A modern Django 6 starter template with best practices, using **uv** for dependency management and **just** for task automation.
 
 ## Features
 
-- **Django 5.2+** - Latest Django features and security updates
+- **Django 6** - Latest Django features and security updates
 - **Custom User Model** - Pre-configured `CustomUser` extending `AbstractUser`
 - **django-allauth** - Email-based authentication with social account support
 - **uv** - Fast, modern Python package manager
@@ -13,179 +13,33 @@ A modern Django 5.2+ starter template with best practices, using **uv** for depe
 - **Code Quality** - Ruff for linting/formatting, prek-managed Git hooks
 - **Testing** - pytest with pytest-django and coverage reporting
 - **Environment Configuration** - django-environ for 12-factor app compliance
+- **Docker** - Multi-stage builds, Caddy reverse proxy, Cloudflare integration
 
-## 🚀 Quick Start
-
-### Prerequisites
-
-- Python 3.13+
-- [uv](https://github.com/astral-sh/uv) - Install with `curl -LsSf https://astral.sh/uv/install.sh | sh`
-- [Just](https://github.com/casey/just) - Install with `brew install just` (macOS)
-
-### Command Invocation
-
-This project organizes commands in Just modules.
-
-- Use `just django <command>` for Django app operations
-- Use `just <command>` for root development/QA commands
-- Use `just docker <command>` for container workflows
-
-### Option 1: Initialize a New Project (Recommended)
-
-Use the included initialization script to set up a fresh project:
+## Quick start
 
 ```bash
-# Interactive mode
-./init.py
-
-# Non-interactive mode
-./init.py --name my-project-name --description "My awesome Django project" --force
-```
-
-> `uv run init.py` also works if you prefer not to invoke the script directly.
-
-The initialization script will:
-
-- Remove the existing git repository (unless `--skip-git` is used)
-- Remove the virtual environment and database
-- Create a new README.md with your project name
-- Update pyproject.toml with your project details
-- Prepare the project for a fresh start
-
-After initialization:
-
-```bash
-rm init.py          # Remove the script
-git init            # Initialize new git repo
-just init           # Set up environment
-```
-
-### Option 2: Manual Installation
-
-1. Clone the repository:
-
-```bash
+# Clone and enter the project
 git clone <your-repo-url>
 cd django-starter-template
-```
 
-2. Set up the environment:
+# Create environment file
+cp .env.example .env   # edit .env and set SECRET_KEY
 
-```bash
+# Install dependencies and hooks
 just init
-```
 
-3. Create a `.env` file in the project root:
-
-```bash
-# Generate with: openssl rand -base64 48
-SECRET_KEY=replace-with-a-securely-generated-secret-key
-# Keep False for production; use True only in local development
-DEBUG=False
-ALLOWED_HOSTS=localhost,127.0.0.1
-TIME_ZONE=UTC
-DATABASE_URL=sqlite:///src/db.sqlite3
-```
-
-4. Run migrations:
-
-```bash
+# Run migrations and start the server
 just django migrate
-```
-
-5. Create a superuser:
-
-```bash
-just django add-superuser
-```
-
-6. Start the development server:
-
-```bash
 just django serve
 ```
 
-Visit [http://127.0.0.1:8000](http://127.0.0.1:8000) to see your app running!
+Visit **http://127.0.0.1:8000**.
 
-## 🛠️ Project Initialization Script
+For detailed instructions (including Windows), see **[docs/quickstart.md](docs/quickstart.md)**.
 
-The included `init.py` script helps you quickly transform this template into your own project.
+## Available commands
 
-### Features
-
-- **Interactive or Non-Interactive**: Run with or without command-line arguments
-- **Clean Slate**: Removes git history, virtual environment, and database
-- **Safety Gate**: Requires confirmation in interactive mode or `--force` in non-interactive mode before deleting existing state
-- **Auto-Configuration**: Updates README.md and pyproject.toml with your project details
-- **Rich UI**: Beautiful terminal interface with progress bars and colored output
-
-### Usage
-
-**Interactive Mode** (recommended for first-time users):
-
-```bash
-./init.py
-```
-
-You'll be prompted to enter:
-
-- Project name (lowercase, with hyphens or underscores)
-- Optional custom description
-
-**Non-Interactive Mode**:
-
-```bash
-# Basic usage
-./init.py --name my-awesome-project --force
-
-# With description
-./init.py --name my-awesome-project --description "A revolutionary Django app" --force
-
-# Skip git repository removal
-./init.py --name my-awesome-project --skip-git --force
-```
-
-### Command-Line Options
-
-- `project_name` - Name of your new project (positional argument, optional)
-- `--name` - Name of your new project (optional flag alternative)
-- `--description, -d` - Custom project description
-- `--skip-git` - Skip removing the git repository
-- `--force` - Required for non-interactive runs that delete existing project state
-
-### What It Does
-
-1. **Removes existing git repository** - Clean slate for your version control
-1. **Removes virtual environment** - Fresh Python environment
-1. **Removes database file** - No leftover demo data
-1. **Creates new README.md** - Customized with your project name and description
-1. **Updates pyproject.toml** - Sets your project name and metadata
-
-### After Initialization
-
-Once the script completes, follow these steps:
-
-```bash
-# 1. Remove the initialization script (you won't need it anymore)
-rm init.py
-
-# 2. Initialize a new git repository
-git init
-
-# 3. Set up the environment
-just init
-
-# 4. Create your .env file (see Configuration section)
-
-# 5. Run migrations
-just django migrate
-
-# 6. Start coding! 🎉
-```
-
-## 📋 Available Commands
-
-### Django Commands
+### Django commands
 
 | Command                     | Description                                              |
 | --------------------------- | -------------------------------------------------------- |
@@ -197,7 +51,7 @@ just django migrate
 | `just django collectstatic` | Collect static files                                     |
 | `just django new NAME`      | Create a new Django app with proper structure            |
 
-### Development Commands
+### Development commands
 
 | Command             | Description                                       |
 | ------------------- | ------------------------------------------------- |
@@ -208,7 +62,7 @@ just django migrate
 | `just hooks-update` | Update prek hook revisions                        |
 | `just export-reqs`  | Generate `requirements.txt` from `pyproject.toml` |
 
-### Quality Assurance Commands
+### Quality assurance commands
 
 | Command      | Description                                                |
 | ------------ | ---------------------------------------------------------- |
@@ -217,180 +71,90 @@ just django migrate
 | `just check` | Run lint, type checks, and prek-managed commit-stage hooks |
 | `just test`  | Run pytest test suite                                      |
 
-## 🔧 Configuration
+## Configuration
 
-### Environment Variables
+The project uses `django-environ` to load all configuration from environment variables. Copy `.env.example` to `.env` and set at minimum:
 
-The project uses `django-environ` for configuration. Create a `.env` file in the project root:
-
-```bash
-# Django Settings
-# Generate with: openssl rand -base64 48
-SECRET_KEY=replace-with-a-securely-generated-secret-key
-# Keep False for production; use True only in local development
-DEBUG=False
-ALLOWED_HOSTS=localhost,127.0.0.1
-
-# Database
+```env
+SECRET_KEY=<generate with: openssl rand -base64 48>
+DEBUG=True
 DATABASE_URL=sqlite:///src/db.sqlite3
-# For PostgreSQL: DATABASE_URL=postgres://user:password@localhost:5432/dbname
-
-# Localization
-TIME_ZONE=UTC
 ```
 
-Note: `LANGUAGE_CODE` is currently defined in `src/config/settings.py`.
+See **[docs/settings.md](docs/settings.md)** for the full environment variable reference.
 
-### Custom User Model
+## Authentication
 
-This template uses a custom user model from the start (`users.CustomUser`). Always reference:
+Configured with django-allauth for email-only login (no username). Social login (GitHub, Google, etc.) is ready to enable via Django admin.
+
+See **[docs/authentication.md](docs/authentication.md)** for allauth configuration, social login setup, and email verification options.
+
+## Custom user model
+
+This template ships with a custom user model from day one (`users.CustomUser`). Always reference it indirectly:
 
 ```python
 from django.contrib.auth import get_user_model
+
 User = get_user_model()
-
-# Or import directly
-from users.models import CustomUser
 ```
 
-**Never import Django's default User model.**
+See **[docs/users.md](docs/users.md)** for extending the user model with custom fields.
 
-### Authentication
-
-Configured with django-allauth for email-based authentication:
-
-- Email-only login (no username)
-- Social account integration ready
-- Login URL: `/accounts/login/`
-- Logout URL: `/accounts/logout/`
-- Redirects after login: `home` URL name
-
-### Sample allauth templates (Tailwind)
-
-This template includes simple examples of custom allauth pages in:
-
-- `src/templates/account/login.html`
-- `src/templates/account/signup.html`
-
-These files extend `src/templates/_base.html` and use Tailwind/DaisyUI utility classes.
-Because Django searches `TEMPLATES['DIRS']` before app templates, matching file paths in
-`src/templates/account/` override allauth defaults automatically.
-
-## 🎨 Code Quality
-
-### Linting and Formatting
-
-Uses **Ruff** for fast Python linting and formatting:
-
-- Single quotes enforced
-- 120 character line length
-- Python 3.13 target
-- Auto-fix on `just lint`
-
-### Type Checking
-
-Uses **ty** for all type checks (`just ty`) with django-stubs for Django-specific type information:
-
-- All functions require type hints
-- Checks `manage.py`, `src/`, and `tests/`
-- Errors on unresolved imports/references and invalid assignments
-
-Example:
-
-```python
-from django.http.request import HttpRequest
-from django.http.response import HttpResponse
-
-def my_view(request: HttpRequest) -> HttpResponse:
-    return render(request, 'template.html')
-```
-
-### Prek Hooks
-
-By default, `just check` runs prek-managed commit-stage hooks on all files.
-
-Commit-stage hooks:
-
-- djlint - Django template linting
-- ruff - Python linting/formatting
-- pyupgrade - Python 3.13+ syntax upgrades
-- codespell - Spell checking
-- detect-secrets - Secret detection
-
-Pre-push/manual stage hooks:
-
-- ty - Type checking with django-stubs
-- vulture - Unused code detection
-- bandit - Security issue detection
-- uv-secure - Dependency vulnerability scanning
-- semgrep - Security rules scanning
-- pytest - Test suite execution
-
-## 🧪 Testing
-
-Uses **pytest** with pytest-django:
+## Testing
 
 ```bash
-# Run all tests
-just test
-
-# Run with coverage report
-uv run pytest --cov=src --cov-report=html
-
-# Run specific test file
-uv run pytest tests/test_specific.py -vv
+just test                                # run all tests
+uv run pytest --cov=src --cov-report=html  # with HTML coverage
 ```
 
-Tests are located in the top-level `tests/` directory.
+See **[docs/testing.md](docs/testing.md)** for writing model, view, and form tests, and CI setup.
 
-## 🐳 Docker
+## Deployment
 
-Container commands are available via the Docker Just module:
+This project supports multiple deployment targets:
+
+- **Docker Compose + Caddy** (Hetzner, DigitalOcean VPS)
+- **Dokploy** (self-hosted PaaS)
+- **Railway** (managed PaaS)
+- **Fly.io** (managed PaaS)
+- **Cloudflare** (DNS, proxy, TLS)
 
 ```bash
-# Build image
-just docker build
-
-# Run container locally
-just docker run
-
-# Build and run with Compose
-docker compose up --build
+# Production deploy with Docker Compose
+just deploy-production
 ```
 
-## 🆕 Creating New Apps
+See **[docs/deployment.md](docs/deployment.md)** for full deployment guides.
 
-Use the built-in command to create properly structured apps:
+## Creating new apps
 
 ```bash
 just django new blog
 ```
 
-This creates:
+Creates `src/blog/` with standard Django app files, templates, and static directories. Don't forget to add the app to `LOCAL_APPS` in `src/config/settings.py`.
 
-- `src/blog/` directory with standard Django app files
-- `src/blog/templates/blog/` for app-specific templates
-- `src/blog/static/blog/` for app-specific static files
+## Contributing
 
-**Don't forget to add the new app to `LOCAL_APPS` in `src/config/settings.py`:**
+See **[docs/contributing.md](docs/contributing.md)** for dependency management, code style, and PR guidelines.
 
-```python
-LOCAL_APPS = [
-    'users',
-    'web',
-    'blog',  # Add your new app here
-]
+```bash
+just check   # run all quality checks before opening a PR
+just test    # run tests
 ```
 
-## 📦 Dependencies
+## Dependencies
 
-### Core Dependencies
+### Core
 
-- **Django 5.2+** - Web framework
+- **Django 6** - Web framework
 - **django-allauth** - Authentication with social accounts
 - **django-environ** - Environment variable management
+- **gunicorn** - WSGI HTTP server
+- **whitenoise** - Static file serving
 
-### Development Dependencies
+### Development
 
 - **pytest** & **pytest-django** - Testing framework
 - **pytest-cov** - Coverage reporting
@@ -399,36 +163,22 @@ LOCAL_APPS = [
 - **prek** - Git hook management
 - **django-debug-toolbar** - Debug panel for development
 
-## 🤝 Contributing
-
-1. Fork the repository
-1. Create a feature branch: `git checkout -b feature/amazing-feature`
-1. Run quality checks: `just check`
-1. Run tests: `just test`
-1. Commit your changes: `git commit -m 'Add amazing feature'`
-1. Push to the branch: `git push origin feature/amazing-feature`
-1. Open a Pull Request
-
-## 📝 License
+## License
 
 This project is open source and available under the [MIT License](LICENSE).
 
-## 🙏 Acknowledgments
+## Acknowledgments
 
 Built with modern Python tooling:
 
 - [uv](https://github.com/astral-sh/uv) - Fast Python package manager
-- [Just](https://github.com/casey/just) - Command runner
+- [Just](https://just.systems/) - Command runner
 - [Ruff](https://github.com/astral-sh/ruff) - Fast Python linter
 - [Django](https://www.djangoproject.com/) - The web framework for perfectionists
 
-## 📚 Additional Resources
+## Resources
 
 - [Django Documentation](https://docs.djangoproject.com/)
 - [django-allauth Documentation](https://docs.allauth.org/)
 - [uv Documentation](https://docs.astral.sh/uv/)
 - [Just Manual](https://just.systems/)
-
-______________________________________________________________________
-
-**Happy coding! 🚀**
