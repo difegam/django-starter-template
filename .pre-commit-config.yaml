@@ -105,21 +105,16 @@ repos:
         args: ["--severity=warning"]
         types_or: [shell, sh]
 
-  # Python static type checker (mypy)
+  # Python static type checker (ty)
   - repo: local
     hooks:
-      - id: mypy
-        name: type-check Python (mypy)
-        entry: uv run mypy
+      - id: ty
+        name: type-check Python (ty)
+        entry: uv run ty check
         language: system
         pass_filenames: false
         stages: [pre-push, manual]
         types: [python]
-        args:
-          - --config-file=./mypy.ini
-          - --install-types
-          - --non-interactive
-          - src/
 
   # Find unused code in Python projects.
   - repo: https://github.com/jendrikseipp/vulture

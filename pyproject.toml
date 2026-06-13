@@ -10,6 +10,7 @@ dependencies = [
     "django-allauth[socialaccount]>=65.17.0",
     "django-environ>=0.13.0",
     "gunicorn>=26.0.0",
+    "whitenoise>=6.9.0",
 ]
 
 
@@ -17,8 +18,7 @@ dependencies = [
 dev = [
     "django-debug-toolbar>=6.3.0",
     "django-stubs-ext>=6.0.5",
-    "django-stubs[compatible-mypy]>=6.0.5",
-    "mypy>=2.1.0",
+    "django-stubs>=6.0.5",
     "prek>=0.4.3",
     "pytest>=9.0.3",
     "pytest-cov>=7.0.0",

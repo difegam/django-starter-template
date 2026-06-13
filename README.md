@@ -9,7 +9,7 @@ A modern Django 5.2+ starter template with best practices, using **uv** for depe
 - **django-allauth** - Email-based authentication with social account support
 - **uv** - Fast, modern Python package manager
 - **Just** - Command runner for development tasks
-- **Type Safety** - `ty` checks plus strict mypy configuration with django-stubs
+- **Type Safety** - `ty` for static type checking with django-stubs
 - **Code Quality** - Ruff for linting/formatting, prek-managed Git hooks
 - **Testing** - pytest with pytest-django and coverage reporting
 - **Environment Configuration** - django-environ for 12-factor app compliance
@@ -265,6 +265,17 @@ Configured with django-allauth for email-based authentication:
 - Logout URL: `/accounts/logout/`
 - Redirects after login: `home` URL name
 
+### Sample allauth templates (Tailwind)
+
+This template includes simple examples of custom allauth pages in:
+
+- `src/templates/account/login.html`
+- `src/templates/account/signup.html`
+
+These files extend `src/templates/_base.html` and use Tailwind/DaisyUI utility classes.
+Because Django searches `TEMPLATES['DIRS']` before app templates, matching file paths in
+`src/templates/account/` override allauth defaults automatically.
+
 ## 🎨 Code Quality
 
 ### Linting and Formatting
@@ -278,11 +289,11 @@ Uses **Ruff** for fast Python linting and formatting:
 
 ### Type Checking
 
-Uses **ty** for routine checks (`just ty`) and maintains strict **mypy** configuration with django-stubs:
+Uses **ty** for all type checks (`just ty`) with django-stubs for Django-specific type information:
 
 - All functions require type hints
-- `disallow_untyped_defs=True`
-- Django plugin enabled
+- Checks `manage.py`, `src/`, and `tests/`
+- Errors on unresolved imports/references and invalid assignments
 
 Example:
 
@@ -308,7 +319,7 @@ Commit-stage hooks:
 
 Pre-push/manual stage hooks:
 
-- mypy - Type checking with django-stubs
+- ty - Type checking with django-stubs
 - vulture - Unused code detection
 - bandit - Security issue detection
 - uv-secure - Dependency vulnerability scanning
@@ -383,7 +394,7 @@ LOCAL_APPS = [
 
 - **pytest** & **pytest-django** - Testing framework
 - **pytest-cov** - Coverage reporting
-- **mypy** & **django-stubs** - Type checking
+- **ty** & **django-stubs** - Type checking
 - **ruff** - Fast linter and formatter
 - **prek** - Git hook management
 - **django-debug-toolbar** - Debug panel for development
