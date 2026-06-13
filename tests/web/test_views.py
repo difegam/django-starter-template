@@ -34,3 +34,17 @@ def test_home_accessible_to_anonymous_users(client: Client) -> None:
     response = client.get(url)
     # A redirect would indicate the view requires login; 200 means it is public.
     assert response.status_code == HTTPStatus.OK
+
+
+def test_health_status_code(client: Client) -> None:
+    """GET /health/ returns HTTP 200 OK."""
+    url = reverse('web:health')
+    response = client.get(url)
+    assert response.status_code == HTTPStatus.OK
+
+
+def test_health_payload(client: Client) -> None:
+    """The health endpoint returns a minimal non-sensitive payload."""
+    url = reverse('web:health')
+    response = client.get(url)
+    assert response.json() == {'status': 'ok'}
