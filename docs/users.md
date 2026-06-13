@@ -16,8 +16,6 @@ AUTH_USER_MODEL = 'users.CustomUser'
 
 All Django internals and third-party packages (including django-allauth) respect this setting automatically.
 
-______________________________________________________________________
-
 ## Current implementation
 
 `src/users/models.py`:
@@ -33,8 +31,6 @@ class CustomUser(AbstractUser):
 ```
 
 `AbstractUser` preserves every field and method from Django's built-in `User` (username, email, first_name, last_name, password, is_active, is_staff, is_superuser, last_login, date_joined, groups, user_permissions). The only customisation so far is that `__str__` returns the email address, which matches the email-only login configured via django-allauth.
-
-______________________________________________________________________
 
 ## Always reference the user model indirectly
 
@@ -65,8 +61,6 @@ class Profile(models.Model):
         on_delete=models.CASCADE,
     )
 ```
-
-______________________________________________________________________
 
 ## Adding custom fields
 
@@ -172,8 +166,6 @@ def test_custom_user_has_default_timezone(user: CustomUser) -> None:
     assert user.timezone == 'UTC'
 ```
 
-______________________________________________________________________
-
 ## Adding a custom manager
 
 If you need custom queryset methods (for example, `active_users()`), add a manager rather than cluttering views with repeated filter logic:
@@ -205,8 +197,6 @@ active = CustomUser.objects.active()
 
 > **Note:** Always subclass `UserManager` (not the plain `Manager`) when replacing the default manager on a user model. `UserManager` provides `create_user()` and `create_superuser()` which are required by Django's auth infrastructure.
 
-______________________________________________________________________
-
 ## Authentication context
 
 This project uses django-allauth configured for **email-only login**:
@@ -223,8 +213,6 @@ Because username-based login is disabled, `__str__` returning `self.email` (rath
 
 > **Note:** The default allauth configuration uses `ACCOUNT_EMAIL_VERIFICATION = 'optional'`, meaning users can log in without verifying their email. For production, consider tightening this to `'mandatory'`. See [Authentication](authentication.md) for details.
 
-______________________________________________________________________
-
 ## Common pitfalls
 
 | Pitfall                                                  | Consequence                                                    | Fix                                                             |
@@ -234,8 +222,6 @@ ______________________________________________________________________
 | Forgetting `just django migrate` after editing the model | `OperationalError: no such column` at runtime                  | Run `just django migrate` after every model change              |
 | Replacing the manager without subclassing `UserManager`  | `create_superuser` / `create_user` missing or broken           | Subclass `UserManager`, not `Manager`                           |
 | Skipping fixture updates for required fields             | Test suite fails with `IntegrityError`                         | Update `tests/conftest.py` whenever a required field is added   |
-
-______________________________________________________________________
 
 ## Further reading
 

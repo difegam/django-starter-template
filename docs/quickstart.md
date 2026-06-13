@@ -1,8 +1,6 @@
 # Quick Start
 
-Get this Django starter template running locally in under 5 minutes.
-
-______________________________________________________________________
+Create a new project from this starter template and get it running locally in under 5 minutes.
 
 ## Prerequisites
 
@@ -54,18 +52,59 @@ cargo install just
 winget install Casey.Just
 ```
 
-______________________________________________________________________
+## Create a new project from this template
 
-## Step-by-step setup
+Use this path when you cloned the starter and want to turn it into your own project.
 
-### 1. Clone the repository
+### 1. Clone the template
 
 ```bash
-git clone <your-repo-url>
-cd django-starter-template
+git clone <your-repo-url> my-project
+cd my-project
 ```
 
-### 2. Create your environment file
+### 2. Run the one-time initializer
+
+The initializer updates project metadata and removes selected local/template artifacts so your new project starts clean.
+
+```bash
+./init.py
+```
+
+When cleanup choices appear, use **Space** to toggle options and **Enter** to continue.
+
+If direct execution fails, run the script through `uv`:
+
+```bash
+uv run init.py
+```
+
+Preview planned changes without modifying files:
+
+```bash
+./init.py --name my-project --dry-run
+```
+
+Run non-interactively:
+
+```bash
+./init.py --name my-project --force
+```
+
+> **Warning:** `./init.py` can remove local template state such as `.git`, `.venv`, caches, `node_modules`, `.DS_Store`, and `src/db.sqlite3`. Run with `--dry-run` first if you want to inspect planned changes before deleting anything.
+
+What `./init.py` does:
+
+- Prompts for a project name and optional description.
+- Updates `README.md` and `pyproject.toml`.
+- Removes selected local/template artifacts.
+- Prints next steps for creating a fresh Git repository and starting development.
+
+## Local development setup
+
+Use these steps after running `./init.py`, or when working on this template repository directly.
+
+### 1. Create your environment file
 
 ```bash
 cp .env.example .env
@@ -81,7 +120,7 @@ DATABASE_URL=sqlite:///src/db.sqlite3
 
 > **Never commit your `.env` file.** It is listed in `.gitignore`.
 
-### 3. Install dependencies
+### 2. Install dependencies
 
 ```bash
 just init
@@ -96,7 +135,7 @@ uv sync --all-groups
 uv run prek install --prepare-hooks --hook-type pre-commit --hook-type pre-push
 ```
 
-### 4. Run database migrations
+### 3. Run database migrations
 
 ```bash
 just django migrate
@@ -109,7 +148,7 @@ uv run python src/manage.py makemigrations
 uv run python src/manage.py migrate
 ```
 
-### 5. Create a superuser
+### 4. Create a superuser
 
 ```bash
 just django add-superuser
@@ -121,7 +160,7 @@ Or without Just:
 uv run python src/manage.py createsuperuser
 ```
 
-### 6. Start the development server
+### 5. Start the development server
 
 ```bash
 just django serve
@@ -133,27 +172,9 @@ Or without Just:
 uv run python src/manage.py runserver
 ```
 
-### 7. Open your browser
+### 6. Open your browser
 
 Visit **[http://127.0.0.1:8000](http://127.0.0.1:8000)** — you should see the home page.
-
-______________________________________________________________________
-
-## Alternative: initialization script
-
-If you're using this template as a starting point for a new project, the included `init.py` script can set everything up for you:
-
-```bash
-# Interactive mode
-./init.py
-
-# Non-interactive mode
-./init.py --name my-project --force
-```
-
-Then follow steps 2–7 above.
-
-______________________________________________________________________
 
 ## Quick command reference
 

@@ -2,15 +2,11 @@
 
 This project uses **django-environ** to load all configuration from environment variables, following the [Twelve-Factor App](https://12factor.net/) methodology. No secrets should ever appear in version control.
 
-______________________________________________________________________
-
 ## How configuration works
 
 1. Django loads `config.settings` (set via `DJANGO_SETTINGS_MODULE` in `pyproject.toml`)
 1. `django-environ` reads your `.env` file (local development) or real environment variables (production)
 1. Settings use `env('VARIABLE_NAME')` to read values with type casting and defaults
-
-______________________________________________________________________
 
 ## Settings file
 
@@ -28,8 +24,6 @@ All settings live in a single file: `src/config/settings.py`. The key sections a
 | **Auth**           | `AUTH_USER_MODEL = 'users.CustomUser'`, login/redirect URLs                             |
 | **allauth**        | Email-only login, session remember, unique email                                        |
 
-______________________________________________________________________
-
 ## Environment variables
 
 ### Core
@@ -43,21 +37,33 @@ ______________________________________________________________________
 
 ### Security
 
-| Variable               | Required | Default                                       | Description                                           |
-| ---------------------- | -------- | --------------------------------------------- | ----------------------------------------------------- |
-| `CSRF_TRUSTED_ORIGINS` | No       | `http://localhost:8000,http://127.0.0.1:8000` | Comma-separated trusted origins for POST/PUT/DELETE   |
-| `SECURE_SSL_REDIRECT`  | No       | `False`                                       | Redirect all HTTP to HTTPS. Enable behind a TLS proxy |
+| Variable                         | Required | Default                                       | Description                                           |
+| -------------------------------- | -------- | --------------------------------------------- | ----------------------------------------------------- |
+| `CSRF_TRUSTED_ORIGINS`           | No       | `http://localhost:8000,http://127.0.0.1:8000` | Comma-separated trusted origins for POST/PUT/DELETE   |
+| `SECURE_SSL_REDIRECT`            | No       | `False`                                       | Redirect all HTTP to HTTPS. Enable behind a TLS proxy |
+| `SECURE_HSTS_SECONDS`            | No       | `0`                                           | Browser HSTS duration in seconds                      |
+| `SECURE_HSTS_INCLUDE_SUBDOMAINS` | No       | `False`                                       | Include subdomains in HSTS policy                     |
+| `SECURE_HSTS_PRELOAD`            | No       | `False`                                       | Opt in to browser HSTS preload lists                  |
+| `SESSION_COOKIE_SECURE`          | No       | `False`                                       | Send session cookies over HTTPS only                  |
+| `CSRF_COOKIE_SECURE`             | No       | `False`                                       | Send CSRF cookies over HTTPS only                     |
+| `SECURE_CONTENT_TYPE_NOSNIFF`    | No       | `True`                                        | Add `X-Content-Type-Options: nosniff`                 |
 
 ### Database
 
-| Variable            | Required | Default                    | Description                                                                  |
-| ------------------- | -------- | -------------------------- | ---------------------------------------------------------------------------- |
-| `DATABASE_URL`      | No       | `sqlite:///src/db.sqlite3` | Database connection URL. PostgreSQL: `postgres://user:pass@host:5432/dbname` |
-| `POSTGRES_DB`       | No       | —                          | PostgreSQL database name (alternative to `DATABASE_URL`)                     |
-| `POSTGRES_USER`     | No       | —                          | PostgreSQL username                                                          |
-| `POSTGRES_PASSWORD` | No       | —                          | PostgreSQL password                                                          |
-| `POSTGRES_HOST`     | No       | `db`                       | PostgreSQL host (use `db` in Docker Compose)                                 |
-| `POSTGRES_PORT`     | No       | `5432`                     | PostgreSQL port                                                              |
+| Variable            | Required | Default                    | Description                                                                       |
+| ------------------- | -------- | -------------------------- | --------------------------------------------------------------------------------- |
+| `DATABASE_URL`      | No       | `sqlite:///src/db.sqlite3` | Django database connection URL. PostgreSQL: `postgres://user:pass@db:5432/dbname` |
+| `POSTGRES_DB`       | No       | `django_db` in Compose     | PostgreSQL container database name; Django does not read this directly            |
+| `POSTGRES_USER`     | No       | `postgres` in Compose      | PostgreSQL container username; Django does not read this directly                 |
+| `POSTGRES_PASSWORD` | No       | `postgres` in Compose      | PostgreSQL container password; Django does not read this directly                 |
+| `POSTGRES_HOST`     | No       | `db` by convention         | PostgreSQL host to use inside `DATABASE_URL` when using Docker Compose            |
+| `POSTGRES_PORT`     | No       | `5432` by convention       | PostgreSQL port to use inside `DATABASE_URL`                                      |
+
+For Docker Compose with the bundled PostgreSQL service, set Django's database connection explicitly:
+
+```env
+DATABASE_URL=postgres://postgres:postgres@db:5432/django_db
+```
 
 ### Email
 
@@ -94,8 +100,6 @@ ______________________________________________________________________
 | -------- | -------- | ------- | ----------------------------------------------------------------- |
 | `PORT`   | No       | `8000`  | Gunicorn bind port. Most PaaS platforms inject this automatically |
 
-______________________________________________________________________
-
 ## Using django-environ
 
 All environment variables are read through `django-environ`'s typed accessors:
@@ -119,8 +123,6 @@ DATABASES = {'default': env.db_url('DATABASE_URL', default=...)}  # URL → Djan
 EMAIL_URL = env.email_url('EMAIL_URL')  # URL → email settings dict
 ```
 
-______________________________________________________________________
-
 ## Setting DJANGO_SETTINGS_MODULE
 
 By default, `DJANGO_SETTINGS_MODULE` is set in `pyproject.toml`:
@@ -141,8 +143,6 @@ If you need environment-specific settings, set `DJANGO_SETTINGS_MODULE` to a dif
 - **Local dev**: keep `config.settings` in `pyproject.toml` (the default)
 - **Docker/production**: set `DJANGO_SETTINGS_MODULE=config.settings` in your environment (the same module reads env vars differently depending on the environment)
 
-______________________________________________________________________
-
 ## Security checklist for production
 
 - [ ] `SECRET_KEY` is a long, random string (never reuse across environments)
@@ -150,7 +150,7 @@ ______________________________________________________________________
 - [ ] `ALLOWED_HOSTS` includes your production domain(s)
 - [ ] `CSRF_TRUSTED_ORIGINS` includes `https://yourdomain.com`
 - [ ] `SECURE_SSL_REDIRECT=True` (behind a TLS proxy)
-- [ ] `SECURE_HSTS_SECONDS=31536000` (HSTS — only after confirming HTTPS works end-to-end)
+- [ ] `SECURE_HSTS_SECONDS=31536000` (only after confirming HTTPS works end-to-end)
 - [ ] `SECURE_HSTS_INCLUDE_SUBDOMAINS=True`
 - [ ] `SECURE_HSTS_PRELOAD=True`
 - [ ] `SESSION_COOKIE_SECURE=True`
@@ -159,8 +159,6 @@ ______________________________________________________________________
 - [ ] `.env` file is never committed to version control
 - [ ] Database credentials use a strong, unique password
 - [ ] `EMAIL_URL` points to a real SMTP server
-
-______________________________________________________________________
 
 ## Reference
 

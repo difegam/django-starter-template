@@ -16,7 +16,31 @@ The following deployment platforms are covered:
 - **Hetzner VPS** — Docker Compose + Caddy
 - **DigitalOcean** — Docker Compose + Caddy (or App Platform)
 
-______________________________________________________________________
+## Choose your deployment path
+
+| If you want...                    | Start here                                                                   |
+| --------------------------------- | ---------------------------------------------------------------------------- |
+| Local Docker development          | [Local Development with Docker](#local-development-with-docker)              |
+| Self-hosted PaaS                  | [Dokploy](#dokploy-self-hosted-paas)                                         |
+| Managed PaaS                      | [Railway](#railway-managed-paas) or [Fly.io](#flyio-managed-paas)            |
+| VPS with Docker Compose and Caddy | [Hetzner VPS](#hetzner-vps-docker-compose--caddy)                            |
+| Production Compose stack          | [Production Docker Compose](#production-docker-compose)                      |
+| Docker image publishing           | [GitHub Actions: Publish Docker image](#github-actions-publish-docker-image) |
+
+Use [Settings & Environment](settings.md) as the source of truth for all supported environment variables.
+
+## Production topology
+
+```mermaid
+flowchart LR
+    user[User] --> cloudflare[Cloudflare DNS/proxy]
+    cloudflare --> caddy[Caddy reverse proxy]
+    caddy --> web[Gunicorn + Django web service]
+    web --> db[(PostgreSQL)]
+    web --> static[Static/media volumes]
+```
+
+The bundled production Compose stack maps this topology to the `caddy`, `web`, and `db` services in `docker-compose.production.yml`.
 
 ## Prerequisites
 
@@ -29,9 +53,9 @@ ______________________________________________________________________
   - **Fly.io:** `flyctl` CLI
   - **Hetzner / DigitalOcean:** SSH access
 
-______________________________________________________________________
+## Shared configuration
 
-## Shared Configuration
+For the full environment variable reference, see [Settings & Environment](settings.md). This section lists deployment-specific values and examples only.
 
 ### Environment Variables
 
@@ -50,6 +74,12 @@ ______________________________________________________________________
 | `LOGIN_REDIRECT_URL`             | Redirect target after login                  | No       | `home`                     |
 | `PORT`                           | Web server port                              | No       | `8000`                     |
 | `SECURE_SSL_REDIRECT`            | Force HTTPS redirects                        | No       | `False`                    |
+| `SECURE_HSTS_SECONDS`            | Browser HSTS duration in seconds             | No       | `0`                        |
+| `SECURE_HSTS_INCLUDE_SUBDOMAINS` | Include subdomains in HSTS                   | No       | `False`                    |
+| `SECURE_HSTS_PRELOAD`            | Opt in to browser HSTS preload lists         | No       | `False`                    |
+| `SESSION_COOKIE_SECURE`          | Send session cookies over HTTPS only         | No       | `False`                    |
+| `CSRF_COOKIE_SECURE`             | Send CSRF cookies over HTTPS only            | No       | `False`                    |
+| `SECURE_CONTENT_TYPE_NOSNIFF`    | Add `X-Content-Type-Options: nosniff`        | No       | `True`                     |
 | `DJANGO_SUPERUSER_USERNAME`      | Auto-create superuser (optional)             | No       | —                          |
 | `DJANGO_SUPERUSER_EMAIL`         | Auto-create superuser (optional)             | No       | —                          |
 | `DJANGO_SUPERUSER_PASSWORD`      | Superuser password (dev only)                | No       | —                          |
@@ -105,6 +135,12 @@ SECRET_KEY=<long-random-string>
 ALLOWED_HOSTS=yourdomain.com,www.yourdomain.com
 CSRF_TRUSTED_ORIGINS=https://yourdomain.com,https://www.example.com
 SECURE_SSL_REDIRECT=True
+SECURE_HSTS_SECONDS=31536000
+SECURE_HSTS_INCLUDE_SUBDOMAINS=True
+SECURE_HSTS_PRELOAD=True
+SESSION_COOKIE_SECURE=True
+CSRF_COOKIE_SECURE=True
+SECURE_CONTENT_TYPE_NOSNIFF=True
 ```
 
 ### Superuser Creation (Optional)
@@ -141,8 +177,6 @@ For **development only**, you may set the password inline (never commit real sec
 ```env
 DJANGO_SUPERUSER_PASSWORD=changeme
 ```
-
-______________________________________________________________________
 
 ## Local Development with Docker
 
@@ -181,6 +215,8 @@ POSTGRES_USER=postgres
 POSTGRES_PASSWORD=postgres
 ```
 
+`POSTGRES_*` variables configure the PostgreSQL container. Django reads `DATABASE_URL`, so keep the values in sync.
+
 ### Creating a Superuser
 
 ```bash
@@ -193,8 +229,6 @@ docker compose exec web python src/manage.py createsuperuser
 docker compose down          # keep volumes
 docker compose down -v       # remove volumes (fresh start)
 ```
-
-______________________________________________________________________
 
 ## Dokploy (Self-hosted PaaS)
 
@@ -248,8 +282,6 @@ ______________________________________________________________________
 1. Traefik routes traffic to the new container.
 1. Run migrations: `docker compose exec web python src/manage.py migrate`
 
-______________________________________________________________________
-
 ## Railway (Managed PaaS)
 
 [Railway](https://railway.app) uses Nixpacks to auto-detect your project and build it without a Dockerfile.
@@ -274,13 +306,17 @@ ______________________________________________________________________
 
 ### Static Files
 
-Railway runs `collectstatic` automatically when detected. Ensure WhiteNoise is configured as described in [Shared Configuration](#shared-configuration).
+Ensure your Railway build or release process runs `collectstatic`. WhiteNoise is configured as described in [Shared configuration](#shared-configuration), but this repository does not include a Railway-specific config file.
+
+One option is to add `collectstatic` to your Railway build or release command:
+
+```bash
+python src/manage.py collectstatic --noinput
+```
 
 ### Deployment
 
 Push to your connected branch — Railway automatically builds and deploys.
-
-______________________________________________________________________
 
 ## Fly.io (Managed PaaS)
 
@@ -350,8 +386,6 @@ fly ssh console -C "python src/manage.py createsuperuser"
 fly logs
 ```
 
-______________________________________________________________________
-
 ## Hetzner VPS (Docker Compose + Caddy)
 
 Deploy on a Hetzner CX-series VPS using Docker Compose with Caddy as a reverse proxy.
@@ -396,8 +430,15 @@ DEBUG=False
 ALLOWED_HOSTS=yourdomain.com,www.yourdomain.com
 CSRF_TRUSTED_ORIGINS=https://yourdomain.com,https://www.yourdomain.com
 DJANGO_SETTINGS_MODULE=config.settings
+SECURE_SSL_REDIRECT=True
+SECURE_HSTS_SECONDS=31536000
+SECURE_HSTS_INCLUDE_SUBDOMAINS=True
+SECURE_HSTS_PRELOAD=True
+SESSION_COOKIE_SECURE=True
+CSRF_COOKIE_SECURE=True
 
 # PostgreSQL
+DATABASE_URL=postgres://myuser:<strong-db-password>@db:5432/mydb
 POSTGRES_DB=mydb
 POSTGRES_USER=myuser
 POSTGRES_PASSWORD=<strong-db-password>
@@ -532,8 +573,6 @@ docker compose exec db pg_dump -U ${POSTGRES_USER} ${POSTGRES_DB} > backup_$(dat
 0 2 * * * cd /opt/myproject && docker compose exec -T db pg_dump -U myuser mydb > /backups/db_$(date +\%Y\%m\%d).sql
 ```
 
-______________________________________________________________________
-
 ## DigitalOcean (Docker Compose + Caddy)
 
 The DigitalOcean Droplet setup is nearly identical to Hetzner. Key differences are noted below.
@@ -595,8 +634,6 @@ For a fully managed experience:
 | **Env Vars**      | `SECRET_KEY`, `DEBUG=False`, `ALLOWED_HOSTS`, `DATABASE_URL`                                       |
 | **Database**      | Attach Managed PostgreSQL (injects `DATABASE_URL` automatically)                                   |
 
-______________________________________________________________________
-
 ## GitHub Actions: Publish Docker image
 
 The project includes a GitHub Actions workflow (`.github/workflows/docker-publish.yml`) that builds and pushes a multi-arch Docker image to Docker Hub.
@@ -634,8 +671,6 @@ gh release create v1.0.0 --title "v1.0.0" --generate-notes
 # Or trigger manually from the Actions tab in GitHub
 ```
 
-______________________________________________________________________
-
 ## Production Docker Compose
 
 The `docker-compose.production.yml` file provides a production-ready stack with Caddy as the reverse proxy, PostgreSQL, and optional Redis.
@@ -654,6 +689,7 @@ Create a `.env` file with these additional variables:
 CLOUDFLARE_API_TOKEN=your_cloudflare_api_token_here
 
 # PostgreSQL
+DATABASE_URL=postgres://postgres:<strong-db-password>@db:5432/django_db
 POSTGRES_DB=django_db
 POSTGRES_USER=postgres
 POSTGRES_PASSWORD=<strong-db-password>
@@ -663,6 +699,12 @@ SECRET_KEY=<your-secret-key>
 DEBUG=False
 ALLOWED_HOSTS=yourdomain.com,www.yourdomain.com
 CSRF_TRUSTED_ORIGINS=https://yourdomain.com,https://www.yourdomain.com
+SECURE_SSL_REDIRECT=True
+SECURE_HSTS_SECONDS=31536000
+SECURE_HSTS_INCLUDE_SUBDOMAINS=True
+SECURE_HSTS_PRELOAD=True
+SESSION_COOKIE_SECURE=True
+CSRF_COOKIE_SECURE=True
 ```
 
 ### Cloudflare API Token
@@ -716,8 +758,6 @@ just stop-production
 | `db`      | `postgres:17-alpine`                 | PostgreSQL database                  |
 | `caddy`   | Built from `Docker/caddy/Dockerfile` | Reverse proxy with Cloudflare DNS-01 |
 | `# redis` | Commented out                        | Optional Celery broker               |
-
-______________________________________________________________________
 
 ## Caddy Configuration Reference
 
@@ -783,8 +823,6 @@ See the [Hetzner VPS](#hetzner-vps-docker-compose--caddy) section for a complete
 - Listens on `:80, :443` — works in Docker with `CAP_NET_BIND_SERVICE`
 - No `acme_dns` or `email` — no Cloudflare or production TLS needed locally
 
-______________________________________________________________________
-
 ## Cloudflare DNS for HTTPS
 
 ### Why DNS-01
@@ -829,8 +867,6 @@ Set `CLOUDFLARE_API_TOKEN` in your environment (`.env` or Docker Compose environ
 ### Traefik with Cloudflare
 
 See the [Traefik Alternative](#traefik-alternative) section below for Cloudflare DNS-01 configuration with Traefik.
-
-______________________________________________________________________
 
 ## Traefik Alternative
 
@@ -924,8 +960,6 @@ volumes:
 
 Update `example.com` in the dynamic config and your `DJANGO_SETTINGS_MODULE` as needed.
 
-______________________________________________________________________
-
 ## Production Checklist
 
 - [ ] `DEBUG=False` in production environment
@@ -937,10 +971,8 @@ ______________________________________________________________________
 - [ ] WhiteNoise middleware is correctly positioned (after `SecurityMiddleware`)
 - [ ] Database is backed up regularly
 - [ ] Logging is configured (stdout for containerized environments)
-- [ ] Health check endpoint (`/health/`) returns 200
+- [ ] Health check endpoint (`/health/`) returns `200` with `{"status": "ok"}`
 - [ ] `python src/manage.py check --deploy` passes
-
-______________________________________________________________________
 
 ## Running check --deploy
 
@@ -966,8 +998,6 @@ This checks for common production misconfigurations:
 | `SECURE_CONTENT_TYPE_NOSNIFF`    | Is `True`                             |
 
 Fix any warnings before going live. Some checks (like HSTS) should only be enabled once you're confident HTTPS works end-to-end.
-
-______________________________________________________________________
 
 ## Just deploy-production
 
@@ -1007,8 +1037,6 @@ just stop-production
 # Restart after code changes
 docker compose -f docker-compose.production.yml up -d --build
 ```
-
-______________________________________________________________________
 
 ## Cloudflare DNS setup
 
@@ -1073,8 +1101,6 @@ Set SSL mode to **Full (Strict)** in Cloudflare's dashboard:
 - This ensures end-to-end encryption between Cloudflare and your server
 - Caddy handles TLS termination with valid certificates
 
-______________________________________________________________________
-
 ## Troubleshooting
 
 | Problem                     | Likely Cause                        | Fix                                             |
@@ -1102,8 +1128,6 @@ fly logs
 docker compose logs -f web caddy
 docker compose logs -f db
 ```
-
-______________________________________________________________________
 
 ## Appendix: Gunicorn Configuration
 

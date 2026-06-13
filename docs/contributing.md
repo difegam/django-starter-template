@@ -2,8 +2,6 @@
 
 Guidelines for maintaining dependencies, updating hooks, and contributing to this template.
 
-______________________________________________________________________
-
 ## Dependency management
 
 ### Adding a dependency
@@ -48,18 +46,18 @@ just export-reqs
 # Or: uv pip compile pyproject.toml -o requirements.txt
 ```
 
-______________________________________________________________________
-
 ## Pre-commit hooks (prek)
 
 This project uses **[prek](https://github.com/dferguson/prek)** for managing Git hooks. Hooks run automatically on commit and push.
 
 ### What hooks run
 
-| Stage             | Hooks                                                                                                    |
-| ----------------- | -------------------------------------------------------------------------------------------------------- |
-| **Commit**        | djlint, ruff (lint + format), pyupgrade, codespell, detect-secrets                                       |
-| **Push / manual** | ty (type check), vulture (unused code), bandit (security), uv-secure (dependency vulns), semgrep, pytest |
+| Stage             | Hooks                                                                                           |
+| ----------------- | ----------------------------------------------------------------------------------------------- |
+| **Commit**        | pre-commit-hooks, djlint, pyupgrade, ruff (lint + format), mdformat, codespell, shellcheck      |
+| **Push / manual** | ty (type check), vulture (unused code), bandit (security), uv-secure (dependency vulns), pytest |
+
+The exact hook list lives in [`.pre-commit-config.yaml`](../.pre-commit-config.yaml). Update this table whenever hooks are added or removed.
 
 ### Installing hooks
 
@@ -86,8 +84,6 @@ uv run prek run --all-files
 # Run only commit-stage hooks
 uv run prek run --all-files --hook-type pre-commit
 ```
-
-______________________________________________________________________
 
 ## Code style
 
@@ -120,6 +116,13 @@ just ty
 
 Django templates are linted by **djlint** (Django profile). Template files must follow HTML conventions with proper indentation.
 
+### Documentation
+
+- Use sentence case for headings.
+- Prefer short sections with concrete commands over long prose.
+- Do not use decorative horizontal divider lines; headings provide structure.
+- Keep README as the high-level entry point and link to `docs/` for detail.
+
 ### Commit messages
 
 The project follows [Conventional Commits](https://www.conventionalcommits.org/) conventions:
@@ -147,8 +150,6 @@ docs: update deployment guide with Cloudflare steps
 test: add form validation tests
 chore: update Django to 6.0.5
 ```
-
-______________________________________________________________________
 
 ## Pull request workflow
 
@@ -187,19 +188,17 @@ Include in your PR description:
 1. How to test it manually
 1. Any environment variable changes or migrations
 
-______________________________________________________________________
-
 ## Running quality checks
 
-| What          | Command      |
-| ------------- | ------------ |
-| Lint + format | `just lint`  |
-| Type check    | `just ty`    |
-| All checks    | `just check` |
-| Tests         | `just test`  |
-| Full reset    | `just fresh` |
-
-______________________________________________________________________
+| What          | Command            |
+| ------------- | ------------------ |
+| Lint + format | `just lint`        |
+| Type check    | `just ty`          |
+| All checks    | `just check`       |
+| Tests         | `just test`        |
+| Docs format   | `just docs-format` |
+| Docs links    | `just docs-check`  |
+| Full reset    | `just fresh`       |
 
 ## Common tasks
 
@@ -233,8 +232,6 @@ just clean
 just fresh
 ```
 
-______________________________________________________________________
-
 ## Project conventions
 
 - **`src/` layout**: all Django apps live under `src/`
@@ -244,11 +241,9 @@ ______________________________________________________________________
 - **Static assets**: project-wide static files in `src/static/`, app-specific in `src/<app>/static/<app>/`
 - **Settings**: single file at `src/config/settings.py` (django-environ)
 
-______________________________________________________________________
-
 ## Releasing and publishing Docker images
 
-The project includes a GitHub Actions workflow that automatically builds and pushes a multi-arch Docker image when a release is published.
+The release workflow is documented here from a contributor perspective. For operational details about the Docker publishing workflow, see [GitHub Actions: Publish Docker image](deployment.md#github-actions-publish-docker-image).
 
 ### Prerequisites
 
@@ -269,17 +264,11 @@ git push origin v1.0.0
 gh release create v1.0.0 --title "v1.0.0" --generate-notes
 ```
 
-The workflow will:
-
-1. Build `Docker/Dockerfile` (runtime target) for `linux/amd64` and `linux/arm64`
-1. Tag with the semver version (`1.0.0`) and a SHA prefix (`sha-abc1234`)
-1. Push to Docker Hub with GHA layer caching
+The workflow builds `Docker/Dockerfile`, tags the image, and pushes it to Docker Hub.
 
 ### Manual trigger
 
 You can also trigger a build manually from the **Actions** tab in GitHub, optionally providing a custom tag. If no tag is provided, the image is tagged `manual`.
-
-______________________________________________________________________
 
 ## Further reading
 

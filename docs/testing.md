@@ -2,8 +2,6 @@
 
 This project uses **[pytest](https://docs.pytest.org/)** with **[pytest-django](https://pytest-django.readthedocs.io/)** for testing. Tests live in the top-level `tests/` directory, organized by app.
 
-______________________________________________________________________
-
 ## Running tests
 
 ```bash
@@ -23,8 +21,6 @@ uv run pytest tests/web/test_home.py -vv
 uv run pytest tests/web/test_home.py::test_home_view_returns_200 -vv
 ```
 
-______________________________________________________________________
-
 ## Test structure
 
 ```
@@ -36,8 +32,6 @@ tests/
     ├── test_home.py     # Home view tests
     └── test_views.py    # Additional view tests
 ```
-
-______________________________________________________________________
 
 ## Shared fixtures (`tests/conftest.py`)
 
@@ -72,8 +66,6 @@ def authenticated_client(client, user):
 ```
 
 Use these fixtures by name in your test functions — pytest auto-discovers them.
-
-______________________________________________________________________
 
 ## Writing model tests
 
@@ -112,8 +104,6 @@ def test_custom_user_password_is_hashed(user: CustomUser) -> None:
 - Use `@pytest.mark.django_db` to enable database access
 - Each test runs in its own transaction, rolled back automatically
 - Use the `user` or `admin_user` fixtures for existing users
-
-______________________________________________________________________
 
 ## Writing view tests
 
@@ -166,11 +156,13 @@ def test_home_view_accessible_without_authentication(client: Client) -> None:
 
 ### Testing protected views
 
+The template does not ship with a protected application view. Replace `your-protected-view-name` with the URL name for a view in your app.
+
 ```python
 @pytest.mark.django_db
 def test_protected_view_requires_login(client: Client) -> None:
     """Unauthenticated users are redirected to login."""
-    url = reverse('some-protected-view')
+    url = reverse('your-protected-view-name')
     response = client.get(url)
     assert response.status_code == HTTPStatus.FOUND  # 302 redirect
     assert '/accounts/login/' in response.url
@@ -181,59 +173,63 @@ def test_protected_view_accessible_when_authenticated(
     authenticated_client: Client,
 ) -> None:
     """Authenticated users can access the protected view."""
-    url = reverse('some-protected-view')
+    url = reverse('your-protected-view-name')
     response = cast(HttpResponse, authenticated_client.get(url))
     assert response.status_code == HTTPStatus.OK
 ```
-
-______________________________________________________________________
 
 ## Writing form tests
 
 Form tests verify validation, cleaning, and error handling.
 
 ```python
-# tests/web/test_forms.py
+# tests/users/test_forms.py
 import pytest
-from web.forms import ContactForm
+from users.forms import CustomUserCreationForm
 
 
-def test_contact_form_valid_data() -> None:
-    """A valid form should pass validation."""
-    form = ContactForm(
+@pytest.mark.django_db
+def test_custom_user_creation_form_valid_data() -> None:
+    """A valid admin user creation form should pass validation."""
+    form = CustomUserCreationForm(
         data={
-            'name': 'Test User',
+            'username': 'testuser',
             'email': 'test@example.com',
-            'message': 'Hello!',
+            'password1': 'ThisIsATestPassword123',
+            'password2': 'ThisIsATestPassword123',
         }
     )
     assert form.is_valid() is True
 
 
-def test_contact_form_missing_required_field() -> None:
+@pytest.mark.django_db
+def test_custom_user_creation_form_missing_required_field() -> None:
     """A form with missing fields should fail validation."""
-    form = ContactForm(
+    form = CustomUserCreationForm(
         data={
-            'name': '',
+            'username': '',
             'email': 'test@example.com',
-            'message': 'Hello!',
+            'password1': 'ThisIsATestPassword123',
+            'password2': 'ThisIsATestPassword123',
         }
     )
     assert form.is_valid() is False
-    assert 'name' in form.errors
+    assert 'username' in form.errors
 
 
-def test_contact_form_invalid_email() -> None:
-    """An invalid email should fail validation."""
-    form = ContactForm(
+@pytest.mark.django_db
+def test_custom_user_creation_form_password_mismatch() -> None:
+    """Mismatched passwords should fail validation."""
+    form = CustomUserCreationForm(
         data={
-            'name': 'Test User',
-            'email': 'not-an-email',
-            'message': 'Hello!',
+            'username': 'testuser',
+            'email': 'test@example.com',
+            'password1': 'ThisIsATestPassword123',
+            'password2': 'DifferentPassword123',
         }
     )
     assert form.is_valid() is False
-    assert 'email' in form.errors
+    assert 'password2' in form.errors
 ```
 
 **Key points:**
@@ -242,8 +238,6 @@ def test_contact_form_invalid_email() -> None:
 - Test both valid and invalid data
 - Assert specific error fields, not just "form is invalid"
 
-______________________________________________________________________
-
 ## pytest-django markers
 
 | Marker                                     | Purpose                                                                     |
@@ -251,8 +245,6 @@ ______________________________________________________________________
 | `@pytest.mark.django_db`                   | Grants database access. Each test runs in a transaction                     |
 | `@pytest.mark.django_db(transaction=True)` | Grants database access with transaction isolation (slower, use when needed) |
 | `@pytest.mark.slow`                        | Custom marker for slow tests (run selectively)                              |
-
-______________________________________________________________________
 
 ## Code coverage
 
@@ -276,8 +268,6 @@ Coverage thresholds are not enforced by default. To add a minimum threshold, add
 [tool.pytest.ini_options]
 addopts = '--cov=src --cov-report=term-missing --cov-fail-under=80'
 ```
-
-______________________________________________________________________
 
 ## GitHub Actions CI
 
@@ -313,8 +303,6 @@ uv run prek run --all-files
 DATABASE_URL=postgres://user:pass@localhost:5432/test_db uv run pytest -vv tests/
 ```
 
-______________________________________________________________________
-
 ## Best practices
 
 1. **One assertion per test** — each test should verify exactly one behavior
@@ -324,8 +312,6 @@ ______________________________________________________________________
 1. **Mark DB tests** — use `@pytest.mark.django_db` only when you need database access
 1. **Test edge cases** — invalid input, empty data, unauthorized access
 1. **Keep tests fast** — avoid external API calls; use mocks when necessary
-
-______________________________________________________________________
 
 ## Further reading
 

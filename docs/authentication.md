@@ -2,8 +2,6 @@
 
 This project uses **[django-allauth](https://docs.allauth.org/)** for authentication with email-only login. Social login (GitHub, Google, etc.) is ready to enable.
 
-______________________________________________________________________
-
 ## How it works
 
 ### Authentication backends
@@ -46,8 +44,6 @@ INSTALLED_APPS = [
 
 This middleware integrates allauth's session and authentication state into every request.
 
-______________________________________________________________________
-
 ## Email-only login configuration
 
 The template ships with email-only login (no username required):
@@ -70,8 +66,6 @@ class CustomUser(AbstractUser):
 ```
 
 This makes log messages, admin displays, and shell output immediately readable.
-
-______________________________________________________________________
 
 ## Email verification
 
@@ -109,8 +103,6 @@ def sensitive_view(request):
 ### Testing email verification locally
 
 With the console email backend (default in development), verification emails are printed to your terminal. Look for the confirmation URL in the output and open it in your browser.
-
-______________________________________________________________________
 
 ## Social login setup
 
@@ -169,8 +161,6 @@ For social accounts, you may want different email verification behavior:
 SOCIALACCOUNT_EMAIL_VERIFICATION = 'none'  # Skip verification for social logins
 ```
 
-______________________________________________________________________
-
 ## Extending the custom user model
 
 The template ships with `users.CustomUser` extending `AbstractUser`. See [Custom User Model](users.md) for the full guide on:
@@ -180,8 +170,6 @@ The template ships with `users.CustomUser` extending `AbstractUser`. See [Custom
 - Adding a custom manager
 - Updating test fixtures
 - Common pitfalls
-
-______________________________________________________________________
 
 ## Custom signup adapters
 
@@ -206,8 +194,6 @@ Then reference it in settings:
 ACCOUNT_ADAPTER = 'users.adapters.CustomAccountAdapter'
 ```
 
-______________________________________________________________________
-
 ## URLs
 
 All allauth URLs are mounted under `/accounts/`:
@@ -222,8 +208,6 @@ All allauth URLs are mounted under `/accounts/`:
 | `/accounts/email/`              | Email management   | Verify and manage email addresses |
 | `/accounts/social/connections/` | Social connections | Link/unlink social accounts       |
 
-______________________________________________________________________
-
 ## Template overrides
 
 The template includes custom allauth templates using Tailwind/DaisyUI in `src/templates/account/`:
@@ -237,8 +221,6 @@ The template includes custom allauth templates using Tailwind/DaisyUI in `src/te
 - `email_confirm.html` — email confirmation page
 
 Django's template loader checks `TEMPLATES['DIRS']` (which includes `src/templates/`) before app templates, so files in `src/templates/account/` override allauth defaults automatically.
-
-______________________________________________________________________
 
 ## Further reading
 

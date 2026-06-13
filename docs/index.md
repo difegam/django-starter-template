@@ -6,8 +6,6 @@ A production-ready Django 6 starter template built on modern Python tooling: **u
 
 This template is designed for **small-to-medium projects** where you want a solid, maintainable foundation without the overhead of a larger meta-template.
 
-______________________________________________________________________
-
 ## Design decisions
 
 Every choice in this template was made with learning and long-term maintainability in mind:
@@ -24,19 +22,17 @@ Every choice in this template was made with learning and long-term maintainabili
 | **WhiteNoise for static files**    | Serves static files directly from Gunicorn. No need for Nginx or a separate static file server in most deployments.                                                                                                                                                      |
 | **pytest over unittest**           | Fixtures, markers, parametrize, better assertion introspection. pytest-django provides `client`, `db`, `admin_user`, and other Django-specific fixtures.                                                                                                                 |
 
-______________________________________________________________________
-
 ## Comparison with other templates
 
 ### vs. [Cookiecutter Django](https://github.com/cookiecutter/cookiecutter-django)
 
-| Aspect               | This template                      | Cookiecutter Django                                              |
-| -------------------- | ---------------------------------- | ---------------------------------------------------------------- |
-| **Setup complexity** | Low — one `just init`              | High — 30+ prompts during project creation                       |
-| **Frontend opinion** | Tailwind + DaisyUI (default)       | Generic (Bootstrap or none)                                      |
-| **Tooling**          | uv + Just + Ruff + ty + pytest     | pip + Docker + Celery + Sentry (all optional)                    |
-| **Code quality**     | Prek hooks (pre-commit + pre-push) | Optional pre-commit                                              |
-| **Best for**         | Small teams, learning, fast start  | Large teams needing many integrations (Celery, Sentry, Channels) |
+| Aspect               | This template                          | Cookiecutter Django                                              |
+| -------------------- | -------------------------------------- | ---------------------------------------------------------------- |
+| **Setup complexity** | Low — one initializer plus `just init` | High — 30+ prompts during project creation                       |
+| **Frontend opinion** | Tailwind + DaisyUI (default)           | Generic (Bootstrap or none)                                      |
+| **Tooling**          | uv + Just + Ruff + ty + pytest         | pip + Docker + Celery + Sentry (all optional)                    |
+| **Code quality**     | Prek hooks (pre-commit + pre-push)     | Optional pre-commit                                              |
+| **Best for**         | Small teams, learning, fast start      | Large teams needing many integrations (Celery, Sentry, Channels) |
 
 ### vs. [wemake-django-template](https://github.com/wemake-services/wemake-django-template)
 
@@ -61,8 +57,6 @@ ______________________________________________________________________
 - You want extremely strict code style enforcement and custom project conventions → **use wemake-django-template**
 - You need a team of 10+ developers with complex CI/CD pipelines → **use Cookiecutter Django**
 
-______________________________________________________________________
-
 ## Project structure
 
 ```
@@ -85,7 +79,10 @@ ______________________________________________________________________
 ├── Docker/                     # Docker build files
 │   ├── Dockerfile              # Multi-stage build (dev + production)
 │   ├── caddy/                  # Caddy reverse proxy
-│   └── entrypoint.sh           # Container entrypoint
+│   ├── docker.just             # Docker-related Just recipes
+│   ├── entrypoint.sh           # Container entrypoint
+│   ├── traefik.yml             # Traefik static configuration
+│   └── traefik-dynamic.yml     # Traefik dynamic routing configuration
 ├── docker-compose.yml          # Local development stack
 ├── docker-compose.production.yml  # Production stack
 ├── Caddyfile.prod               # Production Caddy reverse proxy config
@@ -96,13 +93,9 @@ ______________________________________________________________________
 └── ruff.toml                   # Linter/formatter config
 ```
 
-______________________________________________________________________
-
 ## Getting started
 
 See [Quick Start](quickstart.md) for step-by-step instructions.
-
-______________________________________________________________________
 
 ## Further reading
 

@@ -129,6 +129,8 @@ Visit **http://127.0.0.1:8000**.
 | `just fresh`        | Clean and reinstall everything                    |
 | `just hooks-update` | Update prek hook revisions                        |
 | `just export-reqs`  | Generate `requirements.txt` from `pyproject.toml` |
+| `just docs-format`  | Format Markdown documentation                     |
+| `just docs-check`   | Check internal documentation links                |
 
 ### Quality assurance commands
 
@@ -224,6 +226,7 @@ just test    # run tests
 
 ### Development
 
+- **Cyclopts**, **InquirerPy** & **Rich** - Standalone `init.py` CLI tooling via uv script metadata
 - **pytest** & **pytest-django** - Testing framework
 - **pytest-cov** - Coverage reporting
 - **ty** & **django-stubs** - Type checking
