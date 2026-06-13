@@ -39,6 +39,16 @@ export-reqs:
     @echo "Exporting requirements"
     @uv pip compile pyproject.toml -o requirements.txt
 
+[doc('Format Markdown documentation')]
+[group('docs')]
+docs-format:
+    @uv run --with mdformat --with mdformat-gfm mdformat README.md docs
+
+[doc('Check documentation links')]
+[group('docs')]
+docs-check:
+    @uv run python scripts/check_docs.py .
+
 [doc('Install project dependencies and setup prek hooks')]
 [group('development')]
 init:
