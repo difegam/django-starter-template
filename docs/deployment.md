@@ -375,7 +375,7 @@ curl -fsSL https://get.docker.com | sh
 /opt/myproject/
   .env               # Production secrets (never committed)
   docker-compose.yml
-  Caddyfile
+  Caddyfile.prod
   app/               # Your Django project
     Docker/
     src/
@@ -444,7 +444,7 @@ services:
       - "80:80"
       - "443:443"
     volumes:
-      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - ./Caddyfile.prod:/etc/caddy/Caddyfile:ro
       - caddy_data:/data
       - caddy_config:/config
       - static_data:/staticfiles
@@ -460,7 +460,7 @@ volumes:
   caddy_config:
 ```
 
-### Caddyfile
+### Caddyfile.prod
 
 ```caddy
 yourdomain.com, www.yourdomain.com {
@@ -479,10 +479,8 @@ yourdomain.com, www.yourdomain.com {
     }
 
     # Proxy everything else to Django
-    reverse_proxy web:8000 {
-        header_up X-Forwarded-Proto {scheme}
-        header_up X-Forwarded-For {remote_host}
-        header_up Host {host}
+    handle {
+        reverse_proxy web:8000
     }
 
     # Security headers
@@ -595,6 +593,45 @@ For a fully managed experience:
 
 ______________________________________________________________________
 
+## GitHub Actions: Publish Docker image
+
+The project includes a GitHub Actions workflow (`.github/workflows/docker-publish.yml`) that builds and pushes a multi-arch Docker image to Docker Hub.
+
+### Triggers
+
+- **Release published** — automatically pushes an image tagged with the release version
+- **Manual dispatch** — pushes an image with a custom tag or `"manual"` fallback
+
+### Required secrets
+
+Add these in **GitHub → Settings → Secrets and variables → Actions**:
+
+| Secret              | Description                                     |
+| ------------------- | ----------------------------------------------- |
+| `DOCKER_IMAGE_NAME` | Full image name, e.g. `youruser/django-starter` |
+| `DOCKER_USERNAME`   | Docker Hub username                             |
+| `DOCKER_PASSWORD`   | Docker Hub **access token** (not your password) |
+
+### What it does
+
+1. Checks out the code
+1. Sets up QEMU and Docker Buildx for multi-arch builds
+1. Logs in to Docker Hub
+1. Extracts image metadata (semver tags, SHA prefix, manual tag fallback)
+1. Builds the `runtime` target of `Docker/Dockerfile` for `linux/amd64` and `linux/arm64`
+1. Pushes with GHA layer caching enabled
+
+### Triggering a publish
+
+```bash
+# Create a GitHub release
+gh release create v1.0.0 --title "v1.0.0" --generate-notes
+
+# Or trigger manually from the Actions tab in GitHub
+```
+
+______________________________________________________________________
+
 ## Production Docker Compose
 
 The `docker-compose.production.yml` file provides a production-ready stack with Caddy as the reverse proxy, PostgreSQL, and optional Redis.
@@ -690,7 +727,7 @@ Caddy is used for VPS deployments (Hetzner, DigitalOcean) as a reverse proxy wit
 - **Security Headers** — HSTS, X-Content-Type-Options, X-Frame-Options.
 - **HTTP/2 and HTTP/3** — supported out of the box.
 
-### Minimal Caddyfile
+### Minimal Caddyfile.prod
 
 ```caddy
 yourdomain.com {
@@ -700,9 +737,47 @@ yourdomain.com {
 
 That is all you need for HTTPS + reverse proxy. Caddy automatically redirects HTTP to HTTPS.
 
-### Full Production Caddyfile
+### Full Production Caddyfile.prod
 
 See the [Hetzner VPS](#hetzner-vps-docker-compose--caddy) section for a complete annotated example with static/media file serving and security headers.
+
+### Local Development Caddyfile
+
+`Caddyfile.local` provides a local Caddy configuration with self-signed certificates for HTTPS testing:
+
+```caddy
+{
+    local_certs
+}
+
+:80, :443 {
+    encode gzip zstd
+
+    handle_path /static/* {
+        root * /var/www/static
+        file_server
+    }
+
+    handle_path /media/* {
+        root * /var/www/media
+        file_server
+    }
+
+    handle {
+        reverse_proxy django:8000
+    }
+
+    header {
+        X-Content-Type-Options "nosniff"
+        X-Frame-Options "DENY"
+        Referrer-Policy "strict-origin-when-cross-origin"
+    }
+}
+```
+
+- Uses `local_certs` (not `auto_headers on`) to avoid Let's Encrypt calls in development
+- Listens on `:80, :443` — works in Docker with `CAP_NET_BIND_SERVICE`
+- No `acme_dns` or `email` — no Cloudflare or production TLS needed locally
 
 ______________________________________________________________________
 
@@ -732,7 +807,7 @@ FROM caddy:2-alpine
 COPY --from=builder /usr/bin/caddy /usr/bin/caddy
 ```
 
-The `Caddyfile` at the project root configures DNS-01:
+The `Caddyfile.prod` at the project root configures DNS-01:
 
 ```caddy
 {
@@ -966,7 +1041,7 @@ User → Cloudflare (proxy/DNS) → Caddy (TLS + reverse proxy) → Gunicorn →
 
 1. **Verify Caddy is using DNS-01**
 
-   The `Caddyfile` should contain:
+   The `Caddyfile.prod` should contain:
 
    ```caddy
    {

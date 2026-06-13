@@ -241,6 +241,41 @@ ______________________________________________________________________
 
 ______________________________________________________________________
 
+## Releasing and publishing Docker images
+
+The project includes a GitHub Actions workflow that automatically builds and pushes a multi-arch Docker image when a release is published.
+
+### Prerequisites
+
+Set these GitHub repository secrets (Settings → Secrets and variables → Actions):
+
+| Secret              | Value                                                                            |
+| ------------------- | -------------------------------------------------------------------------------- |
+| `DOCKER_IMAGE_NAME` | Your Docker Hub image, e.g. `youruser/your-app`                                  |
+| `DOCKER_USERNAME`   | Docker Hub username                                                              |
+| `DOCKER_PASSWORD`   | Docker Hub access token (create at hub.docker.com → Account Settings → Security) |
+
+### Creating a release
+
+```bash
+# Tag and create a GitHub release (triggers the Docker image build)
+git tag v1.0.0
+git push origin v1.0.0
+gh release create v1.0.0 --title "v1.0.0" --generate-notes
+```
+
+The workflow will:
+
+1. Build `Docker/Dockerfile` (runtime target) for `linux/amd64` and `linux/arm64`
+1. Tag with the semver version (`1.0.0`) and a SHA prefix (`sha-abc1234`)
+1. Push to Docker Hub with GHA layer caching
+
+### Manual trigger
+
+You can also trigger a build manually from the **Actions** tab in GitHub, optionally providing a custom tag. If no tag is provided, the image is tagged `manual`.
+
+______________________________________________________________________
+
 ## Further reading
 
 - [Quick Start](quickstart.md) — getting started
