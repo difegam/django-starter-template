@@ -82,7 +82,11 @@ MIDDLEWARE = [
     # ...
 ]
 
-STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+STORAGES = {
+    'staticfiles': {
+        'BACKEND': 'whitenoise.storage.CompressedManifestStaticFilesStorage',
+    },
+}
 ```
 
 Run `collectstatic` during every deploy:
@@ -938,6 +942,33 @@ ______________________________________________________________________
 
 ______________________________________________________________________
 
+## Running check --deploy
+
+Before deploying to production, run Django's deployment checklist:
+
+```bash
+just django deploy-check
+# Or: uv run python src/manage.py check --deploy
+```
+
+This checks for common production misconfigurations:
+
+| Check                            | What it verifies                      |
+| -------------------------------- | ------------------------------------- |
+| `SECRET_KEY`                     | Not set to the default insecure value |
+| `DEBUG`                          | Is `False`                            |
+| `SECURE_SSL_REDIRECT`            | Is `True` (HTTPS enforced)            |
+| `SECURE_HSTS_SECONDS`            | Set to a reasonable value             |
+| `SECURE_HSTS_INCLUDE_SUBDOMAINS` | Is `True`                             |
+| `SECURE_HSTS_PRELOAD`            | Is `True`                             |
+| `SESSION_COOKIE_SECURE`          | Is `True`                             |
+| `CSRF_COOKIE_SECURE`             | Is `True`                             |
+| `SECURE_CONTENT_TYPE_NOSNIFF`    | Is `True`                             |
+
+Fix any warnings before going live. Some checks (like HSTS) should only be enabled once you're confident HTTPS works end-to-end.
+
+______________________________________________________________________
+
 ## Just deploy-production
 
 The `just deploy-production` command builds and starts the production Docker Compose stack:
@@ -976,33 +1007,6 @@ just stop-production
 # Restart after code changes
 docker compose -f docker-compose.production.yml up -d --build
 ```
-
-______________________________________________________________________
-
-## Running check --deploy
-
-Before deploying to production, run Django's deployment checklist:
-
-```bash
-just django deploy-check
-# Or: uv run python src/manage.py check --deploy
-```
-
-This checks for common production misconfigurations:
-
-| Check                            | What it verifies                      |
-| -------------------------------- | ------------------------------------- |
-| `SECRET_KEY`                     | Not set to the default insecure value |
-| `DEBUG`                          | Is `False`                            |
-| `SECURE_SSL_REDIRECT`            | Is `True` (HTTPS enforced)            |
-| `SECURE_HSTS_SECONDS`            | Set to a reasonable value             |
-| `SECURE_HSTS_INCLUDE_SUBDOMAINS` | Is `True`                             |
-| `SECURE_HSTS_PRELOAD`            | Is `True`                             |
-| `SESSION_COOKIE_SECURE`          | Is `True`                             |
-| `CSRF_COOKIE_SECURE`             | Is `True`                             |
-| `SECURE_CONTENT_TYPE_NOSNIFF`    | Is `True`                             |
-
-Fix any warnings before going live. Some checks (like HSTS) should only be enabled once you're confident HTTPS works end-to-end.
 
 ______________________________________________________________________
 
@@ -1106,7 +1110,7 @@ ______________________________________________________________________
 The project uses Gunicorn with these defaults:
 
 - **Bind:** `0.0.0.0:$PORT` (port provided by the platform)
-- **Workers:** 3 (adjust based on CPU cores: `2n+1`)
+- **Workers:** 3 (adjust based on CPU cores: `CPU + 1`)
 - **Chdir:** `src` (because the Django project lives under the `src/` directory)
 - **WSGI app:** `config.wsgi:application`
 

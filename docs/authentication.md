@@ -102,7 +102,8 @@ from allauth.account.decorators import verified_email_required
 
 
 @verified_email_required
-def sensitive_view(request): ...
+def sensitive_view(request):
+    pass
 ```
 
 ### Testing email verification locally

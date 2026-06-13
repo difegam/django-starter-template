@@ -160,7 +160,8 @@ def test_home_view_accessible_without_authentication(client: Client) -> None:
 
 - Use `django.urls.reverse()` to generate URLs by name — never hardcode paths
 - Use the `client` fixture for HTTP requests
-- Use `cast(HttpResponse, ...)` for proper typing
+- Use `cast(HttpResponse, ...)` when accessing response attributes like `content` or `context` that are only available on `HttpResponse`
+- For redirect assertions, use `response.url` directly — no cast needed
 - Test anonymous access, authenticated access, and redirects separately
 
 ### Testing protected views
@@ -170,7 +171,7 @@ def test_home_view_accessible_without_authentication(client: Client) -> None:
 def test_protected_view_requires_login(client: Client) -> None:
     """Unauthenticated users are redirected to login."""
     url = reverse('some-protected-view')
-    response = cast(HttpResponse, client.get(url))
+    response = client.get(url)
     assert response.status_code == HTTPStatus.FOUND  # 302 redirect
     assert '/accounts/login/' in response.url
 
@@ -280,7 +281,10 @@ ______________________________________________________________________
 
 ## GitHub Actions CI
 
-The project includes a CI workflow in `.github/workflows/ci.yml` that runs on every push and pull request:
+The project includes these workflows in `.github/workflows/`:
+
+- **`ci.yml`** — runs on every push and pull request (lint + test)
+- **`docker-publish.yml`** — builds and pushes multi-arch Docker image on GitHub Release
 
 ### Lint job
 

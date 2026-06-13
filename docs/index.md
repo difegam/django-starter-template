@@ -15,7 +15,7 @@ Every choice in this template was made with learning and long-term maintainabili
 | Decision                           | Rationale                                                                                                                                                                                                                                                                |
 | ---------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
 | **`src/` layout**                  | Encourages treating your Django apps as proper Python packages. Avoids accidental imports from the working directory. Matches the modern Python packaging standard.                                                                                                      |
-| **Custom User Model from day one** | Django's own docs [recommend this](https://docs.djangoproject.com/en/5.2/topics/auth/customizing/#using-a-custom-user-model-when-starting-a-project). Changing the user model after the first migration is complex and risky — this template removes that pain entirely. |
+| **Custom User Model from day one** | Django's own docs [recommend this](https://docs.djangoproject.com/en/6.0/topics/auth/customizing/#using-a-custom-user-model-when-starting-a-project). Changing the user model after the first migration is complex and risky — this template removes that pain entirely. |
 | **uv over pip/poetry/pipenv**      | Significantly faster dependency resolution and installation. Deterministic lockfile. No separate virtual environment management step — `uv sync` handles everything.                                                                                                     |
 | **Just over Make**                 | Single, discoverable task runner with readable syntax. Cross-platform (macOS, Linux, Windows). No shell escaping issues.                                                                                                                                                 |
 | **Ruff over flake8/black/isort**   | One tool replaces multiple linters and formatters. 10–100x faster. Enforces consistent style including import sorting.                                                                                                                                                   |
@@ -108,6 +108,7 @@ ______________________________________________________________________
 
 - [Quick Start](quickstart.md) — get up and running
 - [Settings & Environment](settings.md) — configure your project
+- [User Model](users.md) — custom user setup and extension points
 - [Authentication](authentication.md) — allauth, social logins, custom user
 - [Testing](testing.md) — write and run tests
 - [Deployment](deployment.md) — Docker, Caddy, Cloudflare, production

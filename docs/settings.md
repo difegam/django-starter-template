@@ -23,7 +23,7 @@ All settings live in a single file: `src/config/settings.py`. The key sections a
 | **Installed apps** | Django core + allauth + local apps (`config`, `users`, `web`)                           |
 | **Middleware**     | SecurityMiddleware → WhiteNoiseMiddleware → SessionMiddleware → ... → AccountMiddleware |
 | **Database**       | `DATABASE_URL` parsed into Django's `DATABASES` dict                                    |
-| **Static files**   | WhiteNoise `CompressedManifestStaticFilesStorage`, `STATIC_ROOT`                        |
+| **Static files**   | `STORAGES` → WhiteNoise `CompressedManifestStaticFilesStorage`, `STATIC_ROOT`           |
 | **Email**          | `EMAIL_URL` parsed into Django's email settings                                         |
 | **Auth**           | `AUTH_USER_MODEL = 'users.CustomUser'`, login/redirect URLs                             |
 | **allauth**        | Email-only login, session remember, unique email                                        |
@@ -37,7 +37,7 @@ ______________________________________________________________________
 | Variable                 | Required | Default               | Description                                                |
 | ------------------------ | -------- | --------------------- | ---------------------------------------------------------- |
 | `SECRET_KEY`             | **Yes**  | —                     | Django secret key. Generate with `openssl rand -base64 48` |
-| `DEBUG`                  | No       | `False`               | Enable debug mode. Set `True` for local development only   |
+| `DEBUG`                  | No       | `True`                | Enable debug mode. Set `False` for production              |
 | `ALLOWED_HOSTS`          | No       | `localhost,127.0.0.1` | Comma-separated list of allowed hostnames                  |
 | `DJANGO_SETTINGS_MODULE` | No       | `config.settings`     | Python path to settings module                             |
 
@@ -136,10 +136,10 @@ And in `src/config/wsgi.py` / `src/config/asgi.py`:
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'config.settings')
 ```
 
-If you create separate settings files (e.g. `config/settings/production.py`), update the appropriate locations:
+If you need environment-specific settings, set `DJANGO_SETTINGS_MODULE` to a different path:
 
-- **Local dev**: keep `config.settings` in `pyproject.toml`
-- **Docker/production**: set `DJANGO_SETTINGS_MODULE=config.settings.production` in your environment
+- **Local dev**: keep `config.settings` in `pyproject.toml` (the default)
+- **Docker/production**: set `DJANGO_SETTINGS_MODULE=config.settings` in your environment (the same module reads env vars differently depending on the environment)
 
 ______________________________________________________________________
 
@@ -150,6 +150,12 @@ ______________________________________________________________________
 - [ ] `ALLOWED_HOSTS` includes your production domain(s)
 - [ ] `CSRF_TRUSTED_ORIGINS` includes `https://yourdomain.com`
 - [ ] `SECURE_SSL_REDIRECT=True` (behind a TLS proxy)
+- [ ] `SECURE_HSTS_SECONDS=31536000` (HSTS — only after confirming HTTPS works end-to-end)
+- [ ] `SECURE_HSTS_INCLUDE_SUBDOMAINS=True`
+- [ ] `SECURE_HSTS_PRELOAD=True`
+- [ ] `SESSION_COOKIE_SECURE=True`
+- [ ] `CSRF_COOKIE_SECURE=True`
+- [ ] `SECURE_CONTENT_TYPE_NOSNIFF=True`
 - [ ] `.env` file is never committed to version control
 - [ ] Database credentials use a strong, unique password
 - [ ] `EMAIL_URL` points to a real SMTP server

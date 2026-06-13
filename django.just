@@ -22,6 +22,11 @@ makemigrations:
 add-superuser:
     @uv run python src/manage.py createsuperuser
 
+[doc("Generate a random Django SECRET_KEY")]
+[group("ops")]
+secret:
+    @uv run python -c 'from django.core.management.utils import get_random_secret_key; print(get_random_secret_key())'
+
 [doc("Start Django shell")]
 [group("app")]
 shell:

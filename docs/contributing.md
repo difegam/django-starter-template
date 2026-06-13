@@ -124,14 +124,19 @@ Django templates are linted by **djlint** (Django profile). Template files must 
 
 The project follows [Conventional Commits](https://www.conventionalcommits.org/) conventions:
 
-| Prefix      | When to use                                 |
-| ----------- | ------------------------------------------- |
-| `feat:`     | New feature or functionality                |
-| `fix:`      | Bug fix                                     |
-| `docs:`     | Documentation changes                       |
-| `test:`     | Adding or updating tests                    |
-| `chore:`    | Maintenance, dependency updates, CI changes |
-| `refactor:` | Code restructuring without behavior change  |
+| Prefix      | When to use                                |
+| ----------- | ------------------------------------------ |
+| `feat:`     | New feature or functionality               |
+| `fix:`      | Bug fix                                    |
+| `docs:`     | Documentation changes                      |
+| `test:`     | Adding or updating tests                   |
+| `chore:`    | Maintenance, dependency updates            |
+| `refactor:` | Code restructuring without behavior change |
+| `ci:`       | CI/CD workflow changes                     |
+| `config:`   | Configuration changes                      |
+| `perf:`     | Performance improvements                   |
+| `style:`    | Code style (formatting, whitespace)        |
+| `build:`    | Build system or external dependencies      |
 
 Examples:
 
@@ -280,4 +285,7 @@ ______________________________________________________________________
 
 - [Quick Start](quickstart.md) — getting started
 - [Settings & Environment](settings.md) — environment variables
+- [User Model](users.md) — custom user setup
+- [Authentication](authentication.md) — allauth and social logins
 - [Testing](testing.md) — writing and running tests
+- [Deployment](deployment.md) — Docker and production

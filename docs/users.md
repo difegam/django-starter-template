@@ -2,7 +2,7 @@
 
 ## Why this template ships with a custom user model
 
-Django's own documentation [advises setting up a custom user model at the very start of a project](https://docs.djangoproject.com/en/5.2/topics/auth/customizing/#using-a-custom-user-model-when-starting-a-project):
+Django's own documentation [advises setting up a custom user model at the very start of a project](https://docs.djangoproject.com/en/6.0/topics/auth/customizing/#using-a-custom-user-model-when-starting-a-project):
 
 > If you're starting a new project, it's highly recommended to set up a custom user model, even if the default User model is sufficient for you. This model behaves identically to the default user model, but you'll be able to customise it in the future if the need arises.
 
@@ -241,6 +241,6 @@ ______________________________________________________________________
 
 - [Authentication](authentication.md) — allauth config, social login, email verification
 - [Settings & Environment](settings.md) — environment variables and configuration
-- [Django docs — Customizing authentication: substituting a custom user model](https://docs.djangoproject.com/en/5.2/topics/auth/customizing/#substituting-a-custom-user-model)
-- [Django docs — Using a custom user model when starting a project](https://docs.djangoproject.com/en/5.2/topics/auth/customizing/#using-a-custom-user-model-when-starting-a-project)
+- [Django docs — Customizing authentication: substituting a custom user model](https://docs.djangoproject.com/en/6.0/topics/auth/customizing/#substituting-a-custom-user-model)
+- [Django docs — Using a custom user model when starting a project](https://docs.djangoproject.com/en/6.0/topics/auth/customizing/#using-a-custom-user-model-when-starting-a-project)
 - [django-allauth configuration reference](https://docs.allauth.org/en/latest/account/configuration.html)

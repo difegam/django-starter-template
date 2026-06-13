@@ -12,43 +12,34 @@ ______________________________________________________________________
 
 ### Install uv
 
-=== "macOS / Linux"
+**macOS / Linux:**
 
-````
 ```bash
 curl -LsSf https://astral.sh/uv/install.sh | sh
 ```
-````
 
-=== "Windows (PowerShell)"
+**Windows (PowerShell):**
 
-````
 ```powershell
 powershell -ExecutionPolicy ByPass -c "irm https://astral.sh/uv/install.ps1 | iex"
 ```
-````
 
-=== "Windows (winget)"
+**Windows (winget):**
 
-````
 ```powershell
 winget install astral-sh.uv
 ```
-````
 
 ### Install Just
 
-=== "macOS"
+**macOS:**
 
-````
 ```bash
 brew install just
 ```
-````
 
-=== "Linux"
+**Linux:**
 
-````
 ```bash
 # Debian/Ubuntu
 sudo apt install just
@@ -56,15 +47,12 @@ sudo apt install just
 # Or via cargo
 cargo install just
 ```
-````
 
-=== "Windows"
+**Windows:**
 
-````
 ```powershell
 winget install Casey.Just
 ```
-````
 
 ______________________________________________________________________
 
