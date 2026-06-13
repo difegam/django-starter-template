@@ -29,6 +29,70 @@ def test_validate_project_name(name: str, expected: bool) -> None:
     assert init_script.validate_project_name(name) is expected
 
 
+def test_project_name_validator_allows_omitted_name() -> None:
+    init_script.project_name_validator(str, None)
+
+
+def test_resolve_options_uses_interactive_prompts_when_name_is_omitted(
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
+) -> None:
+    monkeypatch.setattr(init_script, 'is_interactive', lambda: True)
+    monkeypatch.setattr(init_script, 'ask_project_name', lambda: 'interactive-project')
+    monkeypatch.setattr(init_script, 'ask_description', lambda description: description or 'Interactive description')
+    monkeypatch.setattr(init_script, 'ask_cleanup_keys', lambda: ['venv'])
+
+    options = init_script.resolve_options(
+        tmp_path,
+        project_name=None,
+        description=None,
+        cleanup=(),
+        skip_git=False,
+        force=False,
+        dry_run=False,
+    )
+
+    assert options.project_name == 'interactive-project'
+    assert options.description == 'Interactive description'
+    assert options.cleanup_keys == ['venv']
+
+
+def test_resolve_options_requires_name_when_non_interactive(
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
+) -> None:
+    monkeypatch.setattr(init_script, 'is_interactive', lambda: False)
+
+    with pytest.raises(ValueError, match='Project name is required'):
+        init_script.resolve_options(
+            tmp_path,
+            project_name=None,
+            description=None,
+            cleanup=(),
+            skip_git=False,
+            force=False,
+            dry_run=False,
+        )
+
+
+def test_ask_cleanup_keys_explains_space_bar_selection(monkeypatch: pytest.MonkeyPatch) -> None:
+    captured_message = None
+
+    class CheckboxPrompt:
+        def execute(self) -> list[str]:
+            return ['venv']
+
+    def fake_checkbox(**kwargs: object) -> CheckboxPrompt:
+        nonlocal captured_message
+        captured_message = kwargs['message']
+        return CheckboxPrompt()
+
+    monkeypatch.setattr(init_script.inquirer, 'checkbox', fake_checkbox)
+
+    assert init_script.ask_cleanup_keys() == ['venv']
+    assert captured_message == 'Select cleanup targets with Space, then press Enter:'
+
+
 def test_discover_cleanup_paths_deduplicates_children(tmp_path: Path) -> None:
     (tmp_path / '.venv' / 'lib' / '__pycache__').mkdir(parents=True)
     (tmp_path / '.venv' / 'lib' / '__pycache__' / 'module.pyc').write_text('', encoding='utf-8')

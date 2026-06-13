@@ -17,25 +17,93 @@ A modern Django 6 starter template with best practices, using **uv** for depende
 
 ## Quick start
 
+Use this section based on what you are doing:
+
+- **Creating a new project from this template?** Follow the recommended path below and run `./init.py` first.
+- **Working on this template repository directly?** Skip to [local development setup](#local-development-setup).
+
+For detailed instructions, including Windows setup, see **[docs/quickstart.md](docs/quickstart.md)**.
+
+### Create a new project from this template
+
+#### 1. Clone the template
+
 ```bash
-# Clone and enter the project
-git clone <your-repo-url>
-cd django-starter-template
+git clone <your-repo-url> my-project
+cd my-project
+```
 
-# Create environment file
-cp .env.example .env   # edit .env and set SECRET_KEY
+#### 2. Run the one-time initializer
 
-# Install dependencies and hooks
+The initializer turns the starter template into your project. It prompts for a project name, optional description, and cleanup choices.
+
+```bash
+./init.py
+```
+
+When cleanup choices appear, use **Space** to toggle options and **Enter** to continue.
+
+If direct execution fails, run the script through `uv`:
+
+```bash
+uv run init.py
+```
+
+Preview planned changes without modifying files:
+
+```bash
+./init.py --name my-project --dry-run
+```
+
+Run non-interactively:
+
+```bash
+./init.py --name my-project --force
+```
+
+> [!WARNING]
+> `./init.py` can remove local template state such as `.git`, `.venv`, caches, `node_modules`, `.DS_Store`, and `src/db.sqlite3`.
+> Run with `--dry-run` first if you want to inspect planned changes before deleting anything.
+
+What `./init.py` does:
+
+- Updates `README.md` with your project name and description.
+- Updates `pyproject.toml` project metadata.
+- Removes selected local/template artifacts so the new project starts clean.
+- Prints next steps for creating a fresh Git repository and starting development.
+
+### Local development setup
+
+Use these commands after running `./init.py`, or when working on this template repository directly.
+
+#### 1. Create your environment file
+
+```bash
+cp .env.example .env
+```
+
+Edit `.env` and set at minimum:
+
+```env
+SECRET_KEY=<generate with: openssl rand -base64 48>
+DEBUG=True
+DATABASE_URL=sqlite:///src/db.sqlite3
+```
+
+#### 2. Install dependencies and hooks
+
+```bash
 just init
+```
 
-# Run migrations and start the server
+#### 3. Run migrations and start the server
+
+```bash
 just django migrate
 just django serve
 ```
 
 Visit **http://127.0.0.1:8000**.
-
-For detailed instructions (including Windows), see **[docs/quickstart.md](docs/quickstart.md)**.
 
 ## Available commands
 

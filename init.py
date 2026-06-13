@@ -198,8 +198,10 @@ def validate_project_name(name: str | None) -> bool:
     return bool(name and PROJECT_NAME_PATTERN.match(name))
 
 
-def project_name_validator(_type: type[str], value: str) -> None:
+def project_name_validator(_type: type[str], value: str | None) -> None:
     """Validate project names passed through Cyclopts."""
+    if value is None:
+        return
     if not validate_project_name(value):
         msg = 'Use lowercase letters, numbers, hyphens, and underscores. The first character must be alphanumeric.'
         raise ValueError(msg)
@@ -278,12 +280,13 @@ def ask_description(description: str | None) -> str | None:
 
 def ask_cleanup_keys() -> list[str]:
     """Prompt for cleanup targets using InquirerPy checkboxes."""
+    console.print('[dim]Use Space to toggle cleanup targets, then press Enter to continue.[/dim]')
     choices = [
         Choice(target.key, name=f'{target.label} - {target.description}', enabled=target.default)
         for target in CLEANUP_TARGETS
     ]
     selected_keys = inquirer.checkbox(
-        message='Select cleanup targets:',
+        message='Select cleanup targets with Space, then press Enter:',
         choices=choices,
         validate=lambda result: bool(result) or 'Select at least one cleanup target.',
         transformer=lambda result: f'{len(result)} target group(s) selected',
