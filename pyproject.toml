@@ -16,13 +16,16 @@ dependencies = [
 
 [dependency-groups]
 dev = [
+    "cyclopts>=4,<5",
     "django-debug-toolbar>=6.3.0",
     "django-stubs-ext>=6.0.5",
     "django-stubs>=6.0.5",
+    "inquirerpy>=0.3.4",
     "prek>=0.4.3",
     "pytest>=9.0.3",
     "pytest-cov>=7.0.0",
     "pytest-django>=4.12.0",
+    "rich>=13.0.0",
     "ruff>=0.15.0",
     "ty>=0.0.40",
 ]
